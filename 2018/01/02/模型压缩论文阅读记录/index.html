@@ -1,0 +1,1036 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="pruning," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可">
+<meta name="keywords" content="pruning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="模型压缩之pruning">
+<meta property="og:url" content="https://hjchen2.github.io/2018/01/02/模型压缩论文阅读记录/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/0.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2-2.png">
+<meta property="og:updated_time" content="2018-09-03T05:32:07.228Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="模型压缩之pruning">
+<meta name="twitter:description" content="Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '作者'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hjchen2.github.io/2018/01/02/模型压缩论文阅读记录/"/>
+
+
+
+
+
+  <title> 模型压缩之pruning | Don't Respond </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Don't Respond</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            全部
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2018/01/02/模型压缩论文阅读记录/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Dou Jiang">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                模型压缩之pruning
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-02T22:00:04+08:00">
+                2018-01-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/model-compression/" itemprop="url" rel="index">
+                    <span itemprop="name">model compression</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            <!--noindex-->
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/02/模型压缩论文阅读记录/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2018/01/02/模型压缩论文阅读记录/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+              <!--/noindex-->
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Regularization-of-Neural-Networks-using-DropConnect"><a href="#Regularization-of-Neural-Networks-using-DropConnect" class="headerlink" title="Regularization of Neural Networks using DropConnect"></a>Regularization of Neural Networks using DropConnect</h2><ul>
+<li>DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可能不一样，因此实际上我们训练的是多个子模型组成的混合模型。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/0.png" alt=""></p>
+<ul>
+<li><p>Dropout</p>
+<p>如果考虑激活函数为tanh和relu，则dropout的输出：</p>
+<p>$$r=m<em>a(Wv)=a(m</em>(Wv))$$</p>
+<p>inference时混合模型的输出：</p>
+<p>$o=E_{M}[a(M<em>(Wv))] \approx a(E_{M}[(M</em>W)v])=a(pWv)$</p>
+<p>$M$是$m$的repeat得到的矩阵。</p>
+</li>
+</ul>
+<ul>
+<li><p>DropConnect</p>
+<p>随机地将全连接层的权重值置0，即输出为：</p>
+<p>$$r=a((M*W)v)$$</p>
+<p>$M$是与$W$大小一致的0-1矩阵，并且$M_{ij}$服从Bernoulli(p)分布。</p>
+<p>inference时混合模型的输出：</p>
+<p>$$o=E_{M}[a((M*W)v)] \approx E_{u}[a(u)] $$</p>
+<p>where $u\sim N(pWv, p(1-p)(W<em>W)(v</em>v))$</p>
+<p>注：对于$u$的分布论文中提到用高斯矩匹配估计，但也可以用中心极限定理进行估计</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/3.png" alt="">   </p>
+</li>
+</ul>
+<p>训练时的伪代码：<br>  <img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1.png" alt=""></p>
+<p>inference时的伪代码：<br>  <img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2.png" alt=""></p>
+<ul>
+<li><p>实验结果</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/4.png" alt=""></p>
+</li>
+</ul>
+<ul>
+<li><p>总结</p>
+<p>DropConnect的初衷是解决过拟合问题的，DropConnect虽然在训练时可以将稠密矩阵乘转化成稀疏乘的方式，减少计算量，但在inference时还是需要完整的计算一遍，然后再利用正态分布多次采样后计算均值得到下一层的输入，因此inference的计算量反而增加了。论文给出的实验结果表明DropConnect在tanh和relu激活函数时会比dropout带来更低的测试错误率，sigmoid时会比dropout差点。DropConnect给模型压缩提供了一些思路，在训练时我们都倾向于选择更复杂的模型而需要非常大的计算量，DropConnect的做法表明这些复杂的模型实际上有大量的冗余，而去除这些冗余后并不会对模型产生任何伤害，反而会增强模型的泛化能力，因此在模型压缩中，对模型进行剪枝成了一个重要的研究方向。</p>
+</li>
+</ul>
+<p>##Learning bothWeights and Connections for Efficient Neural Network</p>
+<ul>
+<li><p>作者首先关注到神经网络预测时的能耗问题，下面给出了一个45nm的CMOS处理器能耗表。</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/5.png" alt=""></p>
+</li>
+</ul>
+<p>内存读取的能量消耗比其他数学指令高出三个数量级，因此论文提出对神经网络进行剪枝以压缩模型大小，减少内存读取消耗并降低计算量。剪枝不仅降低了模型复杂度，也减少了过拟合。除了剪枝，文中也提到可以借鉴HashedNets的方法进行模型参数共享，进一步降低模型大小。</p>
+<p>模型剪枝分成三步：</p>
+<p>1、正常训练模型，得到每个连接的重要程度（重要程度可以用权值的绝对值表示）</p>
+<p>2、删除重要程度低的连接，将稠密网络转换成稀疏网络</p>
+<p>3、使用保留下来的连接重训模型</p>
+<p>第2步和第3步迭代进行。</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/6.png" alt=""></p>
+<ul>
+<li><p>正则化</p>
+<p>关于正则化对剪枝结果的影响，论文给出的结论是：剪枝后重训前L1正则比L2效果好，但重训后L2比L1效果好。</p>
+</li>
+<li><p>Dropout  Ratio调整</p>
+<p>Dropout仍然被用来抑制过拟合，但是由于剪枝会减小模型大小，因此重训时Dropout ratio也应该更小。</p>
+<p>$$D_{r}=D_{0}\sqrt{\frac{C_{ir}}{C_{io}}}$$</p>
+<p>$$C_{i}=N_{i}N_{i-1}$$</p>
+<p>其中$D_{r}$为重训的ratio，$D_{0}$为原始的ratio，$N_{i}$为第$i$层的神经元个数。</p>
+</li>
+<li><p>重训参数</p>
+<p>由于神经网络的连续层往往保持耦合性，因此重训模型时最好保持连接的权重，而不是重新初始化。并且卷积层和全连接层的剪枝是交替进行的，对fc进行剪枝重训时需要保持conv不变，反之对conv进行剪枝重训时需要保持fc不变。</p>
+</li>
+<li><p>迭代剪枝</p>
+<p>迭代剪枝的方式可以最大程度的压缩模型大小。在不损失效果的前提下，相比单次剪枝，多次迭代的方式可以将AlexNet的压缩率从5X提高到9X。</p>
+</li>
+<li><p>裁剪神经元</p>
+<p>每次剪枝可以将那些没有输入连接或没有输出连接的神经元移除。无输出的神经元对最终模型结果没有任何影响，因此移除也不会对模型效果产生影响，而那些没有输入连接的神经元由于梯度下降和正则化最终也会变成无输出的神经元。</p>
+</li>
+<li><p>实验结果</p>
+<p>文中将裁剪门限设置为一个质量参数乘以这一层权重的标准差，并在LeNet、AlexNet和VGG-16上进行了相关实验，卷积层也可以跟全连接层一样使用相同的剪枝策略，重训模型时会有一次调整学习率的过程，比如LeNet重训时学习率会衰减到原来的1/10，AlexNet会衰减至原来的1/100。</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-2.png" alt=""></p>
+<p>AlexNet各层的压缩情况：<img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-3.png" alt=""></p>
+<p>剪枝与其他模型压缩方法的对比：</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2-2.png" alt=""></p>
+</li>
+<li><p>模型保存</p>
+<p>稀疏矩阵在保存时需要同时保存indices，比如按照CSR格式保存时，我们除了保存所有的非零元素外，还需要保存每个元素对应的列号以及每行第一个非零元素在所有元素中的位置。为了压缩保存indices带来的开销，文中提到使用相对indices代替绝对indices，全连接层可以使用5bit来表示相对indices，而卷积层也可以只使用8bit。</p>
+</li>
+<li><p>总结</p>
+<p>由于卷积层本身就是稀疏连接，相比fc对剪枝更敏感，因此剪枝方法对于全连接层的压缩率更高。剪枝只能压缩模型大小，但inference时并不会带来预测速度提升。intel在16年提出另一个剪枝与嫁接相结合的方法<a href="https://arxiv.org/pdf/1608.04493.pdf" target="_blank" rel="noopener">Dynamic Network Surgery for Efficient DNNs</a>，进一步提高了剪枝方法的压缩率和重训收敛速度，此外2017年孙剑等提出了针对卷积层的<a href="https://arxiv.org/pdf/1707.06168.pdf" target="_blank" rel="noopener">Channel Pruning方法</a>，可以结合此处的剪枝方法，应该可以达到更好的压缩效果。</p>
+</li>
+</ul>
+<p>##Channel Pruning for Accelerating Very Deep Neural Networks</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pruning/" rel="tag"># pruning</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/01/seq2seq串讲/" rel="next" title="NEURAL MACHINE TRANSLATION论文学习串讲">
+                <i class="fa fa-chevron-left"></i> NEURAL MACHINE TRANSLATION论文学习串讲
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/03/混合精度训练/" rel="prev" title="混合精度训练">
+                混合精度训练 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="hypercomments_widget"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg"
+               alt="Dou Jiang" />
+          <p class="site-author-name" itemprop="name">Dou Jiang</p>
+           
+              <p class="site-description motion-element" itemprop="description">凌绝顶，众山小</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/hjchen2" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/p/1005052128954644" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Regularization-of-Neural-Networks-using-DropConnect"><span class="nav-number">1.</span> <span class="nav-text">Regularization of Neural Networks using DropConnect</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="author" itemprop="copyrightHolder">Dou Jiang</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme by <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+		<script type="text/javascript">
+		_hcwp = window._hcwp || [];
+
+		_hcwp.push({widget:"Bloggerstream", widget_id: 88618, selector:".hc-comment-count", label: "{\%COUNT%\}" });
+
+		
+		_hcwp.push({widget:"Stream", widget_id: 88618, xid: "2018/01/02/模型压缩论文阅读记录/"});
+		
+
+		(function() {
+		if("HC_LOAD_INIT" in window)return;
+		HC_LOAD_INIT = true;
+		var lang = "en";
+                //var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+		var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+		hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/88618/"+lang+"/widget.js";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hcc, s.nextSibling);
+		})();
+		</script>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>
