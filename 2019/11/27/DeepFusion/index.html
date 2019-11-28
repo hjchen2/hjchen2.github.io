@@ -101,7 +101,7 @@
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2011.22.57.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2013.53.21.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2017.26.12.png?raw=true">
-<meta property="og:updated_time" content="2019-11-28T03:40:00.272Z">
+<meta property="og:updated_time" content="2019-11-28T03:57:49.957Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs">
 <meta name="twitter:description" content="FusionStitching系统概述 输入HloModule，经过以下三个阶段，最终输出LLVM IR。  Computation Fusion Schedule Planning Code Generation  论文主要针对XLA Fusion算法进行了改进，提出了实现Block合并策略的Schedule和Shared Memory Planning技术，以及实现对应的IR Emitter。">
@@ -480,7 +480,7 @@
 <p>不同ops分配的Shared Memory是可以复用的，论文中作者提出从Root Instruction开始构造一颗支配树，支配节点可以复用被支配节点申请的Shared Memory。</p>
 </li>
 </ul>
-<h3 id="Code-Generation-1"><a href="#Code-Generation-1" class="headerlink" title="Code Generation"></a>Code Generation</h3><p>XLA使用GpuElementalIrEmitter来实现线程合并的Computation。基于XLA的GpuElementalIrEmitter，实现了用于Block合并的IrEmitter (论文中称作IrEmitterStitched)。</p>
+<h3 id="Code-Generation-1"><a href="#Code-Generation-1" class="headerlink" title="Code Generation"></a>Code Generation</h3><p>XLA使用GpuElementalIrEmitter来实现线程合并的Computation。基于XLA的GpuElementalIrEmitter，作者实现了用于Block合并的IrEmitter (论文中称作IrEmitterStitched)。</p>
 <p><img src="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2017.26.12.png?raw=true" width="600/"></p>
 <p>IrEmitterStitched输入有hlo、root、shared、schedule和generators。</p>
 <ul>
