@@ -101,7 +101,7 @@
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2011.22.57.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2013.53.21.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2017.26.12.png?raw=true">
-<meta property="og:updated_time" content="2019-11-28T03:57:49.957Z">
+<meta property="og:updated_time" content="2019-11-28T06:08:39.504Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs">
 <meta name="twitter:description" content="FusionStitching系统概述 输入HloModule，经过以下三个阶段，最终输出LLVM IR。  Computation Fusion Schedule Planning Code Generation  论文主要针对XLA Fusion算法进行了改进，提出了实现Block合并策略的Schedule和Shared Memory Planning技术，以及实现对应的IR Emitter。">
@@ -462,7 +462,7 @@
 <p><img src="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2013.53.21.png?raw=true" alt="屏幕快照 2019-11-27 13.53.21"></p>
 <p>Table.1表明了不同Instruction的Schedule后向传播规则。Schedule约束判断结果会反馈到Subgraph Fusion过程，Fusion不应该破坏Schedule相容性约束。</p>
 <h3 id="Schedule-Tuning"><a href="#Schedule-Tuning" class="headerlink" title="Schedule Tuning"></a>Schedule Tuning</h3><p>任意一个Instruction，split_dim=0和sword=1的Row Schedule总是合法的，也就是只有一个数据块，并且只用一个GPU线程块来计算。这样做的问题也很明显，就是无法充分利用GPU硬件资源。每个Instruction可能有多个合法的Schedule，Schedule Tuning用来选择一个合适的Schedule。<br>如果Computation中只有一个Root，遍历该Root Instructon所有合法的满足约束的Schedule，在performance library中查找每个kernel的执行时间，并统计总耗时。总耗时最少的Schedule会被选择用来Code Generation。</p>
-<p>如果Computation中有多个Roots，</p>
+<p>如果Computation中有多个Roots，则采取一种two-stage的方法加速Schedule的搜索过程。<br>第一步：遍历所有的Roots，计算blocks和blocks对应的Schedule两个序列。对所有Roots对应的blocks序列求交集，结果对应的Schedule即合法的候选Schedule。<br>第二步：遍历所有的候选Schedule，计算每个Schedule下所有kernel的耗时，选择耗时最少的Schedule。论文中还提到可以忽略部分ops和early stop的搜索策略，加速第二步的搜索过程。</p>
 <h2 id="Code-Generation"><a href="#Code-Generation" class="headerlink" title="Code Generation"></a>Code Generation</h2><h3 id="Shared-Memory-Planning"><a href="#Shared-Memory-Planning" class="headerlink" title="Shared Memory Planning"></a>Shared Memory Planning</h3><p>标记出所有可能需要用到Shared Memory的候选ops，当Memory不足时优先满足most critical ops。</p>
 <ul>
 <li><p>Size Requirement Analysis</p>
