@@ -101,7 +101,7 @@
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2011.22.57.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2013.53.21.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2017.26.12.png?raw=true">
-<meta property="og:updated_time" content="2019-11-27T14:47:01.265Z">
+<meta property="og:updated_time" content="2019-11-28T03:40:00.272Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs">
 <meta name="twitter:description" content="FusionStitching系统概述 输入HloModule，经过以下三个阶段，最终输出LLVM IR。  Computation Fusion Schedule Planning Code Generation  论文主要针对XLA Fusion算法进行了改进，提出了实现Block合并策略的Schedule和Shared Memory Planning技术，以及实现对应的IR Emitter。">
@@ -439,7 +439,7 @@
 </ul>
 </blockquote>
 <h2 id="Schedule-Planning"><a href="#Schedule-Planning" class="headerlink" title="Schedule Planning"></a>Schedule Planning</h2><h3 id="Schedule定义"><a href="#Schedule定义" class="headerlink" title="Schedule定义"></a>Schedule定义</h3><blockquote>
-<p>Schedule</p>
+<p>Schedule通常指的是将算法指定的计算过程分配给计算资源的方法。这些计算过程可能包括线程、进程以及数据流等。</p>
 <p>常见的一些Schedule配置:</p>
 <ul>
 <li>Reorder<br>循环顺序重排，比如for x for y -&gt; for y for x</li>
@@ -449,6 +449,7 @@
 <li>Parallel</li>
 <li>some CUDA-specific<br>比如blocks、threads、shared memory size等。</li>
 </ul>
+<p>对于包含多个计算stage的算法，Schedule通常是由Consumer驱动，并指定何时对Consumer计算Producer（<strong>Specify when the producer is computed with respect to the consumer</strong> ）。</p>
 </blockquote>
 <p>论文中将Instruction大致分成Elementwise、Transpose、Reduce、BatchDot、Reshape和Broadcast这几种，然后基于这些op定义了一套用来表示对数据分块的Shedule配置。通过一个定义好的Shedule配置和数据的shape，我们就可以知道需要切成多少个数据块，映射到GPU硬件上就是多少个线程块（thread blocks）。</p>
 <p><img src="https://github.com/hjchen2/personal/blob/master/blog/DeepFusion/屏幕快照%202019-11-27%2011.22.57.png?raw=true" alt="屏幕快照 2019-11-27 11.22.57"></p>
