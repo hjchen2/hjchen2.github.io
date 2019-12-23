@@ -6,15 +6,15 @@
 
 
 <html class="theme-next pisces use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
@@ -32,7 +32,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -66,21 +66,21 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="caffe,deep learning,momentum," />
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
 
 
+  <meta name="keywords" content="caffe,deep learning,momentum,">
 
 
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="https://hjchen2.github.io/2017/06/21/ASGD中momentum的影响/"/>
+  <link rel="canonical" href="https://hjchen2.github.io/2017/06/21/ASGD中momentum的影响/">
 
 
 
@@ -166,7 +166,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">Don't Respond</span>
         <span class="logo-line-after"><i></i></span>
@@ -196,7 +196,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -206,7 +206,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -216,7 +216,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             全部
           </a>
@@ -226,7 +226,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -239,7 +239,7 @@
             <a href="javascript:;" class="popup-trigger">
           
             
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
             
             搜索
           </a>
@@ -260,9 +260,7 @@
       <i class="fa fa-times-circle"></i>
     </span>
     <div class="local-search-input-wrapper">
-      <input autocapitalize="off" autocomplete="off" autocorrect="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
     </div>
   </div>
   <div id="local-search-result"></div>
@@ -299,7 +297,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Dou Jiang">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
     </span>
 
@@ -342,7 +340,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -402,9 +400,10 @@
 
       
         <p>这几天的主要工作是将caffe移植到组内新开发的某个计算框架，在验证正确性时遇到一个问题。由于计算框架只支持异步更新的方式，因此采用全异步SGD算法训练Alexnet时非常容易发散。另外调研了一下近期发布的异步更新算法DC-ASGD，实验结果只能说对收敛有些正向效果，仍无法解决训练发散的问题。在另外一个DNN的网络上发现在多机时momentum对收敛结果有较大影响，momentum会导致收敛出现较大波动。</p>
-<p>网上找了一圈，似乎也就这个有些参考价值：<br><a href="http://stanford.edu/~imit/tuneyourmomentum/theory/" target="_blank" rel="noopener">http://stanford.edu/~imit/tuneyourmomentum/theory/</a></p>
+<p>网上找了一圈，似乎也就这个有些参考价值：<br>
+<a href="http://stanford.edu/~imit/tuneyourmomentum/theory/" target="_blank" rel="noopener">http://stanford.edu/~imit/tuneyourmomentum/theory/</a></p>
 <p>看来近期得做一些调momentum和学习率的实验了。。。</p>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
       
     </div>
 
@@ -514,9 +513,7 @@
 
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg"
-               alt="Dou Jiang" />
+          <img class="site-author-image" itemprop="image" src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg" alt="Dou Jiang">
           <p class="site-author-name" itemprop="name">Dou Jiang</p>
            
               <p class="site-description motion-element" itemprop="description">凌绝顶，众山小</p>
@@ -608,7 +605,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2019</span>

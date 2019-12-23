@@ -6,15 +6,15 @@
 
 
 <html class="theme-next pisces use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
@@ -32,7 +32,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -66,34 +66,34 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="pruning," />
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
 
 
+  <meta name="keywords" content="pruning,">
 
 
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
 
 
 
 
 
 
-<meta name="description" content="Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可">
+<meta name="description" content="¶ Regularization of Neural Networks using DropConnect  DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网">
 <meta name="keywords" content="pruning">
 <meta property="og:type" content="article">
 <meta property="og:title" content="模型压缩之pruning">
 <meta property="og:url" content="https://hjchen2.github.io/2018/01/02/模型压缩论文阅读记录/index.html">
 <meta property="og:site_name" content="Don&#39;t Respond">
-<meta property="og:description" content="Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可">
+<meta property="og:description" content="¶ Regularization of Neural Networks using DropConnect  DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/0.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/3.png">
@@ -108,7 +108,7 @@
 <meta property="og:updated_time" content="2018-09-03T05:32:07.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="模型压缩之pruning">
-<meta name="twitter:description" content="Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可">
+<meta name="twitter:description" content="¶ Regularization of Neural Networks using DropConnect  DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/0.png">
 
 
@@ -137,7 +137,7 @@
 
 
 
-  <link rel="canonical" href="https://hjchen2.github.io/2018/01/02/模型压缩论文阅读记录/"/>
+  <link rel="canonical" href="https://hjchen2.github.io/2018/01/02/模型压缩论文阅读记录/">
 
 
 
@@ -177,7 +177,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">Don't Respond</span>
         <span class="logo-line-after"><i></i></span>
@@ -207,7 +207,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -217,7 +217,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -227,7 +227,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             全部
           </a>
@@ -237,7 +237,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -250,7 +250,7 @@
             <a href="javascript:;" class="popup-trigger">
           
             
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
             
             搜索
           </a>
@@ -271,9 +271,7 @@
       <i class="fa fa-times-circle"></i>
     </span>
     <div class="local-search-input-wrapper">
-      <input autocapitalize="off" autocomplete="off" autocorrect="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
     </div>
   </div>
   <div id="local-search-result"></div>
@@ -310,7 +308,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Dou Jiang">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
     </span>
 
@@ -353,7 +351,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -412,47 +410,54 @@
       
 
       
-        <h2 id="Regularization-of-Neural-Networks-using-DropConnect"><a href="#Regularization-of-Neural-Networks-using-DropConnect" class="headerlink" title="Regularization of Neural Networks using DropConnect"></a>Regularization of Neural Networks using DropConnect</h2><ul>
+        <h2 id="Regularization of Neural Networks using DropConnect"><a class="header-anchor" href="#Regularization of Neural Networks using DropConnect">¶</a> Regularization of Neural Networks using DropConnect</h2>
+<ul>
 <li>DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可能不一样，因此实际上我们训练的是多个子模型组成的混合模型。</li>
 </ul>
-<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/0.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/0.png" alt></p>
 <ul>
-<li><p>Dropout</p>
+<li>
+<p>Dropout</p>
 <p>如果考虑激活函数为tanh和relu，则dropout的输出：</p>
-<p>$$r=m<em>a(Wv)=a(m</em>(Wv))$$</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi><mo>=</mo><mi>m</mi><mo>∗</mo><mi>a</mi><mo>(</mo><mi>W</mi><mi>v</mi><mo>)</mo><mo>=</mo><mi>a</mi><mo>(</mo><mi>m</mi><mo>∗</mo><mo>(</mo><mi>W</mi><mi>v</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">r=m*a(Wv)=a(m*(Wv))
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base displaystyle textstyle uncramped"><span class="mord mathit" style="margin-right:0.02778em;">r</span><span class="mrel">=</span><span class="mord mathit">m</span><span class="mbin">∗</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mrel">=</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mord mathit">m</span><span class="mbin">∗</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></span></p>
 <p>inference时混合模型的输出：</p>
-<p>$o=E_{M}[a(M<em>(Wv))] \approx a(E_{M}[(M</em>W)v])=a(pWv)$</p>
-<p>$M$是$m$的repeat得到的矩阵。</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>o</mi><mo>=</mo><msub><mi>E</mi><mrow><mi>M</mi></mrow></msub><mo>[</mo><mi>a</mi><mo>(</mo><mi>M</mi><mo>∗</mo><mo>(</mo><mi>W</mi><mi>v</mi><mo>)</mo><mo>)</mo><mo>]</mo><mo>≈</mo><mi>a</mi><mo>(</mo><msub><mi>E</mi><mrow><mi>M</mi></mrow></msub><mo>[</mo><mo>(</mo><mi>M</mi><mo>∗</mo><mi>W</mi><mo>)</mo><mi>v</mi><mo>]</mo><mo>)</mo><mo>=</mo><mi>a</mi><mo>(</mo><mi>p</mi><mi>W</mi><mi>v</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">o=E_{M}[a(M*(Wv))] \approx a(E_{M}[(M*W)v])=a(pWv)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base textstyle uncramped"><span class="mord mathit">o</span><span class="mrel">=</span><span class="mord"><span class="mord mathit" style="margin-right:0.05764em;">E</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.05764em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit" style="margin-right:0.10903em;">M</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mopen">[</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.10903em;">M</span><span class="mbin">∗</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mclose">)</span><span class="mclose">]</span><span class="mrel">≈</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mord"><span class="mord mathit" style="margin-right:0.05764em;">E</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.05764em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit" style="margin-right:0.10903em;">M</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mopen">[</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.10903em;">M</span><span class="mbin">∗</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mclose">)</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">]</span><span class="mclose">)</span><span class="mrel">=</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mord mathit">p</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span></p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.68333em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit" style="margin-right:0.10903em;">M</span></span></span></span>是<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.43056em;"></span><span class="strut bottom" style="height:0.43056em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit">m</span></span></span></span>的repeat得到的矩阵。</p>
 </li>
-</ul>
-<ul>
-<li><p>DropConnect</p>
+<li>
+<p>DropConnect</p>
 <p>随机地将全连接层的权重值置0，即输出为：</p>
-<p>$$r=a((M*W)v)$$</p>
-<p>$M$是与$W$大小一致的0-1矩阵，并且$M_{ij}$服从Bernoulli(p)分布。</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>r</mi><mo>=</mo><mi>a</mi><mo>(</mo><mo>(</mo><mi>M</mi><mo>∗</mo><mi>W</mi><mo>)</mo><mi>v</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">r=a((M*W)v)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base displaystyle textstyle uncramped"><span class="mord mathit" style="margin-right:0.02778em;">r</span><span class="mrel">=</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.10903em;">M</span><span class="mbin">∗</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mclose">)</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span></span></p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.68333em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit" style="margin-right:0.10903em;">M</span></span></span></span>是与<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>W</mi></mrow><annotation encoding="application/x-tex">W</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.68333em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit" style="margin-right:0.13889em;">W</span></span></span></span>大小一致的0-1矩阵，并且<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>M</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">M_{ij}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="base textstyle uncramped"><span class="mord"><span class="mord mathit" style="margin-right:0.10903em;">M</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.10903em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">i</span><span class="mord mathit" style="margin-right:0.05724em;">j</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span></span></span></span>服从Bernoulli§分布。</p>
 <p>inference时混合模型的输出：</p>
-<p>$$o=E_{M}[a((M*W)v)] \approx E_{u}[a(u)] $$</p>
-<p>where $u\sim N(pWv, p(1-p)(W<em>W)(v</em>v))$</p>
-<p>注：对于$u$的分布论文中提到用高斯矩匹配估计，但也可以用中心极限定理进行估计</p>
-<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/3.png" alt="">   </p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>o</mi><mo>=</mo><msub><mi>E</mi><mrow><mi>M</mi></mrow></msub><mo>[</mo><mi>a</mi><mo>(</mo><mo>(</mo><mi>M</mi><mo>∗</mo><mi>W</mi><mo>)</mo><mi>v</mi><mo>)</mo><mo>]</mo><mo>≈</mo><msub><mi>E</mi><mrow><mi>u</mi></mrow></msub><mo>[</mo><mi>a</mi><mo>(</mo><mi>u</mi><mo>)</mo><mo>]</mo></mrow><annotation encoding="application/x-tex">o=E_{M}[a((M*W)v)] \approx E_{u}[a(u)] 
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base displaystyle textstyle uncramped"><span class="mord mathit">o</span><span class="mrel">=</span><span class="mord"><span class="mord mathit" style="margin-right:0.05764em;">E</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.05764em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit" style="margin-right:0.10903em;">M</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mopen">[</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.10903em;">M</span><span class="mbin">∗</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mclose">)</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mclose">]</span><span class="mrel">≈</span><span class="mord"><span class="mord mathit" style="margin-right:0.05764em;">E</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.05764em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">u</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mopen">[</span><span class="mord mathit">a</span><span class="mopen">(</span><span class="mord mathit">u</span><span class="mclose">)</span><span class="mclose">]</span></span></span></span></span></p>
+<p>where <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>u</mi><mo>∼</mo><mi>N</mi><mo>(</mo><mi>p</mi><mi>W</mi><mi>v</mi><mo separator="true">,</mo><mi>p</mi><mo>(</mo><mn>1</mn><mo>−</mo><mi>p</mi><mo>)</mo><mo>(</mo><mi>W</mi><mo>∗</mo><mi>W</mi><mo>)</mo><mo>(</mo><mi>v</mi><mo>∗</mo><mi>v</mi><mo>)</mo><mo>)</mo></mrow><annotation encoding="application/x-tex">u\sim N(pWv, p(1-p)(W*W)(v*v))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base textstyle uncramped"><span class="mord mathit">u</span><span class="mrel">∼</span><span class="mord mathit" style="margin-right:0.10903em;">N</span><span class="mopen">(</span><span class="mord mathit">p</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mpunct">,</span><span class="mord mathit">p</span><span class="mopen">(</span><span class="mord mathrm">1</span><span class="mbin">−</span><span class="mord mathit">p</span><span class="mclose">)</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mbin">∗</span><span class="mord mathit" style="margin-right:0.13889em;">W</span><span class="mclose">)</span><span class="mopen">(</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mbin">∗</span><span class="mord mathit" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mclose">)</span></span></span></span></p>
+<p>注：对于<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>u</mi></mrow><annotation encoding="application/x-tex">u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.43056em;"></span><span class="strut bottom" style="height:0.43056em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit">u</span></span></span></span>的分布论文中提到用高斯矩匹配估计，但也可以用中心极限定理进行估计</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/3.png" alt></p>
 </li>
 </ul>
-<p>训练时的伪代码：<br>  <img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1.png" alt=""></p>
-<p>inference时的伪代码：<br>  <img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2.png" alt=""></p>
+<p>训练时的伪代码：<br>
+<img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1.png" alt></p>
+<p>inference时的伪代码：<br>
+<img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2.png" alt></p>
 <ul>
-<li><p>实验结果</p>
-<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/4.png" alt=""></p>
+<li>
+<p>实验结果</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/4.png" alt></p>
 </li>
-</ul>
-<ul>
-<li><p>总结</p>
+<li>
+<p>总结</p>
 <p>DropConnect的初衷是解决过拟合问题的，DropConnect虽然在训练时可以将稠密矩阵乘转化成稀疏乘的方式，减少计算量，但在inference时还是需要完整的计算一遍，然后再利用正态分布多次采样后计算均值得到下一层的输入，因此inference的计算量反而增加了。论文给出的实验结果表明DropConnect在tanh和relu激活函数时会比dropout带来更低的测试错误率，sigmoid时会比dropout差点。DropConnect给模型压缩提供了一些思路，在训练时我们都倾向于选择更复杂的模型而需要非常大的计算量，DropConnect的做法表明这些复杂的模型实际上有大量的冗余，而去除这些冗余后并不会对模型产生任何伤害，反而会增强模型的泛化能力，因此在模型压缩中，对模型进行剪枝成了一个重要的研究方向。</p>
 </li>
 </ul>
 <p>##Learning bothWeights and Connections for Efficient Neural Network</p>
 <ul>
-<li><p>作者首先关注到神经网络预测时的能耗问题，下面给出了一个45nm的CMOS处理器能耗表。</p>
-<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/5.png" alt=""></p>
+<li>
+<p>作者首先关注到神经网络预测时的能耗问题，下面给出了一个45nm的CMOS处理器能耗表。</p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/5.png" alt></p>
 </li>
 </ul>
 <p>内存读取的能量消耗比其他数学指令高出三个数量级，因此论文提出对神经网络进行剪枝以压缩模型大小，减少内存读取消耗并降低计算量。剪枝不仅降低了模型复杂度，也减少了过拟合。除了剪枝，文中也提到可以借鉴HashedNets的方法进行模型参数共享，进一步降低模型大小。</p>
@@ -461,42 +466,52 @@
 <p>2、删除重要程度低的连接，将稠密网络转换成稀疏网络</p>
 <p>3、使用保留下来的连接重训模型</p>
 <p>第2步和第3步迭代进行。</p>
-<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/6.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/6.png" alt></p>
 <ul>
-<li><p>正则化</p>
+<li>
+<p>正则化</p>
 <p>关于正则化对剪枝结果的影响，论文给出的结论是：剪枝后重训前L1正则比L2效果好，但重训后L2比L1效果好。</p>
 </li>
-<li><p>Dropout  Ratio调整</p>
+<li>
+<p>Dropout  Ratio调整</p>
 <p>Dropout仍然被用来抑制过拟合，但是由于剪枝会减小模型大小，因此重训时Dropout ratio也应该更小。</p>
-<p>$$D_{r}=D_{0}\sqrt{\frac{C_{ir}}{C_{io}}}$$</p>
-<p>$$C_{i}=N_{i}N_{i-1}$$</p>
-<p>其中$D_{r}$为重训的ratio，$D_{0}$为原始的ratio，$N_{i}$为第$i$层的神经元个数。</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mrow><mi>r</mi></mrow></msub><mo>=</mo><msub><mi>D</mi><mrow><mn>0</mn></mrow></msub><msqrt><mrow><mfrac><mrow><msub><mi>C</mi><mrow><mi>i</mi><mi>r</mi></mrow></msub></mrow><mrow><msub><mi>C</mi><mrow><mi>i</mi><mi>o</mi></mrow></msub></mrow></mfrac></mrow></msqrt></mrow><annotation encoding="application/x-tex">D_{r}=D_{0}\sqrt{\frac{C_{ir}}{C_{io}}}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:1.596055em;"></span><span class="strut bottom" style="height:2.44003em;vertical-align:-0.843975em;"></span><span class="base displaystyle textstyle uncramped"><span class="mord"><span class="mord mathit" style="margin-right:0.02778em;">D</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.02778em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit" style="margin-right:0.02778em;">r</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mrel">=</span><span class="mord"><span class="mord mathit" style="margin-right:0.02778em;">D</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.02778em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathrm">0</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="sqrt mord"><span class="sqrt-sign" style="top:-0.10605500000000001em;"><span class="style-wrap reset-textstyle textstyle uncramped"><span class="delimsizing size3">√</span></span></span><span class="vlist"><span style="top:0em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:1em;">​</span></span><span class="mord displaystyle textstyle cramped"><span class="mord reset-textstyle displaystyle textstyle cramped"><span class="sizing reset-size5 size5 reset-textstyle textstyle uncramped nulldelimiter"></span><span class="mfrac"><span class="vlist"><span style="top:0.686em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle textstyle cramped"><span class="mord textstyle cramped"><span class="mord"><span class="mord mathit" style="margin-right:0.07153em;">C</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.07153em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">i</span><span class="mord mathit">o</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span></span></span></span><span style="top:-0.22999999999999998em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle textstyle uncramped frac-line"></span></span><span style="top:-0.677em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle textstyle cramped"><span class="mord textstyle cramped"><span class="mord"><span class="mord mathit" style="margin-right:0.07153em;">C</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.07153em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">i</span><span class="mord mathit" style="margin-right:0.02778em;">r</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="sizing reset-size5 size5 reset-textstyle textstyle uncramped nulldelimiter"></span></span></span></span><span style="top:-1.516055em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:1em;">​</span></span><span class="reset-textstyle textstyle uncramped sqrt-line"></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:1em;">​</span></span>​</span></span></span></span></span></span></span></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>C</mi><mrow><mi>i</mi></mrow></msub><mo>=</mo><msub><mi>N</mi><mrow><mi>i</mi></mrow></msub><msub><mi>N</mi><mrow><mi>i</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">C_{i}=N_{i}N_{i-1}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.891661em;vertical-align:-0.208331em;"></span><span class="base displaystyle textstyle uncramped"><span class="mord"><span class="mord mathit" style="margin-right:0.07153em;">C</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.07153em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">i</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mrel">=</span><span class="mord"><span class="mord mathit" style="margin-right:0.10903em;">N</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.10903em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">i</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span><span class="mord"><span class="mord mathit" style="margin-right:0.10903em;">N</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.10903em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">i</span><span class="mbin">−</span><span class="mord mathrm">1</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span></span></span></span></span></p>
+<p>其中<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mrow><mi>r</mi></mrow></msub></mrow><annotation encoding="application/x-tex">D_{r}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="base textstyle uncramped"><span class="mord"><span class="mord mathit" style="margin-right:0.02778em;">D</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.02778em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit" style="margin-right:0.02778em;">r</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span></span></span></span>为重训的ratio，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mrow><mn>0</mn></mrow></msub></mrow><annotation encoding="application/x-tex">D_{0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="base textstyle uncramped"><span class="mord"><span class="mord mathit" style="margin-right:0.02778em;">D</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.02778em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathrm">0</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span></span></span></span>为原始的ratio，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>N</mi><mrow><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">N_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.68333em;"></span><span class="strut bottom" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="base textstyle uncramped"><span class="mord"><span class="mord mathit" style="margin-right:0.10903em;">N</span><span class="vlist"><span style="top:0.15em;margin-right:0.05em;margin-left:-0.10903em;"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span><span class="reset-textstyle scriptstyle cramped"><span class="mord scriptstyle cramped"><span class="mord mathit">i</span></span></span></span><span class="baseline-fix"><span class="fontsize-ensurer reset-size5 size5"><span style="font-size:0em;">​</span></span>​</span></span></span></span></span></span>为第<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.65952em;"></span><span class="strut bottom" style="height:0.65952em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span class="mord mathit">i</span></span></span></span>层的神经元个数。</p>
 </li>
-<li><p>重训参数</p>
+<li>
+<p>重训参数</p>
 <p>由于神经网络的连续层往往保持耦合性，因此重训模型时最好保持连接的权重，而不是重新初始化。并且卷积层和全连接层的剪枝是交替进行的，对fc进行剪枝重训时需要保持conv不变，反之对conv进行剪枝重训时需要保持fc不变。</p>
 </li>
-<li><p>迭代剪枝</p>
+<li>
+<p>迭代剪枝</p>
 <p>迭代剪枝的方式可以最大程度的压缩模型大小。在不损失效果的前提下，相比单次剪枝，多次迭代的方式可以将AlexNet的压缩率从5X提高到9X。</p>
 </li>
-<li><p>裁剪神经元</p>
+<li>
+<p>裁剪神经元</p>
 <p>每次剪枝可以将那些没有输入连接或没有输出连接的神经元移除。无输出的神经元对最终模型结果没有任何影响，因此移除也不会对模型效果产生影响，而那些没有输入连接的神经元由于梯度下降和正则化最终也会变成无输出的神经元。</p>
 </li>
-<li><p>实验结果</p>
+<li>
+<p>实验结果</p>
 <p>文中将裁剪门限设置为一个质量参数乘以这一层权重的标准差，并在LeNet、AlexNet和VGG-16上进行了相关实验，卷积层也可以跟全连接层一样使用相同的剪枝策略，重训模型时会有一次调整学习率的过程，比如LeNet重训时学习率会衰减到原来的1/10，AlexNet会衰减至原来的1/100。</p>
-<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-2.png" alt=""></p>
-<p>AlexNet各层的压缩情况：<img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-3.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-2.png" alt></p>
+<p>AlexNet各层的压缩情况：<img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/1-3.png" alt></p>
 <p>剪枝与其他模型压缩方法的对比：</p>
-<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2-2.png" alt=""></p>
+<p><img src="https://raw.githubusercontent.com/hjchen2/personal/master/blog/pruning/2-2.png" alt></p>
 </li>
-<li><p>模型保存</p>
+<li>
+<p>模型保存</p>
 <p>稀疏矩阵在保存时需要同时保存indices，比如按照CSR格式保存时，我们除了保存所有的非零元素外，还需要保存每个元素对应的列号以及每行第一个非零元素在所有元素中的位置。为了压缩保存indices带来的开销，文中提到使用相对indices代替绝对indices，全连接层可以使用5bit来表示相对indices，而卷积层也可以只使用8bit。</p>
 </li>
-<li><p>总结</p>
+<li>
+<p>总结</p>
 <p>由于卷积层本身就是稀疏连接，相比fc对剪枝更敏感，因此剪枝方法对于全连接层的压缩率更高。剪枝只能压缩模型大小，但inference时并不会带来预测速度提升。intel在16年提出另一个剪枝与嫁接相结合的方法<a href="https://arxiv.org/pdf/1608.04493.pdf" target="_blank" rel="noopener">Dynamic Network Surgery for Efficient DNNs</a>，进一步提高了剪枝方法的压缩率和重训收敛速度，此外2017年孙剑等提出了针对卷积层的<a href="https://arxiv.org/pdf/1707.06168.pdf" target="_blank" rel="noopener">Channel Pruning方法</a>，可以结合此处的剪枝方法，应该可以达到更好的压缩效果。</p>
 </li>
 </ul>
 <p>##Channel Pruning for Accelerating Very Deep Neural Networks</p>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
       
     </div>
 
@@ -600,7 +615,7 @@
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
@@ -611,9 +626,7 @@
 
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg"
-               alt="Dou Jiang" />
+          <img class="site-author-image" itemprop="image" src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg" alt="Dou Jiang">
           <p class="site-author-name" itemprop="name">Dou Jiang</p>
            
               <p class="site-description motion-element" itemprop="description">凌绝顶，众山小</p>
@@ -701,7 +714,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Regularization-of-Neural-Networks-using-DropConnect"><span class="nav-number">1.</span> <span class="nav-text">Regularization of Neural Networks using DropConnect</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Regularization of Neural Networks using DropConnect"><span class="nav-number">1.</span> <span class="nav-text">¶ Regularization of Neural Networks using DropConnect</span></a></li></ol></div>
             
 
           </div>
@@ -721,7 +734,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2019</span>

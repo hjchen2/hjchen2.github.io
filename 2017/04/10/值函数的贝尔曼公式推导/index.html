@@ -6,15 +6,15 @@
 
 
 <html class="theme-next pisces use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
@@ -32,7 +32,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -66,39 +66,39 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="reinforcement learning,machine learning，贝尔曼公式推导," />
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
 
 
+  <meta name="keywords" content="reinforcement learning,machine learning，贝尔曼公式推导,">
 
 
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
 
 
 
 
 
 
-<meta name="description" content="下面的推导过程中第2步和第5步两次用到重期望公式: $\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}$。 $$\begin{split}\upsilon_{\pi}(s)&amp;amp;={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \&amp;amp;={\bf{E_{\pi}}}\left({\bf{E_{\pi">
+<meta name="description" content="下面的推导过程中第2步和第5步两次用到重期望公式: \bfEX=\bfE(E[X∣Y])\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}\bfEX=\bfE(E[X∣Y])。 \begin{split} \upsilon_{\pi}(s)&amp;={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \\ &amp;={\bf">
 <meta name="keywords" content="reinforcement learning,machine learning，贝尔曼公式推导">
 <meta property="og:type" content="article">
 <meta property="og:title" content="值函数的贝尔曼公式推导">
 <meta property="og:url" content="https://hjchen2.github.io/2017/04/10/值函数的贝尔曼公式推导/index.html">
 <meta property="og:site_name" content="Don&#39;t Respond">
-<meta property="og:description" content="下面的推导过程中第2步和第5步两次用到重期望公式: $\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}$。 $$\begin{split}\upsilon_{\pi}(s)&amp;amp;={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \&amp;amp;={\bf{E_{\pi}}}\left({\bf{E_{\pi">
+<meta property="og:description" content="下面的推导过程中第2步和第5步两次用到重期望公式: \bfEX=\bfE(E[X∣Y])\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}\bfEX=\bfE(E[X∣Y])。 \begin{split} \upsilon_{\pi}(s)&amp;={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \\ &amp;={\bf">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-09-03T05:32:07.000Z">
+<meta property="og:updated_time" content="2019-12-23T12:44:23.331Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="值函数的贝尔曼公式推导">
-<meta name="twitter:description" content="下面的推导过程中第2步和第5步两次用到重期望公式: $\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}$。 $$\begin{split}\upsilon_{\pi}(s)&amp;amp;={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \&amp;amp;={\bf{E_{\pi}}}\left({\bf{E_{\pi">
+<meta name="twitter:description" content="下面的推导过程中第2步和第5步两次用到重期望公式: \bfEX=\bfE(E[X∣Y])\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}\bfEX=\bfE(E[X∣Y])。 \begin{split} \upsilon_{\pi}(s)&amp;={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \\ &amp;={\bf">
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-  <link rel="canonical" href="https://hjchen2.github.io/2017/04/10/值函数的贝尔曼公式推导/"/>
+  <link rel="canonical" href="https://hjchen2.github.io/2017/04/10/值函数的贝尔曼公式推导/">
 
 
 
@@ -166,7 +166,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">Don't Respond</span>
         <span class="logo-line-after"><i></i></span>
@@ -196,7 +196,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -206,7 +206,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -216,7 +216,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             全部
           </a>
@@ -226,7 +226,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -239,7 +239,7 @@
             <a href="javascript:;" class="popup-trigger">
           
             
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
             
             搜索
           </a>
@@ -260,9 +260,7 @@
       <i class="fa fa-times-circle"></i>
     </span>
     <div class="local-search-input-wrapper">
-      <input autocapitalize="off" autocomplete="off" autocorrect="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
     </div>
   </div>
   <div id="local-search-result"></div>
@@ -299,7 +297,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Dou Jiang">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
     </span>
 
@@ -342,7 +340,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -401,9 +399,20 @@
       
 
       
-        <p>下面的推导过程中第2步和第5步两次用到重期望公式: $\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}$。</p>
-<p>$$\begin{split}<br>\upsilon_{\pi}(s)&amp;={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \<br>&amp;={\bf{E_{\pi}}}\left({\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t\right]\right) \<br>&amp;={\bf{E_{\pi}}}\left[\sum_a\pi(a|s)G_t\mid S_t=s,A_t=a\right] \<br>&amp;=\sum_a\pi(a|s){\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t=a\right] \<br>&amp;=\sum_a\pi(a|s){\bf{E_{\pi}}}\left({\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t=a,S_{t+1}\right]\right) \<br>&amp;=\sum_a\pi(a|s){\bf{E_{\pi}}}\left[\sum_{s^{‘}}p(s^{‘}\mid s,a)G_t\mid S_t=s,A_t=a,S_{t+1}=s^{‘}\right] \<br>&amp;=\sum_a\pi(a|s)\sum_{s^{‘}}p(s^{‘}\mid s,a){\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t=a,S_{t+1}=s^{‘}\right] \<br>&amp;=\sum_{a}\pi(a\mid{s})\sum_{s^{‘}}p(s^{‘}\mid s,a){\bf E}<em>{\pi}\left[R</em>{t+1}+\gamma\sum_{k=0}^{\infty}\gamma^{k}R_{t+k+2}\mid{S_{t}=s,A_{t}=a,S_{t+1}=s^{‘}}\right] \<br>&amp;=\sum_{a}\pi(a\mid{s})\sum_{s^{‘}}p(s^{‘}\mid{s,a})\left[r(s,a,s^{‘})+\gamma{\bf E}<em>{\pi}\left[\sum</em>{k=0}^{\infty}\gamma^{k}R_{t+k+2}\mid{S_{t+1}=s^{‘}}\right]\right] \<br>&amp;=\sum_{a}\pi(a\mid{s})\sum_{s^{‘}}p(s^{‘}\mid{s,a})\left[r(s,a,s^{‘})+\gamma\upsilon_{\pi}(s^{‘})\right]<br>\end{split}$$</p>
-
+        <p>下面的推导过程中第2步和第5步两次用到重期望公式: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mstyle mathcolor="#cc0000"><mtext><mi mathvariant="normal">\</mi><mi mathvariant="normal">b</mi><mi mathvariant="normal">f</mi></mtext></mstyle><mrow><mi>E</mi><mi>X</mi></mrow><mo>=</mo><mstyle mathcolor="#cc0000"><mtext><mi mathvariant="normal">\</mi><mi mathvariant="normal">b</mi><mi mathvariant="normal">f</mi></mtext></mstyle><mrow><mi>E</mi><mrow><mo fence="true">(</mo><mi>E</mi><mrow><mo fence="true">[</mo><mi>X</mi><mo>∣</mo><mi>Y</mi><mo fence="true">]</mo></mrow><mo fence="true">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">\bf{EX}=\bf{E\left(E\left[X\mid Y\right]\right)}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base textstyle uncramped"><span class="text mord textstyle uncramped"><span class="mord mathrm" style="color:#cc0000;">\</span><span class="mord mathrm" style="color:#cc0000;">b</span><span class="mord mathrm" style="margin-right:0.07778em;color:#cc0000;">f</span></span><span class="mord textstyle uncramped"><span class="mord mathit" style="margin-right:0.05764em;">E</span><span class="mord mathit" style="margin-right:0.07847em;">X</span></span><span class="mrel">=</span><span class="text mord textstyle uncramped"><span class="mord mathrm" style="color:#cc0000;">\</span><span class="mord mathrm" style="color:#cc0000;">b</span><span class="mord mathrm" style="margin-right:0.07778em;color:#cc0000;">f</span></span><span class="mord textstyle uncramped"><span class="mord mathit" style="margin-right:0.05764em;">E</span><span class="minner textstyle uncramped"><span class="style-wrap reset-textstyle textstyle uncramped" style="top:0em;">(</span><span class="mord mathit" style="margin-right:0.05764em;">E</span><span class="minner textstyle uncramped"><span class="style-wrap reset-textstyle textstyle uncramped" style="top:0em;">[</span><span class="mord mathit" style="margin-right:0.07847em;">X</span><span class="mrel">∣</span><span class="mord mathit" style="margin-right:0.22222em;">Y</span><span class="style-wrap reset-textstyle textstyle uncramped" style="top:0em;">]</span></span><span class="style-wrap reset-textstyle textstyle uncramped" style="top:0em;">)</span></span></span></span></span></span>。</p>
+\begin{split}
+\upsilon_{\pi}(s)&={\bf{E_{\pi}}}\left[G_{t}\mid{S_{t}=s}\right] \\
+&={\bf{E_{\pi}}}\left({\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t\right]\right) \\
+&={\bf{E_{\pi}}}\left[\sum_a\pi(a|s)G_t\mid S_t=s,A_t=a\right] \\
+&=\sum_a\pi(a|s){\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t=a\right] \\
+&=\sum_a\pi(a|s){\bf{E_{\pi}}}\left({\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t=a,S_{t+1}\right]\right) \\
+&=\sum_a\pi(a|s){\bf{E_{\pi}}}\left[\sum_{s^{'}}p(s^{'}\mid s,a)G_t\mid S_t=s,A_t=a,S_{t+1}=s^{'}\right] \\
+&=\sum_a\pi(a|s)\sum_{s^{'}}p(s^{'}\mid s,a){\bf{E_{\pi}}}\left[G_t\mid S_t=s,A_t=a,S_{t+1}=s^{'}\right] \\
+&=\sum_{a}\pi(a\mid{s})\sum_{s^{'}}p(s^{'}\mid s,a){\bf E}_{\pi}\left[R_{t+1}+\gamma\sum_{k=0}^{\infty}\gamma^{k}R_{t+k+2}\mid{S_{t}=s,A_{t}=a,S_{t+1}=s^{'}}\right] \\
+&=\sum_{a}\pi(a\mid{s})\sum_{s^{'}}p(s^{'}\mid{s,a})\left[r(s,a,s^{'})+\gamma{\bf E}_{\pi}\left[\sum_{k=0}^{\infty}\gamma^{k}R_{t+k+2}\mid{S_{t+1}=s^{'}}\right]\right] \\
+&=\sum_{a}\pi(a\mid{s})\sum_{s^{'}}p(s^{'}\mid{s,a})\left[r(s,a,s^{'})+\gamma\upsilon_{\pi}(s^{'})\right]
+\end{split}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
       
     </div>
 
@@ -511,9 +520,7 @@
 
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg"
-               alt="Dou Jiang" />
+          <img class="site-author-image" itemprop="image" src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg" alt="Dou Jiang">
           <p class="site-author-name" itemprop="name">Dou Jiang</p>
            
               <p class="site-description motion-element" itemprop="description">凌绝顶，众山小</p>
@@ -605,7 +612,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2019</span>
