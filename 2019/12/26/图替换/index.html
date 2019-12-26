@@ -1,0 +1,1008 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="图替换,超优化,graph optimization,super optimization,substitution,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0">
+
+
+
+
+
+
+<meta name="description" content="¶ 背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。  一些常见的图优化技术：   DCE   CSE（公共子表达式消除）   常量折叠   数学公式简化   Op融合   Layout变换   内存优化（swap-in/swap-ou">
+<meta name="keywords" content="图替换,超优化,graph optimization,super optimization,substitution">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图替换">
+<meta property="og:url" content="https://hjchen2.github.io/2019/12/26/图替换/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="¶ 背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。  一些常见的图优化技术：   DCE   CSE（公共子表达式消除）   常量折叠   数学公式简化   Op融合   Layout变换   内存优化（swap-in/swap-ou">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.21.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.35.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.29.51.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.30.01.png?raw=true">
+<meta property="og:updated_time" content="2019-12-26T05:56:31.435Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="图替换">
+<meta name="twitter:description" content="¶ 背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。  一些常见的图优化技术：   DCE   CSE（公共子表达式消除）   常量折叠   数学公式简化   Op融合   Layout变换   内存优化（swap-in/swap-ou">
+<meta name="twitter:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.21.png?raw=true">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"hide","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '作者'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://hjchen2.github.io/2019/12/26/图替换/">
+
+
+
+
+
+  <title> 图替换 | Don't Respond </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Don't Respond</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            全部
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2019/12/26/图替换/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Dou Jiang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                图替换
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-26T13:54:04+08:00">
+                2019-12-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/graph-optimization-图优化/" itemprop="url" rel="index">
+                    <span itemprop="name">graph optimization, 图优化</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            <!--noindex-->
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/12/26/图替换/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count hc-comment-count" data-xid="2019/12/26/图替换/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+              <!--/noindex-->
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="背景"><a class="header-anchor" href="#背景">¶</a> 背景</h3>
+<p>图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。</p>
+<blockquote>
+<p>一些常见的图优化技术：</p>
+<ul>
+<li>
+<p>DCE</p>
+</li>
+<li>
+<p>CSE（公共子表达式消除）</p>
+</li>
+<li>
+<p>常量折叠</p>
+</li>
+<li>
+<p>数学公式简化</p>
+</li>
+<li>
+<p>Op融合</p>
+</li>
+<li>
+<p>Layout变换</p>
+</li>
+<li>
+<p>内存优化（swap-in/swap-out、重计算）</p>
+</li>
+</ul>
+</blockquote>
+<p>由于目前的编译器技术通常基于low-level的中间表达，注重对局部计算的优化，对于跨多个粗粒度op的优化要不无能为力，要不就得增加编译器的分析难度并导致代码膨胀。一般来说AI框架支持的粗粒度op非常有限，而且这些op的组合常常也比较固定，比如convolution通常和bias_add、relu组合使用，因此基于高层中间表达的图替换成为一种比较可行的优化方案。经过图替换优化后的计算图再经过编译器的优化后，生成最终的硬件代码。</p>
+<p>目前主流开源框架的图替换都是基于经验和手工设置的替换子来实现的，在这里统称为经典图替换技术。</p>
+<h3 id="经典图替换"><a class="header-anchor" href="#经典图替换">¶</a> 经典图替换</h3>
+<p>图替换是将原始计算图替换成另一个优化后的等价计算图，替换后的计算图通常是硬件友好的，比如可以消除中间结果，降低内存占用，减少访存和计算量，并且不影响最终的计算结果。</p>
+<p>在进行图替换之前，首先需要定义出源计算图到目标计算图的替换规则（替换子），由于这些替换规则往往需要依靠人的经验一条条手工去定义，因此称之为经典图替换。给出一条替换子，我们需要在原始计算图中不断地去匹配替换子的源计算子图，一旦匹配到满足要求的子图后，就将源计算子图重新映射为替换子中的目标计算图。</p>
+<p>在一些开源框架中，替换子的定义形式不尽相同。在TensorFlow中源图匹配和替换的定义是非常松散的，它甚至没有直接定义出替换子的源图，而是定义一系列约束来判断是否匹配。PaddlePaddle中则是将一个替换过程定义为一个pass，pass执行时动态构建相应的替换子源图，执行匹配算法并回调源图到目标图的替换函数。比如下面是TensorFlow中将Conv+BiasAdd替换成FusedConv的过程。</p>
+<ul>
+<li>
+<p>定义匹配约束</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ContractionWithBiasAdd</span> &#123;</span></span><br><span class="line">  <span class="keyword">int</span> constraction;</span><br><span class="line">  <span class="keyword">int</span> bias_add;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// node为输入的grapper node， pattern为输出的ContractionWithBiasAdd.</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">FindContractionWithBias</span><span class="params">(node，*pattern)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 开始列举匹配的constractions.</span></span><br><span class="line">  <span class="number">1</span>、如果node存在控制边，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">2</span>、如果node不是BiasAdd，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">3</span>、如果node的父节点不是Conv或MatMul，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">4</span>、...</span><br><span class="line">  <span class="comment">// 如果以上所有constructions都满足，则将需要替换的node id写到特定的pattern中。</span></span><br><span class="line">  pattern-&gt;constraction = node的父节点;</span><br><span class="line">  pattern-&gt;bias_add = node；</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.21.png?raw=true" style="zoom:33%;">
+<ul>
+<li>
+<p>定义替换过程</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pattern为输入的ContractionWithBiasAdd，</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddFusedContractionNode</span><span class="params">(pattern, *invalidated_nodes)</span> </span>&#123;</span><br><span class="line">  <span class="number">1</span>、创建一个新的node：fused_op</span><br><span class="line">  <span class="number">2</span>、将Conv或MatMul的input和filter添加到fused_op的输入中，并将BiasAdd的bias加到fused_op的输入</span><br><span class="line">  <span class="number">3</span>、根据Conv或MatMul的一些参数设置fused_op的参数，比如conv的kernel、channel、padding等等，以及matmul的transpose等</span><br><span class="line">  <span class="number">4</span>、将fused_op加入到graph，同时将Conv或MatMul和BiasAdd加入到invalidated_nodes</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.35.png?raw=true" style="zoom:33%;">
+<p>TensorFlow采用定义匹配约束的方式相比直接定义出子图的方式本质上是等价的，但相比后者可读性较差，而优点就是代码可复用性高，比如上面的FindContractionWithBias可以同时匹配Conv+BiasAdd和MatMul+BiasAdd两种子图，并且这些约束便于嵌套使用。</p>
+<p>无论是TensorFlow还是PaddlePaddle，图替换都是不完全的。比如说对于Conv+BiasAdd+BiasAdd这种计算图，第一次只能匹配到Conv+BiasAdd，替换后又变成了一个Conv+BiasAdd的计算图，因此TensorFlow中默认采用了两遍优化。根据TensorFlow公开的一些数据，基本上第二次优化的机会已经非常少了。</p>
+<ul>
+<li>
+<p>InceptionV3</p>
+<img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.29.51.png?raw=true" style="zoom:40%;">
+</li>
+<li>
+<p>Seq2Seq</p>
+<img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.30.01.png?raw=true" style="zoom:40%;">
+</li>
+</ul>
+<h3 id="基于超优化的图替换"><a class="header-anchor" href="#基于超优化的图替换">¶</a> 基于超优化的图替换</h3>
+<h3 id="低精度和layout优化"><a class="header-anchor" href="#低精度和layout优化">¶</a> 低精度和layout优化</h3>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/图替换/" rel="tag"># 图替换</a>
+          
+            <a href="/tags/超优化/" rel="tag"># 超优化</a>
+          
+            <a href="/tags/graph-optimization/" rel="tag"># graph optimization</a>
+          
+            <a href="/tags/super-optimization/" rel="tag"># super optimization</a>
+          
+            <a href="/tags/substitution/" rel="tag"># substitution</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/27/DeepFusion/" rel="next" title="FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs">
+                <i class="fa fa-chevron-left"></i> FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="hypercomments_widget"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg" alt="Dou Jiang">
+          <p class="site-author-name" itemprop="name">Dou Jiang</p>
+           
+              <p class="site-description motion-element" itemprop="description">凌绝顶，众山小</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/index.html">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/hjchen2" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/p/1005052128954644" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">¶ 背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#经典图替换"><span class="nav-number">2.</span> <span class="nav-text">¶ 经典图替换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于超优化的图替换"><span class="nav-number">3.</span> <span class="nav-text">¶ 基于超优化的图替换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#低精度和layout优化"><span class="nav-number">4.</span> <span class="nav-text">¶ 低精度和layout优化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="author" itemprop="copyrightHolder">Dou Jiang</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme by <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT</a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+		<script type="text/javascript">
+		_hcwp = window._hcwp || [];
+
+		_hcwp.push({widget:"Bloggerstream", widget_id: 88618, selector:".hc-comment-count", label: "{\%COUNT%\}" });
+
+		
+		_hcwp.push({widget:"Stream", widget_id: 88618, xid: "2019/12/26/图替换/"});
+		
+
+		(function() {
+		if("HC_LOAD_INIT" in window)return;
+		HC_LOAD_INIT = true;
+		var lang = "en";
+                //var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+		var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+		hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/88618/"+lang+"/widget.js";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hcc, s.nextSibling);
+		})();
+		</script>
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+</body>
+</html>

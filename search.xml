@@ -4,6 +4,39 @@
   
     
     <entry>
+      <title>图替换</title>
+      <link href="/2019/12/26/%E5%9B%BE%E6%9B%BF%E6%8D%A2/"/>
+      <url>/2019/12/26/%E5%9B%BE%E6%9B%BF%E6%8D%A2/</url>
+      
+        <content type="html"><![CDATA[<h3 id="背景"><a class="header-anchor" href="#背景">¶</a> 背景</h3><p>图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。</p><blockquote><p>一些常见的图优化技术：</p><ul><li><p>DCE</p></li><li><p>CSE（公共子表达式消除）</p></li><li><p>常量折叠</p></li><li><p>数学公式简化</p></li><li><p>Op融合</p></li><li><p>Layout变换</p></li><li><p>内存优化（swap-in/swap-out、重计算）</p></li></ul></blockquote><p>由于目前的编译器技术通常基于low-level的中间表达，注重对局部计算的优化，对于跨多个粗粒度op的优化要不无能为力，要不就得增加编译器的分析难度并导致代码膨胀。一般来说AI框架支持的粗粒度op非常有限，而且这些op的组合常常也比较固定，比如convolution通常和bias_add、relu组合使用，因此基于高层中间表达的图替换成为一种比较可行的优化方案。经过图替换优化后的计算图再经过编译器的优化后，生成最终的硬件代码。</p><p>目前主流开源框架的图替换都是基于经验和手工设置的替换子来实现的，在这里统称为经典图替换技术。</p><h3 id="经典图替换"><a class="header-anchor" href="#经典图替换">¶</a> 经典图替换</h3><p>图替换是将原始计算图替换成另一个优化后的等价计算图，替换后的计算图通常是硬件友好的，比如可以消除中间结果，降低内存占用，减少访存和计算量，并且不影响最终的计算结果。</p><p>在进行图替换之前，首先需要定义出源计算图到目标计算图的替换规则（替换子），由于这些替换规则往往需要依靠人的经验一条条手工去定义，因此称之为经典图替换。给出一条替换子，我们需要在原始计算图中不断地去匹配替换子的源计算子图，一旦匹配到满足要求的子图后，就将源计算子图重新映射为替换子中的目标计算图。</p><p>在一些开源框架中，替换子的定义形式不尽相同。在TensorFlow中源图匹配和替换的定义是非常松散的，它甚至没有直接定义出替换子的源图，而是定义一系列约束来判断是否匹配。PaddlePaddle中则是将一个替换过程定义为一个pass，pass执行时动态构建相应的替换子源图，执行匹配算法并回调源图到目标图的替换函数。比如下面是TensorFlow中将Conv+BiasAdd替换成FusedConv的过程。</p><ul><li><p>定义匹配约束</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ContractionWithBiasAdd</span> &#123;</span></span><br><span class="line">  <span class="keyword">int</span> constraction;</span><br><span class="line">  <span class="keyword">int</span> bias_add;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// node为输入的grapper node， pattern为输出的ContractionWithBiasAdd.</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">FindContractionWithBias</span><span class="params">(node，*pattern)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 开始列举匹配的constractions.</span></span><br><span class="line">  <span class="number">1</span>、如果node存在控制边，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">2</span>、如果node不是BiasAdd，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">3</span>、如果node的父节点不是Conv或MatMul，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">4</span>、...</span><br><span class="line">  <span class="comment">// 如果以上所有constructions都满足，则将需要替换的node id写到特定的pattern中。</span></span><br><span class="line">  pattern-&gt;constraction = node的父节点;</span><br><span class="line">  pattern-&gt;bias_add = node；</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.21.png?raw=true" style="zoom:33%;"><ul><li><p>定义替换过程</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pattern为输入的ContractionWithBiasAdd，</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AddFusedContractionNode</span><span class="params">(pattern, *invalidated_nodes)</span> </span>&#123;</span><br><span class="line">  <span class="number">1</span>、创建一个新的node：fused_op</span><br><span class="line">  <span class="number">2</span>、将Conv或MatMul的input和filter添加到fused_op的输入中，并将BiasAdd的bias加到fused_op的输入</span><br><span class="line">  <span class="number">3</span>、根据Conv或MatMul的一些参数设置fused_op的参数，比如conv的kernel、channel、padding等等，以及matmul的transpose等</span><br><span class="line">  <span class="number">4</span>、将fused_op加入到graph，同时将Conv或MatMul和BiasAdd加入到invalidated_nodes</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.35.png?raw=true" style="zoom:33%;"><p>TensorFlow采用定义匹配约束的方式相比直接定义出子图的方式本质上是等价的，但相比后者可读性较差，而优点就是代码可复用性高，比如上面的FindContractionWithBias可以同时匹配Conv+BiasAdd和MatMul+BiasAdd两种子图，并且这些约束便于嵌套使用。</p><p>无论是TensorFlow还是PaddlePaddle，图替换都是不完全的。比如说对于Conv+BiasAdd+BiasAdd这种计算图，第一次只能匹配到Conv+BiasAdd，替换后又变成了一个Conv+BiasAdd的计算图，因此TensorFlow中默认采用了两遍优化。根据TensorFlow公开的一些数据，基本上第二次优化的机会已经非常少了。</p><ul><li><p>InceptionV3</p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.29.51.png?raw=true" style="zoom:40%;"></li><li><p>Seq2Seq</p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.30.01.png?raw=true" style="zoom:40%;"></li></ul><h3 id="基于超优化的图替换"><a class="header-anchor" href="#基于超优化的图替换">¶</a> 基于超优化的图替换</h3><h3 id="低精度和layout优化"><a class="header-anchor" href="#低精度和layout优化">¶</a> 低精度和layout优化</h3><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">]]></content>
+      
+      
+      <categories>
+          
+          <category> graph optimization, 图优化 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 图替换 </tag>
+            
+            <tag> 超优化 </tag>
+            
+            <tag> graph optimization </tag>
+            
+            <tag> super optimization </tag>
+            
+            <tag> substitution </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs</title>
       <link href="/2019/11/27/DeepFusion/"/>
       <url>/2019/11/27/DeepFusion/</url>
