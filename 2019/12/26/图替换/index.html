@@ -99,7 +99,7 @@
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.35.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.29.51.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.30.01.png?raw=true">
-<meta property="og:updated_time" content="2019-12-29T04:31:12.740Z">
+<meta property="og:updated_time" content="2019-12-29T04:33:50.705Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="图替换">
 <meta name="twitter:description" content="¶ 背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。  一些常见的图优化技术：   DCE   CSE（公共子表达式消除）   常量折叠   数学公式简化   Op融合   Layout变换   内存优化（swap-in/swap-ou">
@@ -466,7 +466,7 @@
 </ul>
 <h3 id="基于超优化的图替换"><a class="header-anchor" href="#基于超优化的图替换">¶</a> 基于超优化的图替换</h3>
 <p>超优化（Superoptimization）是现代编译器中的一种指令优化技术，其主要工作原理是通过随机生成指令序列以及暴力搜索的方式自动找到一组优化的指令序列，并等价替换原有的指令序列。1992年第一个Superoptimizer被集成到了GCC编译器，之后Google也为LLVM开发了一个Superoptimizer，取名为Souper。</p>
-<p>依靠人工设定的编译器往往对代码的优化不够彻底，给生成的code留下了大量的优化空隙，而且人工设定的优化规则往往没有经过充分验证，导致各种极端条件下的代码bug。Superoptimization将指令序列优化问题转换为自动搜索问题，并加入了自动化验证和一阶逻辑验证，在发现代码优化空隙的同时优化结果也更加可靠。</p>
+<p>依靠人工设定的编译器往往对代码的优化不够彻底，给生成的code留下了大量的优化空隙，而且人工设定的优化规则往往没有经过充分验证，经常导致各种极端条件下的代码bug。Superoptimization将指令序列优化问题转换为自动搜索问题，并加入了自动化验证和一阶逻辑验证，在发现代码优化空隙的同时优化结果也更加可靠。</p>
 <h3 id="低精度和layout优化"><a class="header-anchor" href="#低精度和layout优化">¶</a> 低精度和layout优化</h3>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css">
       
