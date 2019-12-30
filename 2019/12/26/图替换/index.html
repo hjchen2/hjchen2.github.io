@@ -104,7 +104,7 @@
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-29%2016.24.40.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-29%2016.37.22.png?raw=true">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-29%2013.56.06.png?raw=true">
-<meta property="og:updated_time" content="2019-12-30T09:50:54.858Z">
+<meta property="og:updated_time" content="2019-12-30T09:54:52.862Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="图替换">
 <meta name="twitter:description" content="¶ 背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。  一些常见的图优化技术：   DCE   CSE（公共子表达式消除）   常量折叠   数学公式简化   Op融合   Layout变换   内存优化（swap-in/swap-ou">
@@ -494,7 +494,7 @@
 <li>
 <p>测试潜在替换子</p>
 <p>为了进一步验证潜在替换子的合法性，TASO设计了一系列cases来测试潜在替换子。每个测试case都使用随机初始化的输入tensor，当两个计算图结果一致时才认为测试通过，只有所有测试cases都通过的潜在替换子才是合法的替换子。</p>
-<p>与构建计算图时使用int类型的tensor不一样，所有测试case的输入tensor都是-1到1之间的浮点数。由于relu对于所有小于0的值都返回0，因此可能导致非法的替换子通过测试cases，因此作者认为可以使用任意一个非线性函数来代替relu，TASO中使用<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x(x+1)+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base textstyle uncramped"><span class="mord mathit">x</span><span class="mopen">(</span><span class="mord mathit">x</span><span class="mbin">+</span><span class="mord mathrm">1</span><span class="mclose">)</span><span class="mbin">+</span><span class="mord mathrm">1</span></span></span></span>。</p>
+<p>与构建计算图时使用int类型的tensor不一样，所有测试case的输入tensor都是-1到1之间的浮点数。由于relu对于所有小于0的值都返回0，因此可能导致非法的替换子通过测试cases，作者认为可以使用任意一个非线性函数来代替relu，TASO中使用<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x(x+1)+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="strut" style="height:0.75em;"></span><span class="strut bottom" style="height:1em;vertical-align:-0.25em;"></span><span class="base textstyle uncramped"><span class="mord mathit">x</span><span class="mopen">(</span><span class="mord mathit">x</span><span class="mbin">+</span><span class="mord mathrm">1</span><span class="mclose">)</span><span class="mbin">+</span><span class="mord mathrm">1</span></span></span></span>。</p>
 </li>
 </ul>
 <img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-29%2013.56.06.png?raw=true" style="zoom:40%;">
