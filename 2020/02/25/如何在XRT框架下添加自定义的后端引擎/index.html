@@ -95,7 +95,7 @@
 <meta property="og:site_name" content="Don&#39;t Respond">
 <meta property="og:description" content="XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括：  统一的DAG计算图表示 统一的子图表达、切分和折叠过程 统一的JIT子图编译接口和缓存机制 统一的Executable Launch接口  得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable launch接口的具体实现上。 我们把XRT的每个">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-02-25T08:08:59.903Z">
+<meta property="og:updated_time" content="2020-02-25T08:10:34.739Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="如何在XRT框架下添加自定义的后端引擎">
 <meta name="twitter:description" content="XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括：  统一的DAG计算图表示 统一的子图表达、切分和折叠过程 统一的JIT子图编译接口和缓存机制 统一的Executable Launch接口  得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable launch接口的具体实现上。 我们把XRT的每个">
@@ -451,7 +451,7 @@
 <p>并且在xrt/api.cpp中增加一个gflags环境变量，并在该文件中修改相关接口。</p>
 <ul>
 <li>
-<p>增加一个gulags环境变量</p>
+<p>增加一个gflags环境变量</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DEFINE_bool(use_test, EnvToBool(FLAGS_use_test, <span class="literal">false</span>), <span class="string">"It's optional to use test."</span>);</span><br></pre></td></tr></table></figure>
 </li>
 <li>
