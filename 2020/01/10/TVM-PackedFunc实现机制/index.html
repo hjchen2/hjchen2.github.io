@@ -87,19 +87,19 @@
 
 
 
-<meta name="description" content="¶ TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制来实现。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。  ¶ 预备知识 ¶ Python ctypes混合编程 ctypes">
+<meta name="description" content="¶ TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。  ¶ 预备知识 ¶ Python ctypes混合编程 ctypes是Py">
 <meta name="keywords" content="TVM,PackedFunc">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TVM PackedFunc实现机制">
 <meta property="og:url" content="https://hjchen2.github.io/2020/01/10/TVM-PackedFunc实现机制/index.html">
 <meta property="og:site_name" content="Don&#39;t Respond">
-<meta property="og:description" content="¶ TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制来实现。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。  ¶ 预备知识 ¶ Python ctypes混合编程 ctypes">
+<meta property="og:description" content="¶ TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。  ¶ 预备知识 ¶ Python ctypes混合编程 ctypes是Py">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/tvm/屏幕快照%202020-01-10%2010.55.45.png?raw=true">
-<meta property="og:updated_time" content="2020-01-10T08:54:24.140Z">
+<meta property="og:updated_time" content="2020-02-27T11:14:06.794Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TVM PackedFunc实现机制">
-<meta name="twitter:description" content="¶ TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制来实现。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。  ¶ 预备知识 ¶ Python ctypes混合编程 ctypes">
+<meta name="twitter:description" content="¶ TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。  ¶ 预备知识 ¶ Python ctypes混合编程 ctypes是Py">
 <meta name="twitter:image" content="https://github.com/hjchen2/personal/blob/master/blog/tvm/屏幕快照%202020-01-10%2010.55.45.png?raw=true">
 
 
@@ -402,7 +402,7 @@
 
       
         <h2 id="TVM PackedFunc实现"><a class="header-anchor" href="#TVM PackedFunc实现">¶</a> TVM PackedFunc实现</h2>
-<p>为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制来实现。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。</p>
+<p>为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。</p>
 <img src="https://github.com/hjchen2/personal/blob/master/blog/tvm/屏幕快照%202020-01-10%2010.55.45.png?raw=true" style="zoom:36%;">
 <h3 id="预备知识"><a class="header-anchor" href="#预备知识">¶</a> 预备知识</h3>
 <h4 id="Python ctypes混合编程"><a class="header-anchor" href="#Python ctypes混合编程">¶</a> Python ctypes混合编程</h4>
