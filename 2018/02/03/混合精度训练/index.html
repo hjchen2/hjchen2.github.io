@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="MIXED PRECISION TRAINING https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1710.03740.pdf 论文概述 nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="混合精度训练">
+<meta property="og:url" content="https://hjchen2.github.io/2018/02/03/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="MIXED PRECISION TRAINING https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1710.03740.pdf 论文概述 nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。">
+<meta property="og:locale">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/95247900845ca0aa285aea86b971c6ec.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/b89a595f09deb2caf14d44176f931440.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/fc960bb10d950d111404cda831aa5cbe.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/a9166bfb03d36772c83f4aa56e591374.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/3dbc1922becd3b150d50bc71aacecb1e.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/0369372f891c65571c845b04960aafda.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/237914e80a50fe0f2cac573c36733e5c.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/f1c1f41006c8f637c29208ac8652310b.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/f54c9019a7174299761d48094d1f0dab.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/9b304e74b8dbc9ec6324c56d05b85f24.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/4a18c89da9676673a73c899987564e10.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/2f5405a955c03cd522b5b1f17e7300cd.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/55d321517c2de03fe92f7c32aff1d87a.png?raw=true">
+<meta property="article:published_time" content="2018-02-03T04:00:04.000Z">
+<meta property="article:modified_time" content="2023-01-03T13:54:04.920Z">
+<meta property="article:author" content="Dou Jiang">
+<meta property="article:tag" content="int16">
+<meta property="article:tag" content="fp16">
+<meta property="article:tag" content="混合精度训练">
+<meta property="article:tag" content="loss scaling">
+<meta property="article:tag" content="QVNNI16">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/95247900845ca0aa285aea86b971c6ec.png?raw=true">
+
+
+<link rel="canonical" href="https://hjchen2.github.io/2018/02/03/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://hjchen2.github.io/2018/02/03/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/","path":"2018/02/03/混合精度训练/","title":"混合精度训练"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>混合精度训练 | Don't Respond</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Don't Respond</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">Home</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section">Tags</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#mixed-precision-training"><span class="nav-number">1.</span> <span class="nav-text">MIXED PRECISION TRAINING</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">论文概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E7%9A%84%E5%BF%85%E8%A6%81%E6%80%A7"><span class="nav-number">1.2.</span> <span class="nav-text">混合精度的必要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#loss-scaling"><span class="nav-number">1.3.</span> <span class="nav-text">Loss scaling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">1.4.</span> <span class="nav-text">实验结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mixed-precision-training-of-convolutional-neural-networks-using-integer-operations"><span class="nav-number">2.</span> <span class="nav-text">MIXED
+PRECISION TRAINING OF CONVOLUTIONAL NEURAL NETWORKS USING INTEGER
+OPERATIONS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BA%E6%96%87%E6%A6%82%E8%BF%B0-1"><span class="nav-number">2.1.</span> <span class="nav-text">论文概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dfpdynamic-fixed-point"><span class="nav-number">2.2.</span> <span class="nav-text">DFP（Dynamic Fixed Point）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dfp%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83"><span class="nav-number">2.3.</span> <span class="nav-text">DFP混合精度训练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.4.</span> <span class="nav-text">指令实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C-1"><span class="nav-number">2.5.</span> <span class="nav-text">实验结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#abs_max%E9%87%8F%E5%8C%96%E6%96%B9%E6%A1%88"><span class="nav-number">2.6.</span> <span class="nav-text">ABS_MAX量化方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dfp%E4%B8%8Eabs_max%E9%87%8F%E5%8C%96%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">2.7.</span> <span class="nav-text">DFP与ABS_MAX量化的区别</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dou Jiang"
+      src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+  <p class="site-author-name" itemprop="name">Dou Jiang</p>
+  <div class="site-description" itemprop="description">凌绝顶，众山小</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hjchen2" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hjchen2" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/p/1005052128954644" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052128954644" rel="noopener me" target="_blank">Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2018/02/03/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="name" content="Dou Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+      <meta itemprop="description" content="凌绝顶，众山小">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="混合精度训练 | Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          混合精度训练
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2018-02-03 12:00:04" itemprop="dateCreated datePublished" datetime="2018-02-03T12:00:04+08:00">2018-02-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-01-03 21:54:04" itemprop="dateModified" datetime="2023-01-03T21:54:04+08:00">2023-01-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/low-bitwidth/" itemprop="url" rel="index"><span itemprop="name">low bitwidth</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="mixed-precision-training">MIXED PRECISION TRAINING</h2>
+<p><a
+target="_blank" rel="noopener" href="https://email.baidu.com/OWA/redir.aspx?C=G_TpaBQZHjfotfty5PDuHfO3av_KUOGPcZOg_60U2vdUx9QS42vVCA..&amp;URL=https%3a%2f%2farxiv.org%2fpdf%2f1710.03740.pdf">https://arxiv.org/pdf/1710.03740.pdf</a></p>
+<h3 id="论文概述">论文概述</h3>
+<p>nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla
+V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。</p>
+<span id="more"></span>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/95247900845ca0aa285aea86b971c6ec.png?raw=true'></p>
+<p>为了加速训练过程以及减少显存开销，baidu
+Research和nvidia在这篇论文中合作提出了一种FP16和FP32混合精度训练的方法，并且在CNN分类和检测、语音识别和语言模型任务上进行了验证，实验过程中使用的GPU就是Tesla
+V100。</p>
+<p>训练过程中每层的权重都存成FP32格式（Mater-Weights），每次训练时都会将FP32的权重降精度至FP16（
+a master
+copy），前向输出和后向梯度都使用FP16进行计算，更新时将FP16的梯度累加到FP32的Mater-Weight上。</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/b89a595f09deb2caf14d44176f931440.png?raw=true'></p>
+<h3 id="混合精度的必要性">混合精度的必要性</h3>
+<p>由于FP16所能表示的subnormal最小正数是<span
+class="math inline">\(2^{−24}\)</span> ≈ <span
+class="math inline">\(5.96 × 10^{−8}\)</span>（<a
+target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Half-precision_floating-point_format">Half-precision
+floating-point format</a>），也就是说在区间（<span
+class="math inline">\(-2^{-24},
+2^{-24}\)</span>）的数（或者说指数位小于-24的数）使用FP16表示时都会变成0。在一个普通话识别的模型训练中，有将近5%的权重梯度的指数位小于-24，如果更新时也用FP16计算，那么这些数在乘以学习率后都将变成0，从而对最终模型效果产生负面影响，使用混合精度训练的方式可以避免这种问题。</p>
+<h3 id="loss-scaling">Loss scaling</h3>
+<p>混合精度训练可以解决权重更新量很小的问题，但无法解决梯度本身很小的问题。在一些网络中（比如SSD），梯度大部分都在FP16的表示范围之外，因此需要将梯度平移到FP16的表示范围内
+。</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/fc960bb10d950d111404cda831aa5cbe.png?raw=true'></p>
+<p>平移实际上就是对梯度值乘以一个系数（等于<span
+class="math inline">\(2^{n}\)</span>，<span
+class="math inline">\(n\)</span>为平移的位数），但另一种简单高效的方法是直接在前向时就将loss乘以scale，这样在后向传导时所有的梯度都会被乘以相同的scale。权重更新时需要将移位后的梯度除以scale后，再更新到权重上。</p>
+<p>论文中提到他们在实验过程中使用的scale是8~32K，最终取得了与FP32一致的收敛结果。对于scale的选择，论文没有统一的方法，只是提到scale并没有下界，只要选择的scale不会在后向计算时导致溢出就行。</p>
+<h3 id="实验结果">实验结果</h3>
+<ul>
+<li><p>图像分类</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/a9166bfb03d36772c83f4aa56e591374.png?raw=true'></p></li>
+<li><p>物体检测</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/3dbc1922becd3b150d50bc71aacecb1e.png?raw=true'></p></li>
+<li><p>语音识别</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/0369372f891c65571c845b04960aafda.png?raw=true'></p></li>
+<li><p>机器翻译</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/237914e80a50fe0f2cac573c36733e5c.png?raw=true'></p></li>
+<li><p>语言模型</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/f1c1f41006c8f637c29208ac8652310b.png?raw=true'></p>
+<p>​</p></li>
+</ul>
+<h2
+id="mixed-precision-training-of-convolutional-neural-networks-using-integer-operations">MIXED
+PRECISION TRAINING OF CONVOLUTIONAL NEURAL NETWORKS USING INTEGER
+OPERATIONS</h2>
+<p><a
+target="_blank" rel="noopener" href="https://email.baidu.com/OWA/redir.aspx?C=a0s4Pl45ENd9uqHgfl_L2eKY-IGy51CKRbN_JHdP0YhUx9QS42vVCA..&amp;URL=https%3a%2f%2fopenreview.net%2fforum%3fid%3dH135uzZ0-">https://openreview.net/forum?id=H135uzZ0-</a></p>
+<h3 id="论文概述-1">论文概述</h3>
+<p>半精度（16bit）分为半精度浮点（FP16）和半精度定点（INT16），FP16和INT16提供不同的精度和表示范围。INT16相比FP16的动态范围低，但精度更高，因此INT16相比FP16会带来更低的精度误差。</p>
+<p>现在深度学习领域公认的数据类型是单精度浮点（float），半精和单精除了在直观感觉上的数据类型不同之外，在计算（algorithmic）和语义（semantic）上也会有很多的不同，比如说FP16的乘加操作得到的结果是FP32。因此在讨论半精度训练时，对于整个tensor的表达、乘加操作、低精度转换、缩放和规整方法和溢出处理都是需要同时考虑的。</p>
+<p>intel的这篇论文主要受到之前flexpoint和混合精度训练的启发，从而提出了一种共享指数位的动态定点表达（dynamic
+fixed point
+representation）方法，使用INT16和float混合精度训练，在完全不进行任何调参的情况下，在多个CNN的模型上取得了当前所有低精度训练方法中最好的效果。</p>
+<p>这篇论文主要涉及的技术点有：</p>
+<ul>
+<li>DFP：INT16的Tensor共享指数位，扩充INT16的动态表示范围。</li>
+<li>instruction：两个INT16进行乘法，结果存为INT32的指令。</li>
+<li>down-convert：基于最大值的低精度转换策略，使用nearest、stochastic和biased
+rounding三种不同的rounding方法。</li>
+<li>overflow
+management：将局部的INT32结果累加到FP32，防止累加时溢出。</li>
+</ul>
+<h3 id="dfpdynamic-fixed-point">DFP（Dynamic Fixed Point）</h3>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/f54c9019a7174299761d48094d1f0dab.png?raw=true'></p>
+<p>一个DFP
+tensor由一个定点的tensor和该tensor共享的指数组成，更通用的表示形式为DFP-P
+= <span class="math inline">\(&lt;I, E_{s}&gt;\)</span>，P表示定点tensor
+<span class="math inline">\(I\)</span>的位宽，<span
+class="math inline">\(E_{s}\)</span>表示共享指数位。标准单精使用的是8bit的指数位，在该论文中使用的DFP-16共享指数位也是8bit。</p>
+<ul>
+<li><p>DFP-16和fp32的数据转换</p>
+<p>共享指数位需要根据tensor中的绝对值最大的数和定点化的位宽来确定，计算公式如下：</p>
+<p><span class="math display">\[E_{s} = E_{fmax} - (P - 2)\]</span></p>
+<p><span class="math inline">\(E_{s}\)</span>表示DFP-P的共享指数，<span
+class="math inline">\(E_{fmax}\)</span>表示原始fp32
+tensor中绝对值最大的数对应的指数<span class="math inline">\(E_{fmax} =
+E(max_{\forall f \in F} |f|)\)</span></p>
+<p>因此fp32的tensor与DFP的tensor有以下关系：</p>
+<p><span class="math display">\[\forall i_{n} \in I, \ \ \ f_{n} = i_{n}
+\times 2^{E_{s}}, \ \ \ where f_{n} \in F\]</span></p>
+<p>也就是说<span class="math inline">\(i_{n} =
+rounding(\frac{f_{n}}{2^{E_{s}}})\)</span>，这本质上与loss
+scaling思想是一样的，用平移的思想来解决动态范围不够的问题。</p></li>
+<li><p>DFP-16 tensor的乘加运算规则</p>
+<p>1、两个DFP-16 tensor相乘，结果存为DFP-32。</p>
+<p><span class="math display">\[i_{ab} = i_{a} \times i_{b} , \ \ \
+E_{s}^{ab} = E_{s}^{a} + E_{s}^{b}\]</span></p>
+<p>2、两个DFP-16 tensor相加，结果存为DFP-32。</p>
+<p><span class="math display">\[i_{ab} = \left\{\begin{aligned} i_{a} +
+(i_{b} &gt;&gt; (E_{s}^{a} - E_{s}^{b})) \ \ \ when E_{s}^{a} &gt;
+E_{s}^{b} \\ i_{b}+(i_{a} &gt;&gt; (E_{s}^{b}-E_{s}^{a})) \ \ \ when
+E_{s}^{a} &lt; E_{s}^{b} \end{aligned}\right.\]</span></p>
+<p><span class="math display">\[E_{s}^{a+b} = max(E_{s}^{a},
+E_{s}^{b})\]</span></p>
+<p>3、两个DFP-32 tensor相加，结果保存为fp32。</p></li>
+<li><p>DFP-32和DFP-16的数据转换</p>
+<p><span class="math display">\[R_{s} = P - LZC(max_{\forall i_{ab} \in
+I^{32}}|i_{ab}|)\]</span></p>
+<p><span class="math display">\[i_{ab}^{d} = i_{ab} &gt;&gt; R_{s} , \ \
+\ E_{s}^{ab} += R_{s}\]</span></p></li>
+</ul>
+<h3 id="dfp混合精度训练">DFP混合精度训练</h3>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/9b304e74b8dbc9ec6324c56d05b85f24.png?raw=true'></p>
+<h3 id="指令实现">指令实现</h3>
+<p>intel的VNNI指令集中有一条DFP-16乘加的指令QVNNI16，这条指令的第一个操作数是DFP-16内存指针，第二个操作数是4个512位的向量寄存器（每个寄存器可以存储32个DFP-16），结果是一个512位的向量寄存器（该寄存器能存储16个DFP-32）。</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/4a18c89da9676673a73c899987564e10.png?raw=true'></p>
+<p>上面的QVNNI16指令集实际上对mem输入做了两路并行展开，vinp2中一个寄存器支持同时对输入feature
+map的两个channel进行计算。在论文中，卷积层输入的格式为（N，C/16，H，W，16），权重的格式为（C/16，K/16，KH，KW，8c，16k，2c），C表示输入feature
+map的通道数，K表示输出通道数，KH和KW分别表示卷积核的height和width。</p>
+<p>卷积计算过程伪代码：</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/2f5405a955c03cd522b5b1f17e7300cd.png?raw=true'></p>
+<p>每次对输入的ICBLK个通道进行计算，ICBLK个通道又会分成（ICBLK/16）组，每组计算16个通道，由于QVNNI指令每次只能对输入的8个通道进行计算，因此每组调用2次QVNNI16指令，计算结果vout会转换成FP32后与output累加。</p>
+<h3 id="实验结果-1">实验结果</h3>
+<p>baseline和DFP-16的实验均在intel最新的Knights-Mill
+CPU上进行，DFP-16相比FP32训练加速1.8X。</p>
+<p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/55d321517c2de03fe92f7c32aff1d87a.png?raw=true'></p>
+<h3 id="abs_max量化方案">ABS_MAX量化方案</h3>
+<h3 id="dfp与abs_max量化的区别">DFP与ABS_MAX量化的区别</h3>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/int16/" rel="tag"># int16</a>
+              <a href="/tags/fp16/" rel="tag"># fp16</a>
+              <a href="/tags/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/" rel="tag"># 混合精度训练</a>
+              <a href="/tags/loss-scaling/" rel="tag"># loss scaling</a>
+              <a href="/tags/QVNNI16/" rel="tag"># QVNNI16</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2018/01/02/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E8%AE%B0%E5%BD%95/" rel="prev" title="模型压缩之pruning">
+                  <i class="fa fa-chevron-left"></i> 模型压缩之pruning
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2019/11/27/DeepFusion/" rel="next" title="FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs">
+                  FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dou Jiang</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

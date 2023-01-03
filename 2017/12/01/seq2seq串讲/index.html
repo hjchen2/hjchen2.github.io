@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="seq2seq 主要学习的是论文Neural machine translation by jointly learning to align and translate (Dzmitry Bahdanau、Yoshua Bengio等，2016.05)和Neural machine translation (Minh-ThangLuong，2016.12)。 神经机器翻译的目的是将一门语言的文本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NEURAL MACHINE TRANSLATION论文学习串讲">
+<meta property="og:url" content="https://hjchen2.github.io/2017/12/01/seq2seq%E4%B8%B2%E8%AE%B2/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="seq2seq 主要学习的是论文Neural machine translation by jointly learning to align and translate (Dzmitry Bahdanau、Yoshua Bengio等，2016.05)和Neural machine translation (Minh-ThangLuong，2016.12)。 神经机器翻译的目的是将一门语言的文本">
+<meta property="og:locale">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/nmt/12c7a5370bc9da07193c0bd43c5b27cd.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/nmt/ab3551f2c0f12a3bc50283e49e09e52c.png?raw=true">
+<meta property="og:image" content="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/pictures/v2-db380a8bf032afa9533d358389de99d6_hd.jpg?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/nmt/e9ba93ee15054825cb2c66a7180ef022.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/nmt/667d0e7417d384138f961490ff0745c3.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/nmt/970f70807791925f3f8f54266e0a8435.png?raw=true">
+<meta property="og:image" content="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/pictures/rnn-gru-unit.png?raw=true">
+<meta property="article:published_time" content="2017-12-01T04:24:08.000Z">
+<meta property="article:modified_time" content="2023-01-03T13:53:27.268Z">
+<meta property="article:author" content="Dou Jiang">
+<meta property="article:tag" content="seq2seq">
+<meta property="article:tag" content="machine translation">
+<meta property="article:tag" content="Encoder-Decoder">
+<meta property="article:tag" content="Attention">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/hjchen2/personal/blob/master/blog/nmt/12c7a5370bc9da07193c0bd43c5b27cd.png?raw=true">
+
+
+<link rel="canonical" href="https://hjchen2.github.io/2017/12/01/seq2seq%E4%B8%B2%E8%AE%B2/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://hjchen2.github.io/2017/12/01/seq2seq%E4%B8%B2%E8%AE%B2/","path":"2017/12/01/seq2seq串讲/","title":"NEURAL MACHINE TRANSLATION论文学习串讲"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>NEURAL MACHINE TRANSLATION论文学习串讲 | Don't Respond</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Don't Respond</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">Home</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section">Tags</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#seq2seq"><span class="nav-number">1.</span> <span class="nav-text">seq2seq</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#encoder-decoder"><span class="nav-number">2.</span> <span class="nav-text">Encoder-Decoder</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#attention"><span class="nav-number">3.</span> <span class="nav-text">Attention</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#encoder"><span class="nav-number">4.</span> <span class="nav-text">Encoder</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#decoder"><span class="nav-number">5.</span> <span class="nav-text">Decoder</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#beam-search"><span class="nav-number">6.</span> <span class="nav-text">beam search</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dou Jiang"
+      src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+  <p class="site-author-name" itemprop="name">Dou Jiang</p>
+  <div class="site-description" itemprop="description">凌绝顶，众山小</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hjchen2" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hjchen2" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/p/1005052128954644" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052128954644" rel="noopener me" target="_blank">Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/12/01/seq2seq%E4%B8%B2%E8%AE%B2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="name" content="Dou Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+      <meta itemprop="description" content="凌绝顶，众山小">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="NEURAL MACHINE TRANSLATION论文学习串讲 | Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NEURAL MACHINE TRANSLATION论文学习串讲
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2017-12-01 12:24:08" itemprop="dateCreated datePublished" datetime="2017-12-01T12:24:08+08:00">2017-12-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-01-03 21:53:27" itemprop="dateModified" datetime="2023-01-03T21:53:27+08:00">2023-01-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/neural-machine-translation/" itemprop="url" rel="index"><span itemprop="name">neural machine translation</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="seq2seq">seq2seq</h2>
+<p>主要学习的是论文Neural machine translation by jointly learning to
+align and translate (Dzmitry Bahdanau、Yoshua Bengio等，2016.05)和Neural
+machine translation (Minh-ThangLuong，2016.12)。</p>
+<p>神经机器翻译的目的是将一门语言的文本序列翻译成另一门语言的文本序列，因此机器翻译的训练语料一般是源语言和目标语言组成的一对文本，也叫做平行语料(parallel
+corpus)。我们通常将输入和输出都是序列的模型叫做seq2seq，seq2seq不仅应用在机器翻译领域，也用于当前热门的自动问答系统以及文本摘要的自动生成等领域。</p>
+<span id="more"></span>
+<h2 id="encoder-decoder">Encoder-Decoder</h2>
+<p>2014年Dzmitry Bahdanau、Yoshua Bengio等人在论文Learning Phrase
+Representations using RNN Encoder–Decoder for Statistical Machine
+Translation中首次提出将RNN
+Encoder-Decoder结构来计算双语短语对的条件概率，用于改进统计机器翻译的效果。Encoder-Decoder是由encoder和decoder两部分组成，encoder将输入序列编码成定长的语义向量，decoder将语义向量进行解码得到目标序列。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/12c7a5370bc9da07193c0bd43c5b27cd.png?raw=true" width=500 align=center></p>
+<p>在NMT中Encoder-Decoder试图直接对并行语料的条件概率<span
+class="math inline">\(P(Y|X)\)</span>进行建模，encoder输入的是一组向量序列<span
+class="math inline">\(X=(x_{1},…,x_{T_{x}})\)</span>，<span
+class="math inline">\(x_i\)</span>为词<span
+class="math inline">\(i\)</span>的one-hot编码向量，并将序列<span
+class="math inline">\(X\)</span>编码成语义向量<span
+class="math inline">\(c\)</span>，decoder输入语义向量<span
+class="math inline">\(c\)</span>，并逐个生成序列<span
+class="math inline">\(Y=(y_{1},…,y_{T_{y}})\)</span>，其中<span
+class="math inline">\(y_{i}\)</span>的生成与之前已经生成的词序列<span
+class="math inline">\(y_{1},…,y_{i-1}\)</span>有关。</p>
+<p><span class="math display">\[\log p(Y|X)=\sum_{t=1}^{T_{y}}\log
+p(y_{t}|y_{&lt;t}, c)\]</span></p>
+<p>对于不定长度序列的编码和解码，我们很自然会想到RNN，实际上RNN
+Encoder–Decoder就是正反两组RNN拼接在一起组成的编码解码网络。经典的RNN
+Encoder–Decoder示意图如下：</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/ab3551f2c0f12a3bc50283e49e09e52c.png?raw=true" width=400 align=center /></p>
+<p>我们可以用下面公式描述编码过程： <span
+class="math display">\[h_{t}=f(x_{t},h_{t-1})\]</span> <span
+class="math display">\[c=q({h_{1},…,h_{T_{x}}})\]</span></p>
+<p>函数<span
+class="math inline">\(f\)</span>一般用一个RNN结构来表示，可以是LSTM、GRU等，<span
+class="math inline">\(h_{t}\)</span>表示encoder
+RNN在第t时刻的cell隐状态，向量c的计算与encoder
+RNN所有时刻的cell隐状态相关，函数<span
+class="math inline">\(q\)</span>可以表示所有隐状态的加权和，但由于RNN的特殊性，我们这里只使用最后一个时刻的隐状态作为向量<span
+class="math inline">\(c\)</span>，即<span
+class="math inline">\(c=h_{T_{x}}\)</span>。</p>
+<p>对于解码过程，生成<span
+class="math inline">\(y_{t}\)</span>时的条件概率可以改写成</p>
+<p><span
+class="math display">\[p(y_{t}|y_{&lt;t},c)=g(y_{t-1},s_{t},c)\]</span>
+<span class="math display">\[s_{t}=f(s_{t-1},y_{t-1},c)\]</span></p>
+<p>其中，<span
+class="math inline">\(g\)</span>是非线性函数，可以是单层的softmax，也可以是一个多层结构的神经网络，<span
+class="math inline">\(y_{t-1}\)</span>表示上一时刻的输出，<span
+class="math inline">\(f\)</span>同样是一个RNN结构，<span
+class="math inline">\(s_{t}\)</span>表示decoder RNN cell的隐状态。</p>
+<h2 id="attention">Attention</h2>
+<p>在Encoder-Decoder中每个目标词生成时使用的都是同一个向量<span
+class="math inline">\(c\)</span>，虽然理论上来讲向量<span
+class="math inline">\(c\)</span>可以表示输入序列的语义信息，比如一些关键词、句子结构和语法信息等，但也存在注意力分散的问题。在机器翻译中，一般翻译出来的词与源序列的词是有对齐关系的，也就是说目标词的生成与源序列中的部分关键词关系更大，而其他词对当前目标词的生成影响就很小。在Encoder-Decoder中不论生成哪个目标词，使用的语义向量都是<span
+class="math inline">\(c\)</span>，而语义向量<span
+class="math inline">\(c\)</span>是由句子<span
+class="math inline">\(X\)</span>的每个单词经过Encoder编码而成的，也就意味着句子<span
+class="math inline">\(X\)</span>中的关键词对生成任意目标词的影响力是相同的。</p>
+<p><img src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/pictures/v2-db380a8bf032afa9533d358389de99d6_hd.jpg?raw=true" width=500></p>
+<p>第一篇论文在Encoder-Decoder的基础上引入注意力机制，来解决上述注意力分散的问题。在论文中提出，每个目标词生成时使用的语义向量是不同的，也就是说Encoder-Decoder将会学会在生成目标词时给每个源语词分配权重，这个权重表示该源语词对当前目标词的重要程度。增加了attention机制的Encoder-Decoder框架如下图：</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/e9ba93ee15054825cb2c66a7180ef022.png?raw=true" width=400 align=center></p>
+<p>在基于attention的模型中，每个目标词生成时的条件概率可以写成： <span
+class="math display">\[p(y_{i}|y_{&lt;t},X)=g(y_{i-1},s_{i},c_{i})\]</span>
+<span class="math display">\[s_{i}=f(s_{i-1},y_{i-1},c_{i})\]</span></p>
+<p>在RNN中每个时刻的隐状态<span
+class="math inline">\(h_{i}\)</span>可以表示第<span
+class="math inline">\(i\)</span>个源语词及其周围部分词的信息，因此与之前的Encoder-Decoder框架不同，语义向量<span
+class="math inline">\(c_{i}\)</span>不再是encoder
+RNN最后一个时刻的隐状态，而是与encoder RNN所有时刻的隐状态（<span
+class="math inline">\(h_{1},...,h_{T_{x}}\)</span>）相关的一个向量。</p>
+<p><span
+class="math display">\[c_{i}=\sum_{j=1}^{T_{x}}\alpha_{ij}h_{j}\]</span>
+<span class="math inline">\(\alpha_{ij}\)</span>可以认为是目标词<span
+class="math inline">\(i\)</span>与源语词<span
+class="math inline">\(j\)</span>的对齐权重，因此可以使用源语词<span
+class="math inline">\(i\)</span>的隐状态<span
+class="math inline">\(h_{i}\)</span>和目标词前一时刻的隐状态<span
+class="math inline">\(s_{i-1}\)</span>来计算。 <span
+class="math display">\[\alpha_{ij}=\frac{\exp(e_{ij})}{\sum_{k=1}^{T_{x}}\exp(e_{ik})}\]</span>
+其中 <span class="math display">\[e_{ij}=a(s_{i-1},h_{j})\]</span> <span
+class="math inline">\(a\)</span>是一个对齐模型，在Bahdanau的论文中将其定义成一个前馈神经网络，与Encoder-Decoder一起参与训练。计算公式如下：
+<span class="math display">\[a(s_{i-1},h_{j})=v_{a}^\mathsf{T}\cdot
+tanh(W_{a}s_{i-1}+U_{a}h_{j}) \]</span> <span
+class="math inline">\(v_{a}\)</span>、<span
+class="math inline">\(W_{a}\)</span>和<span
+class="math inline">\(U_{a}\)</span>都是对齐模型的参数。在第二篇ThangLuong的论文中提出下面三种计算方式，本质上也是大同小异。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/667d0e7417d384138f961490ff0745c3.png?raw=true" width=400 align=center></p>
+<p>下图是Bahdanau在论文中给出的一个模拟图，图中模拟的是在给定源语序列（<span
+class="math inline">\(X_{1},X_{2},...,X_{T}\)</span>）的情况下生成第<span
+class="math inline">\(t\)</span>个目标词<span
+class="math inline">\(y_{t}\)</span>的过程。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/970f70807791925f3f8f54266e0a8435.png?raw=true" width=300 align=center></p>
+<h2 id="encoder">Encoder</h2>
+<p>在Bahdanau的论文中Encoder和Decoder使用的都是GRU（Gated Recurrent
+Unit），GRU与LSTM一样都是RNN众多变体中比较常见的一种，也可以使用其他变体RNN，比如在ThangLuong的论文中主要用的就是LSTM。</p>
+<p>我们知道传统的RNN理论上可以记忆无限长的序列，但由于递归权重对每个时刻的输入都是一样的，这就导致一个二选一的问题：(1)
+模型发散，无法收敛（2）梯度消失，无法产生长时记忆。GRU和LSTM一样，都是通过引入门（gate）的机制来解决传统RNN梯度消失的问题，gate打开和关闭是由当前时刻的输入和前一时刻的隐层状态控制的，也就是说每个时刻gate的状态都是不同的，一些需要长时间记忆的信息会通过gate一直传递下去，从而学习到长距离依赖。</p>
+<p>传统RNN的隐层计算公式：<span
+class="math inline">\(h_{t}=g(W^{hh}h_{t-1}+W^{hx}x_{t})\)</span>，<span
+class="math inline">\(W^{hh}\)</span>是递归权重，<span
+class="math inline">\(W^{hx}\)</span>是隐层的权重。实际上，LSTM和GRU都可以认为是对<span
+class="math inline">\(h_{t}\)</span>计算方式的改进。</p>
+<p>下面是GRU结构的示意图，输入为<span
+class="math inline">\(h_{t-1}\)</span>和<span
+class="math inline">\(x_{t}\)</span>，输出为<span
+class="math inline">\(h_{t}\)</span>。在GRU中存在两个gate，一个是reset
+gate，一个是update gate，分别对应下图中的<span
+class="math inline">\(r_{t}\)</span>和<span
+class="math inline">\(z_{t}\)</span>，<span
+class="math inline">\(\widetilde
+h_{t}\)</span>表示候选隐层状态，候选隐层状态与上一时刻的隐层状态<span
+class="math inline">\(h_{t-1}\)</span>一起更新当前时刻的隐层状态<span
+class="math inline">\(h_{t}\)</span>。</p>
+<p><img src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/pictures/rnn-gru-unit.png?raw=true" width=400 align=center></p>
+<p>GRU的计算过程：<br />
+1、首先计算重置门<span class="math inline">\(r_{t}\)</span>和更新门<span
+class="math inline">\(z_{t}\)</span>，其中<span
+class="math inline">\(\sigma\)</span>表示sigmoid函数 <span
+class="math display">\[r_{t}=\sigma(W^{r}x_{t}+U^{r}h_{t-1})\]</span>
+<span
+class="math display">\[z_{t}=\sigma(W^{z}x_{t}+U^{z}h_{t-1})\]</span>
+2、计算候选隐层状态<span class="math inline">\(\widetilde
+h_{t}\)</span>，其中<span
+class="math inline">\(r_{t}\)</span>用来控制历史记忆的传递，如果<span
+class="math inline">\(r_{t}=0\)</span>，那么<span
+class="math inline">\(\widetilde h_{t}\)</span>只与当前输入<span
+class="math inline">\(x_{t}\)</span>有关，历史记忆被重置。 <span
+class="math display">\[\widetilde h_{t}=tanh(Wx_{t}+U[r_{t}\odot
+h_{t-1}])\]</span> 实际上仅仅增加一个reset
+gate就已经可以解决长时依赖的问题，因为如果有需要<span
+class="math inline">\(r_{t}\)</span>可以总等于1，那么历史记忆就会一直传递下去。但这会带来一个问题，<span
+class="math inline">\(h_{t-1}\)</span>会累加到当前时刻的隐层状态上产生新的记忆，不断累加的记忆会导致<span
+class="math inline">\(\widetilde
+h_{t}\)</span>达到饱和，最终导致模型无法收敛。为了解决这个问题，GRU可以选择对当前输入产生的新记忆进行遗忘，只传递之前的历史记忆，也就是说我们允许GRU舍弃一些对后续无关的输入信息，保证记忆都是有效信息。GRU是通过下面的更新操作来实现这个过程的，
+<span class="math display">\[h_{t}=z_{t}\odot h_{t-1}+(1-z_{t})\odot
+\widetilde h_{t}\]</span> <span
+class="math inline">\(z_{i}\)</span>反映了相对历史记忆当前输入信息的重要程度，<span
+class="math inline">\(z_{i}\)</span>越小表明当前输入信息越重要。</p>
+<p>实际上在Bahdanau的论文中使用的是双向RNN（BiRNN），BiRNN在前向RNN的基础上增加了一个反向RNN，使得RNN可以同时看到历史和未来的信息，最终前向RNN的隐层状态和反向RNN的隐层状态拼接后输出。</p>
+<p><span class="math display">\[h_{i}=\left [ \begin{align} &amp;
+\vec{h_{i}} \\ &amp; \stackrel{\leftarrow}{h_{i}} \end{align}\right
+]\]</span></p>
+<h2 id="decoder">Decoder</h2>
+<p>在Bahdanau的论文中decoder采用是一个前向的GRU，但与encoder
+GRU不同的是decoder GRU需要额外输入语义向量<span
+class="math inline">\(c_{i}\)</span>。decoder GRU隐层状态<span
+class="math inline">\(s_{i}\)</span>的计算如下： <span
+class="math display">\[s_{i}=(1-z_{i})\odot s_{i-1}+z_{i}\odot
+\widetilde s_{i}\]</span> 其中，<br />
+<span class="math display">\[\widetilde s_{i}=tanh(Wy_{i-1}+U[r_{i}\odot
+s_{i-1}]+Cc_{i})\]</span> <span
+class="math display">\[r_{i}=\sigma(W_{r}y_{i-1}+U_{r}s_{i-1}+C_{r}c_{i})\]</span>
+<span
+class="math display">\[z_{i}=\sigma(W_{z}y_{i-1}+U_{z}s_{i-1}+C_{z}c_{i})\]</span>
+encoder GRU的隐层状态会被传递到decoder
+GRU用于生成第一个目标词，所以decoder
+GRU的隐层状态的初始值不是0，而是将encoder中反向GRU第一个时刻的隐层状态直接复制给decoder
+GRU，即<span
+class="math inline">\(s_{0}=tanh(W_{s}\stackrel{\leftarrow}{h_{1}})\)</span>。</p>
+<h2 id="beam-search">beam search</h2>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/seq2seq/" rel="tag"># seq2seq</a>
+              <a href="/tags/machine-translation/" rel="tag"># machine translation</a>
+              <a href="/tags/Encoder-Decoder/" rel="tag"># Encoder-Decoder</a>
+              <a href="/tags/Attention/" rel="tag"># Attention</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2017/08/22/KunPeng%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="prev" title="阿里KunPeng框架学习">
+                  <i class="fa fa-chevron-left"></i> 阿里KunPeng框架学习
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2018/01/02/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E8%AE%B0%E5%BD%95/" rel="next" title="模型压缩之pruning">
+                  模型压缩之pruning <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dou Jiang</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括：  统一的DAG计算图表示 统一的子图表达、切分和折叠过程 统一的JIT子图编译接口和缓存机制 统一的Executable Launch接口  得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable launch接口的具体实现上。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何在XRT框架下添加自定义的后端引擎">
+<meta property="og:url" content="https://hjchen2.github.io/2020/02/25/%E5%A6%82%E4%BD%95%E5%9C%A8XRT%E6%A1%86%E6%9E%B6%E4%B8%8B%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%90%8E%E7%AB%AF%E5%BC%95%E6%93%8E/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括：  统一的DAG计算图表示 统一的子图表达、切分和折叠过程 统一的JIT子图编译接口和缓存机制 统一的Executable Launch接口  得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable launch接口的具体实现上。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-02-25T08:06:18.000Z">
+<meta property="article:modified_time" content="2023-01-03T14:05:58.107Z">
+<meta property="article:author" content="Dou Jiang">
+<meta property="article:tag" content="XRT">
+<meta property="article:tag" content="Compiler">
+<meta property="article:tag" content="TensorFlow XLA">
+<meta property="article:tag" content="TensorRT">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://hjchen2.github.io/2020/02/25/%E5%A6%82%E4%BD%95%E5%9C%A8XRT%E6%A1%86%E6%9E%B6%E4%B8%8B%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%90%8E%E7%AB%AF%E5%BC%95%E6%93%8E/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://hjchen2.github.io/2020/02/25/%E5%A6%82%E4%BD%95%E5%9C%A8XRT%E6%A1%86%E6%9E%B6%E4%B8%8B%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%90%8E%E7%AB%AF%E5%BC%95%E6%93%8E/","path":"2020/02/25/如何在XRT框架下添加自定义的后端引擎/","title":"如何在XRT框架下添加自定义的后端引擎"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>如何在XRT框架下添加自定义的后端引擎 | Don't Respond</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Don't Respond</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">Home</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section">Tags</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#test-executable"><span class="nav-number">1.</span> <span class="nav-text">Test Executable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#test-compiler"><span class="nav-number">2.</span> <span class="nav-text">Test Compiler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#test-kernels"><span class="nav-number">3.</span> <span class="nav-text">Test Kernels</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python%E5%92%8Cc-apis"><span class="nav-number">4.</span> <span class="nav-text">Python和C++ APIs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">5.</span> <span class="nav-text">完整代码</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dou Jiang"
+      src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+  <p class="site-author-name" itemprop="name">Dou Jiang</p>
+  <div class="site-description" itemprop="description">凌绝顶，众山小</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hjchen2" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hjchen2" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/p/1005052128954644" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052128954644" rel="noopener me" target="_blank">Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2020/02/25/%E5%A6%82%E4%BD%95%E5%9C%A8XRT%E6%A1%86%E6%9E%B6%E4%B8%8B%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%90%8E%E7%AB%AF%E5%BC%95%E6%93%8E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="name" content="Dou Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+      <meta itemprop="description" content="凌绝顶，众山小">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="如何在XRT框架下添加自定义的后端引擎 | Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何在XRT框架下添加自定义的后端引擎
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2020-02-25 16:06:18" itemprop="dateCreated datePublished" datetime="2020-02-25T16:06:18+08:00">2020-02-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-01-03 22:05:58" itemprop="dateModified" datetime="2023-01-03T22:05:58+08:00">2023-01-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/XRT/" itemprop="url" rel="index"><span itemprop="name">XRT</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括：</p>
+<ul>
+<li>统一的DAG计算图表示</li>
+<li>统一的子图表达、切分和折叠过程</li>
+<li>统一的JIT子图编译接口和缓存机制</li>
+<li>统一的Executable Launch接口</li>
+</ul>
+<p>得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable
+launch接口的具体实现上。</p>
+<span id="more"></span>
+<p>我们把XRT的每个子图都看成是一个function，function包含输入和输出参数，以及对应的函数体（DAG表示的计算图），比如下面表示的是只包含一个relu节点的XRT子图。</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">function &#123;</span><br><span class="line">  argument &#123;</span><br><span class="line">    name: &quot;_input_argument_0&quot;</span><br><span class="line">    value: &quot;conv1/out&quot;</span><br><span class="line">  &#125;</span><br><span class="line">  argument &#123;</span><br><span class="line">    name: &quot;_output_argument_0&quot;</span><br><span class="line">    value: &quot;relu1/out&quot;</span><br><span class="line">  &#125;</span><br><span class="line">  node &#123;</span><br><span class="line">    name: &quot;relu1&quot;</span><br><span class="line">    device_type: kGPU</span><br><span class="line">    relu_conf &#123;</span><br><span class="line">      in: &quot;conv1/out&quot;</span><br><span class="line">      out: &quot;out&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在runtime阶段function首先需要被编译成executable，执行function实际上就是feed对应的输入参数去launch这个编译好的executable，同时得到执行的结果，即function的返回值。</p>
+<p>在XRT框架下每个后端引擎都有一个与之相对应的executable（比如XLA的XlaExecutable和TensorRT的TrtExecutable），和将function编译成对应executable的compiler（比如XLA的XlaGraphCompiler和TensorRT的TrtGraphCompiler），因此添加一个新的后端引擎，通常只需要添加一个对应的executable和compiler。下面以添加一个自定义的后端引擎Test为例，详细介绍在XRT框架下支持新的后端引擎的具体过程。</p>
+<p>首先在xrt/types.proto文件中XrtEngine下增加一个Test引擎字段。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> <span class="title class_">XrtEngine</span> &#123;</span><br><span class="line">  DEFAULT = <span class="number">1</span>;</span><br><span class="line">  XLA = <span class="number">2</span>;</span><br><span class="line">  TENSORRT = <span class="number">3</span>;</span><br><span class="line">  TVM = <span class="number">4</span>;</span><br><span class="line">  TEST = <span class="number">5</span>;  <span class="comment">// For Test engine</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果Test引擎针对的硬件不在XrtDevice中，则需要在XrtDevice中增加对应的设备字段。假设我们自定义的Test引擎只支持GPU_CUDA，因此这里就不需要修改XrtDevice了。</p>
+<p>接下来，与XLA和TensorRT一样，我们在xrt目录下创建一个test目录，其余所有与Test引擎相关的代码都将放在该目录下。</p>
+<h2 id="test-executable">Test Executable</h2>
+<p>在增加任何一个后端引擎之前，我们都需要仔细考虑该后端引擎所需的最小执行环境，一个最简单的执行环境包括输入输出、中间结果以及执行具体计算逻辑的硬件代码，这个代码可以是通过codegen自动生成的，也可以是手工实现的。</p>
+<p>接下来我们给自定义的Test引擎增加一个对应的TestExecutable。在xrt/test目录下，我们创建文件test_executable.h和test_executable.cpp。</p>
+<p>test_executable.h中定义TestExecutable，TestExecutable必须继承自Executable，并实现Run接口。为了尽可能简单，TestExecutable只包含输出outputs、中间结果tmp_buffers和编排好的函数调用列表func_codes，以及每个函数的输入输出参数对应的buffer序号func_args_。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> ONEFLOW_XRT_TEST_TEST_EXECUTABLE_H_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;oneflow/xrt/executable.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;oneflow/xrt/parameter.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;functional&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> oneflow &#123;</span><br><span class="line"><span class="keyword">namespace</span> xrt &#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> std::function&lt;<span class="type">void</span>(<span class="type">const</span> std::vector&lt;Parameter&gt; &amp;,</span><br><span class="line">                           <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;)&gt; FuncCode;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">FuncArgumentIndices</span> &#123;</span><br><span class="line">  std::vector&lt;<span class="type">int</span>&gt; inputs;</span><br><span class="line">  std::vector&lt;<span class="type">int</span>&gt; outputs;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TestExecutable</span> : <span class="keyword">public</span> Executable &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">TestExecutable</span>(<span class="type">const</span> std::string &amp;name, <span class="type">const</span> <span class="type">int</span> num_inputs,</span><br><span class="line">                 <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;outputs,</span><br><span class="line">                 <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;temp_buffers,</span><br><span class="line">                 <span class="type">const</span> std::vector&lt;FuncCode&gt; &amp;func_codes,</span><br><span class="line">                 <span class="type">const</span> std::vector&lt;FuncArgumentIndices&gt; &amp;func_args);</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="type">bool</span> <span class="title">Run</span><span class="params">(<span class="type">const</span> std::vector&lt;Parameter&gt; &amp;inputs,</span></span></span><br><span class="line"><span class="params"><span class="function">           <span class="type">const</span> ExecutableRunOptions &amp;run_options,</span></span></span><br><span class="line"><span class="params"><span class="function">           <span class="type">bool</span> block_until_done = <span class="literal">true</span>)</span> <span class="keyword">override</span></span>;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">private</span>:</span><br><span class="line">  <span class="type">int</span> num_inputs_;</span><br><span class="line">  std::vector&lt;Parameter&gt; outputs_;</span><br><span class="line">  std::vector&lt;Parameter&gt; temp_buffers_;</span><br><span class="line">  std::vector&lt;FuncCode&gt; func_codes_;</span><br><span class="line">  std::vector&lt;FuncArgumentIndices&gt; func_args_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">&#125;  <span class="comment">// namespace xrt</span></span><br><span class="line">&#125;  <span class="comment">// namespace oneflow</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span>  <span class="comment">// ONEFLOW_XRT_TEST_TEST_EXECUTABLE_H_</span></span></span><br></pre></td></tr></table></figure>
+<p>在test_executable.cpp中实现Run方法，这里我们只是简单的顺序执行编排好的函数func_codes。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;oneflow/xrt/test/test_executable.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> oneflow &#123;</span><br><span class="line"><span class="keyword">namespace</span> xrt &#123;</span><br><span class="line"></span><br><span class="line">TestExecutable::<span class="built_in">TestExecutable</span>(<span class="type">const</span> std::string &amp;name, <span class="type">const</span> <span class="type">int</span> num_inputs,</span><br><span class="line">                               <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;outputs,</span><br><span class="line">                               <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;temp_buffers,</span><br><span class="line">                               <span class="type">const</span> std::vector&lt;FuncCode&gt; &amp;func_codes,</span><br><span class="line">                               <span class="type">const</span> std::vector&lt;FuncArgumentIndices&gt; &amp;func_args)</span><br><span class="line">    : <span class="built_in">Executable</span>(name, XrtEngine::TEST),</span><br><span class="line">      <span class="built_in">num_inputs_</span>(num_inputs),</span><br><span class="line">      <span class="built_in">outputs_</span>(outputs),</span><br><span class="line">      <span class="built_in">temp_buffers_</span>(temp_buffers),</span><br><span class="line">      <span class="built_in">func_codes_</span>(func_codes),</span><br><span class="line">      <span class="built_in">func_args_</span>(func_args) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">TestExecutable::Run</span><span class="params">(<span class="type">const</span> std::vector&lt;Parameter&gt; &amp;inputs,</span></span></span><br><span class="line"><span class="params"><span class="function">                         <span class="type">const</span> ExecutableRunOptions &amp;run_options,</span></span></span><br><span class="line"><span class="params"><span class="function">                         <span class="type">bool</span> block_until_done)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">auto</span> PullArgs = [&amp;](<span class="type">const</span> std::vector&lt;<span class="type">int</span>&gt; &amp;indices) &#123;</span><br><span class="line">    std::vector&lt;Parameter&gt; args;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> idx : indices) &#123;</span><br><span class="line">      <span class="keyword">if</span> (idx &lt; num_inputs_) &#123;</span><br><span class="line">        args.<span class="built_in">push_back</span>(inputs[idx]);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (idx &lt; num_inputs_ + outputs_.<span class="built_in">size</span>()) &#123;</span><br><span class="line">        args.<span class="built_in">push_back</span>(outputs_[idx - num_inputs_]);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        idx -= (num_inputs_ + outputs_.<span class="built_in">size</span>());</span><br><span class="line">        <span class="built_in">CHECK_GE</span>(idx, <span class="number">0</span>);</span><br><span class="line">        <span class="built_in">CHECK_LT</span>(idx, temp_buffers_.<span class="built_in">size</span>());</span><br><span class="line">        args.<span class="built_in">push_back</span>(temp_buffers_[idx]);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> std::<span class="built_in">move</span>(args);</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">CHECK_EQ</span>(inputs.<span class="built_in">size</span>(), num_inputs_);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; func_codes_.<span class="built_in">size</span>(); ++i) &#123;</span><br><span class="line">    <span class="keyword">auto</span> in_args = <span class="built_in">PullArgs</span>(func_args_[i].inputs);</span><br><span class="line">    <span class="keyword">auto</span> out_args = <span class="built_in">PullArgs</span>(func_args_[i].outputs);</span><br><span class="line">    func_codes_[i](in_args, out_args);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Synchronize stream if block_until_done.</span></span><br><span class="line">  <span class="keyword">if</span> (block_until_done) &#123;</span><br><span class="line">    <span class="comment">// TODO(hjchen2)</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// All return params are the results of the executable.</span></span><br><span class="line">  <span class="keyword">this</span>-&gt;results_ = run_options.return_params;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span> <span class="comment">/*running status*/</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;  <span class="comment">// namespace xrt</span></span><br><span class="line">&#125;  <span class="comment">// namespace oneflow</span></span><br></pre></td></tr></table></figure>
+<p>目前为止我们已经完成了一个最简单的运行时executable，这个executable甚至有点类似其他框架中提供的最简单的图执行器（graph
+executor）。接下来我们要介绍如何将一个XRT的子图编译成上面的TestExecutable。</p>
+<h2 id="test-compiler">Test Compiler</h2>
+<p>每个后端引擎都对应一个compiler，当我们希望使用某个后端引擎来执行一个XRT子图时，就需要有一个对应的compiler将该子图编译成后端引擎对应的executable。Compiler通常都非常注重编译产物的执行性能，而性能以外的关切点也导致了不同的技术路线，比如对算法通用性、跨平台有高度关切的TVM和XLA采用了LLVM传统编译器的路线，而对于过分看重性能但硬件平台单一的TensorRT更多的则是采用手工优化和tuning相结合的策略。不过这两种技术路线并不是完全对立的，也是在不断地相互借鉴和融合。</p>
+<p>在XRT中，所有这些技术方案都是可以被兼容的，你可以根据实际情况自由切换，你也可以把XRT当成实验场所，实现一个自定义的compiler，并在同一套框架下对比不同compiler、不同技术方案的优劣。</p>
+<p>回到本文的主题，我们现在需要实现一个TestExecutable对应的compiler，我们也把该compiler叫做TestGraphCompiler。</p>
+<p>首先在xrt/test目录下新建两个文件test_graph_compiler.h和test_graph_compiler.cpp。在test_graph_compiler.h文件中定义类TestGraphCompiler，TestGraphCompiler必须继承自类GraphCompiler::Impl，并实现对应的Compile接口。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TestGraphCompiler</span> : <span class="keyword">public</span> GraphCompiler::Impl &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">explicit</span> <span class="title">TestGraphCompiler</span><span class="params">(<span class="type">const</span> std::string &amp;name)</span></span></span><br><span class="line"><span class="function">      : GraphCompiler::Impl(name) &#123;</span>&#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">virtual</span> ~<span class="built_in">TestGraphCompiler</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">  <span class="function">std::shared_ptr&lt;Executable&gt; <span class="title">Compile</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">      <span class="type">const</span> XrtGraph *graph,</span></span></span><br><span class="line"><span class="params"><span class="function">      <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;entry_params,</span></span></span><br><span class="line"><span class="params"><span class="function">      <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;return_params,</span></span></span><br><span class="line"><span class="params"><span class="function">      <span class="type">const</span> std::vector&lt;InputOutputAlias&gt; &amp;aliases)</span> <span class="keyword">override</span></span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>在test_graph_compiler.cpp中实现Compile接口，并注册一个新的graph
+compiler。在动手实现该接口之前，有必要先解释一下该接口的参数列表，graph表示的是function子图，entry_params表示子图的输入，return_params表示子图的输出，aliases通常在包含模型更新操作时会用到，表明输出和输入是一对别名关系。被alias的输入将生命期延长到了整个子图，并且与对应的输出共享内存，实际上也就间接实现了in-place计算的目的。</p>
+<p>我们按拓扑顺序遍历子图中的每个节点（或op），依次将节点编译成具体的执行代码，并在合适的位置插入临时buffer。为了方便处理不同类型的op，我们在下面的代码中引入了TestOpContext和TestOpKernel的概念。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Register a new graph compiler for TEST engine.</span></span><br><span class="line"><span class="built_in">REGISTER_GRAPH_COMPILER</span>(XrtEngine::TEST, TestGraphCompiler);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Realize Compile interface.</span></span><br><span class="line"><span class="function">std::shared_ptr&lt;Executable&gt; <span class="title">TestGraphCompiler::Compile</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">const</span> XrtGraph *graph,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;entry_params,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;return_params,</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">const</span> std::vector&lt;InputOutputAlias&gt; &amp;aliases)</span> </span>&#123;</span><br><span class="line">  std::vector&lt;Parameter&gt; temp_buffers;</span><br><span class="line">  std::vector&lt;FuncCode&gt; func_codes;</span><br><span class="line">  std::vector&lt;FuncArgumentIndices&gt; func_args;</span><br><span class="line"></span><br><span class="line">  std::unordered_map&lt;std::string, <span class="type">int</span>&gt; indices;</span><br><span class="line">  std::unordered_map&lt;std::string, Parameter&gt; all_params;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">auto</span> param : entry_params) &#123;</span><br><span class="line">    indices.<span class="built_in">emplace</span>(param.<span class="built_in">name</span>(), indices.<span class="built_in">size</span>());</span><br><span class="line">    all_params[param.<span class="built_in">name</span>()] = param;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">auto</span> param : return_params) &#123;</span><br><span class="line">    indices.<span class="built_in">emplace</span>(param.<span class="built_in">name</span>(), indices.<span class="built_in">size</span>());</span><br><span class="line">    all_params[param.<span class="built_in">name</span>()] = param;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  algorithm::<span class="built_in">TopologyVisit</span>(*graph, [&amp;](<span class="type">const</span> XrtNode *node) &#123;</span><br><span class="line">    <span class="keyword">if</span> (node-&gt;<span class="built_in">type</span>() == <span class="string">&quot;Argument&quot;</span>) &#123;</span><br><span class="line">      <span class="comment">// Argument node is not computation node, so skip it.</span></span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    TestOpContext <span class="built_in">op_context</span>(node, all_params);</span><br><span class="line">    <span class="keyword">auto</span> op_kernel = <span class="built_in">BuildTestOpKernel</span>(node-&gt;<span class="built_in">type</span>());</span><br><span class="line">    op_kernel-&gt;<span class="built_in">Compile</span>(&amp;op_context);</span><br><span class="line"></span><br><span class="line">    func_codes.<span class="built_in">push_back</span>(op_context.func_code_);</span><br><span class="line"></span><br><span class="line">    <span class="type">const</span> <span class="keyword">auto</span> &amp;buffers = op_context.tmp_buffers_;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> it = buffers.<span class="built_in">begin</span>(); it != buffers.<span class="built_in">end</span>(); ++it) &#123;</span><br><span class="line">      all_params[it-&gt;first] = it-&gt;second;</span><br><span class="line">      temp_buffers.<span class="built_in">push_back</span>(it-&gt;second);</span><br><span class="line">      indices.<span class="built_in">emplace</span>(it-&gt;first, indices.<span class="built_in">size</span>());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Finalize argument indices for each function.</span></span><br><span class="line">    FuncArgumentIndices arg_indices;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;arg : op_context.input_args_) &#123;</span><br><span class="line">      arg_indices.inputs.<span class="built_in">push_back</span>(indices.<span class="built_in">at</span>(arg));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> <span class="keyword">auto</span> &amp;arg : op_context.output_args_) &#123;</span><br><span class="line">      arg_indices.outputs.<span class="built_in">push_back</span>(indices.<span class="built_in">at</span>(arg));</span><br><span class="line">    &#125;</span><br><span class="line">    func_args.<span class="built_in">push_back</span>(std::<span class="built_in">move</span>(arg_indices));</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> std::<span class="built_in">make_shared</span>&lt;TestExecutable&gt;(<span class="keyword">this</span>-&gt;name_, entry_params.<span class="built_in">size</span>(),</span><br><span class="line">                                          return_params, temp_buffers,</span><br><span class="line">                                          func_codes, func_args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TestOpContext临时存储编译需要的元信息和编译结果，为TestOpKernel提供必要的接口，TestOpKernel则根据op类型完成单个op的编译过程。上述代码中我们实现了一个将XRT子图编译成TestExecutable的最简单的graph
+compiler，下面我们将以ReLU
+op为例，介绍TestOpContext和TestOpKernel是如何对op进行编译的。</p>
+<h2 id="test-kernels">Test Kernels</h2>
+<p>我们回过头再仔细研究一下TestGraphCompiler的Compile实现，TestOpContext接受两个输入，node和当前所有已经创建过的parameters，经过OpKernel编译后输出函数代码（func_code_）、中间buffer（tmp_buffers_），以及函数代码输入和输出对应的parameter
+names。因此在这个例子中，TestOpContext被设计成如下形式：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TestOpContext</span> &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="built_in">TestOpContext</span>(<span class="type">const</span> XrtNode *node,</span><br><span class="line">                <span class="type">const</span> std::unordered_map&lt;std::string, Parameter&gt; &amp;all_params)</span><br><span class="line">      : <span class="built_in">node_</span>(node), <span class="built_in">all_params_</span>(all_params) &#123;&#125;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="type">const</span> XrtNode *node_;</span><br><span class="line">  <span class="type">const</span> std::unordered_map&lt;std::string, Parameter&gt; &amp;all_params_;</span><br><span class="line"></span><br><span class="line">  std::function&lt;<span class="type">void</span>(<span class="type">const</span> std::vector&lt;Parameter&gt;&amp;,</span><br><span class="line">                     <span class="type">const</span> std::vector&lt;Parameter&gt;&amp;)&gt; func_code_;</span><br><span class="line">  std::vector&lt;std::string&gt; input_args_;</span><br><span class="line">  std::vector&lt;std::string&gt; output_args_;</span><br><span class="line">  std::unordered_map&lt;std::string, Parameter&gt; tmp_buffers_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>对于TestOpKernel，为了处理不同类型的op，我们采用工厂注册模式，并且这种模式还有另一个用处，就是在XRT划分子图时可以用来判断该引擎是否支持某个类型的op。XRT已经将kernel注册接口封装成了一个辅助类OpKernelRegistrar，但同时也要求TestOpKernel必须继承基类OpKernel。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">TestOpKernel</span> : <span class="keyword">public</span> OpKernel&lt;TestOpContext&gt; &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="type">void</span> <span class="title">Compile</span><span class="params">(TestOpContext *ctx)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>使用OpKernelRegistrar定义一个用来注册TestOpKernel的宏。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> REGISTER_TEST_OP_KERNEL(OpName, KernelType)                 \</span></span><br><span class="line"><span class="meta">  static auto _test_op_kernel_##OpName##_ __attribute__((unused)) = \</span></span><br><span class="line"><span class="meta">      OpKernelRegistrar<span class="string">&lt;TestOpContext&gt;</span>(#OpName)                     \</span></span><br><span class="line"><span class="meta">          .SetField(XrtEngine::TEST)                                \</span></span><br><span class="line"><span class="meta">          .SetDevice(&#123;XrtDevice::GPU_CUDA&#125;)                         \</span></span><br><span class="line"><span class="meta">          .SetFactory([]() -&gt; OpKernel<span class="string">&lt;TestOpContext&gt;</span> * &#123;           \</span></span><br><span class="line"><span class="meta">                        return new KernelType;                      \</span></span><br><span class="line"><span class="meta">                      &#125;)</span></span><br></pre></td></tr></table></figure>
+<p>最后我们实现一个Relu的OpKernel，填充TestOpContext的func_code_、tmp_buffers_以及输入输出arguments。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">ComputeRelu</span><span class="params">(<span class="type">const</span> Parameter &amp;input, <span class="type">const</span> Parameter &amp;output)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//TODO(hjchen2)</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TestReluOpKernel</span> : <span class="keyword">public</span> TestOpKernel &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="type">void</span> <span class="title">Compile</span><span class="params">(TestOpContext *ctx)</span> <span class="keyword">override</span> </span>&#123;</span><br><span class="line">    ctx-&gt;func_code_ = [](<span class="type">const</span> std::vector&lt;Parameter&gt; &amp;inputs,</span><br><span class="line">                         <span class="type">const</span> std::vector&lt;Parameter&gt; &amp;outputs) &#123;</span><br><span class="line">      <span class="built_in">CHECK_EQ</span>(inputs.<span class="built_in">size</span>(), <span class="number">1</span>);</span><br><span class="line">      <span class="built_in">CHECK_EQ</span>(outputs.<span class="built_in">size</span>(), <span class="number">1</span>);</span><br><span class="line">      <span class="built_in">ComputeRelu</span>(inputs[<span class="number">0</span>], outputs[<span class="number">0</span>]);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> XrtEdge *edge : ctx-&gt;node_-&gt;<span class="built_in">in_edges</span>()) &#123;</span><br><span class="line">      <span class="type">const</span> <span class="keyword">auto</span> &amp;name = edge-&gt;<span class="built_in">argument</span>().<span class="built_in">name</span>();</span><br><span class="line">      <span class="built_in">CHECK_GT</span>(ctx-&gt;all_params_.<span class="built_in">count</span>(name), <span class="number">0</span>);</span><br><span class="line">      <span class="comment">// TODO(hjchen2): Filter duplicate input.</span></span><br><span class="line">      ctx-&gt;input_args_.<span class="built_in">push_back</span>(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">const</span> XrtEdge *edge : ctx-&gt;node_-&gt;<span class="built_in">out_edges</span>()) &#123;</span><br><span class="line">      <span class="type">const</span> <span class="keyword">auto</span> &amp;name = edge-&gt;<span class="built_in">argument</span>().<span class="built_in">name</span>();</span><br><span class="line">      <span class="comment">// TODO(hjchen2): Filter duplicate output.</span></span><br><span class="line">      ctx-&gt;output_args_.<span class="built_in">push_back</span>(name);</span><br><span class="line">      <span class="keyword">if</span> (ctx-&gt;all_params_.<span class="built_in">count</span>(name) == <span class="number">0</span> &amp;&amp;</span><br><span class="line">          ctx-&gt;tmp_buffers_.<span class="built_in">count</span>(name) == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">auto</span> param = <span class="built_in">CreateParameter</span>(name <span class="comment">/*argument name*/</span>,</span><br><span class="line">                                     edge-&gt;<span class="built_in">argument</span>().<span class="built_in">shape</span>(),</span><br><span class="line">                                     edge-&gt;<span class="built_in">argument</span>().<span class="built_in">data_type</span>());</span><br><span class="line">        ctx-&gt;tmp_buffers_[name] = std::<span class="built_in">move</span>(param);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>最后将TestReluOpKernel注册到Test引擎对应的OpKernel工厂下。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">REGISTER_TEST_OP_KERNEL</span>(Relu, TestReluOpKernel)</span><br><span class="line">    .<span class="built_in">EnableTrainPhase</span>()</span><br><span class="line">    .<span class="built_in">Finalize</span>();</span><br></pre></td></tr></table></figure>
+<p>EnableTrainPhase表示该op支持训练，OpKernelRegistrar也提供了其他一些接口，比如设置支持的device列表，mutable
+variables和是否是optimizer op（optimizer会影响子图划分）。</p>
+<h2 id="python和c-apis">Python和C++ APIs</h2>
+<p>引擎的开启或关闭可以通过Python接口和环境变量来设置，因此添加一个后端引擎时也需要在Python中添加相应的接口，在python/framework/function_util.py文件中增加如下代码，</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@oneflow_function_config(<span class="params"><span class="string">&#x27;use_test&#x27;</span></span>)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">set_use_test</span>(<span class="params">func_desc, value = <span class="literal">True</span></span>):</span><br><span class="line">    func_desc.job_config_proto.xrt_config.use_test = value</span><br></pre></td></tr></table></figure>
+<p>并且在xrt/api.cpp中增加一个gflags环境变量，并在该文件中修改相关接口。</p>
+<ul>
+<li><p>增加一个gflags环境变量</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">DEFINE_bool</span>(use_test, <span class="built_in">EnvToBool</span>(FLAGS_use_test, <span class="literal">false</span>), <span class="string">&quot;It&#x27;s optional to use test.&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>修改InitXrtConfigurations、XrtCompilationEnabled和CreateDefaultXrtPassOptions接口，增加对Test引擎的支持。</p></li>
+</ul>
+<h2 id="完整代码">完整代码</h2>
+<p>https://github.com/Oneflow-Inc/oneflow/commit/50a74bc110f3aacfa853456d9b695f2ba80e9e0a</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/XRT/" rel="tag"># XRT</a>
+              <a href="/tags/Compiler/" rel="tag"># Compiler</a>
+              <a href="/tags/TensorFlow-XLA/" rel="tag"># TensorFlow XLA</a>
+              <a href="/tags/TensorRT/" rel="tag"># TensorRT</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/01/10/TVM-PackedFunc%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6/" rel="prev" title="TVM PackedFunc实现机制">
+                  <i class="fa fa-chevron-left"></i> TVM PackedFunc实现机制
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dou Jiang</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
