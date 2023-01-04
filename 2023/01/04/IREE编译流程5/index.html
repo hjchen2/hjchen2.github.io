@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="IREE Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op fusion等，相关的passes及其作用如下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IREE编译流程解析(五)">
+<meta property="og:url" content="https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="IREE Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op fusion等，相关的passes及其作用如下。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-01-04T13:15:20.000Z">
+<meta property="article:modified_time" content="2023-01-04T12:30:44.911Z">
+<meta property="article:author" content="Dou Jiang">
+<meta property="article:tag" content="Deep Learning Compiler">
+<meta property="article:tag" content="IREE">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/","path":"2023/01/04/IREE编译流程5/","title":"IREE编译流程解析(五)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IREE编译流程解析(五) | Don't Respond</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Don't Respond</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">Home</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section">Tags</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dou Jiang"
+      src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+  <p class="site-author-name" itemprop="name">Dou Jiang</p>
+  <div class="site-description" itemprop="description">凌绝顶，众山小</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hjchen2" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hjchen2" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://weibo.com/p/1005052128954644" title="Weibo → http:&#x2F;&#x2F;weibo.com&#x2F;p&#x2F;1005052128954644" rel="noopener me" target="_blank">Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="name" content="Dou Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+      <meta itemprop="description" content="凌绝顶，众山小">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="IREE编译流程解析(五) | Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IREE编译流程解析(五)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2023-01-04 21:15:20 / Modified: 20:30:44" itemprop="dateCreated datePublished" datetime="2023-01-04T21:15:20+08:00">2023-01-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/DL-Compiler/" itemprop="url" rel="index"><span itemprop="name">DL Compiler</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>IREE
+Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
+fusion等，相关的passes及其作用如下。</p>
+<span id="more"></span>
+<ul>
+<li><p>IREE::Util::createDemoteF64ToF32Pass</p>
+<p>将F64类型窄化为F32。</p></li>
+<li><p>IREE::Flow::createConvertConv2D1x1ToMatmulPass</p>
+<p>将1x1的<code>linalg.conv_2d_nhwc_hwcf</code>转换成<code>linalg.matmul</code>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">func.func @conv(%input : tensor&lt;1x2x2x3xf32&gt;, %filter: tensor&lt;1x1x3x4xf32&gt;) -&gt; tensor&lt;1x2x2x4xf32&gt; &#123;</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">  %0 = mhlo.convolution(%input, %filter)</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">            dim_numbers = [b, 0, 1, f]x[0, 1, i, o]-&gt;[b, 0, 1, f],</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">            window = &#123;stride = [1, 1], pad = [[0, 0], [0, 0]], rhs_dilate = [1, 1]&#125;</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">            &#123;batch_group_count = 1 : i64, feature_group_count = 1 : i64&#125;</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">          : (tensor&lt;1x2x2x3xf32&gt;, tensor&lt;1x1x3x4xf32&gt;) -&gt; tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">  <span class="built_in">return</span> %0 : tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">&#125;</span></span><br><span class="line">  </span><br><span class="line">func.func @conv(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;1x2x2x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;1x1x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = linalg.init_tensor [1, 2, 2, 4] : tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.fill ins(%cst : f32) outs(%2 : tensor&lt;1x2x2x4xf32&gt;) -&gt; tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = linalg.conv_2d_nhwc_hwcf &#123;dilations = dense&lt;1&gt; : tensor&lt;2xi64&gt;, strides = dense&lt;1&gt; : tensor&lt;2xi64&gt;&#125; ins(%0, %1 : tensor&lt;1x2x2x3xf32&gt;, tensor&lt;1x1x3x4xf32&gt;) outs(%3 : tensor&lt;1x2x2x4xf32&gt;) -&gt; tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = hal.tensor.export %4 : tensor&lt;1x2x2x4xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %5 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">func.func @conv(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;1x2x2x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;1x1x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = linalg.init_tensor [1, 2, 2, 4] : tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.fill ins(%cst : f32) outs(%2 : tensor&lt;1x2x2x4xf32&gt;) -&gt; tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = tensor.collapse_shape %0 [[0, 1, 2], [3]] : tensor&lt;1x2x2x3xf32&gt; into tensor&lt;4x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = tensor.collapse_shape %1 [[0, 1, 2], [3]] : tensor&lt;1x1x3x4xf32&gt; into tensor&lt;3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">6 = tensor.collapse_shape %3 [[0, 1, 2], [3]] : tensor&lt;1x2x2x4xf32&gt; into tensor&lt;4x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">7 = linalg.matmul ins(%4, %5 : tensor&lt;4x3xf32&gt;, tensor&lt;3x4xf32&gt;) outs(%6 : tensor&lt;4x4xf32&gt;) -&gt; tensor&lt;4x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">8 = tensor.expand_shape %7 [[0, 1, 2], [3]] : tensor&lt;4x4xf32&gt; into tensor&lt;1x2x2x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">9 = hal.tensor.export %8 : tensor&lt;1x2x2x4xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %9 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>IREE::Flow::createConvertConv2DToImg2ColPass</p>
+<p>将conv2d转换成img2col。默认不开启。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">%0 = mhlo.convolution(%input, %filter)</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">              dim_numbers = [b, 0, 1, f]x[0, 1, i, o]-&gt;[b, 0, 1, f],</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">              window = &#123;stride = [1, 1], pad = [[0, 0], [0, 0]], rhs_dilate = [1, 1]&#125;</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">              &#123;batch_group_count = 1 : i64, feature_group_count = 1 : i64&#125;</span></span><br><span class="line"><span class="meta prompt_">//# </span><span class="language-bash">            : (tensor&lt;1x4x4x3xf32&gt;, tensor&lt;2x2x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line">func.func @conv(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;1x4x4x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;2x2x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = linalg.init_tensor [1, 3, 3, 4] : tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.fill ins(%cst : f32) outs(%2 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = linalg.conv_2d_nhwc_hwcf &#123;dilations = dense&lt;1&gt; : tensor&lt;2xi64&gt;, strides = dense&lt;1&gt; : tensor&lt;2xi64&gt;&#125; ins(%0, %1 : tensor&lt;1x4x4x3xf32&gt;, tensor&lt;2x2x3x4xf32&gt;) outs(%3 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = hal.tensor.export %4 : tensor&lt;1x3x3x4xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %5 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">func.func @conv(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;1x4x4x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;2x2x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = linalg.init_tensor [1, 3, 3, 4] : tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.fill ins(%cst : f32) outs(%2 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = linalg.init_tensor [1, 3, 3, 2, 2, 3] : tensor&lt;1x3x3x2x2x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3, d4, d5) -&gt; (d0, d1 + d3, d2 + d4, d5)&gt;, affine_map&lt;(d0, d1, d2, d3, d4, d5) -&gt; (d0, d1, d2, d3, d4, d5)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%0 : tensor&lt;1x4x4x3xf32&gt;) outs(%4 : tensor&lt;1x3x3x2x2x3xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg2: f32, %arg3: f32):</span><br><span class="line">    linalg.yield %arg2 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;1x3x3x2x2x3xf32&gt;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">6 = tensor.collapse_shape %5 [[0, 1, 2], [3, 4, 5]] : tensor&lt;1x3x3x2x2x3xf32&gt; into tensor&lt;9x12xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">7 = tensor.collapse_shape %1 [[0, 1, 2], [3]] : tensor&lt;2x2x3x4xf32&gt; into tensor&lt;12x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">8 = tensor.collapse_shape %3 [[0, 1, 2], [3]] : tensor&lt;1x3x3x4xf32&gt; into tensor&lt;9x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">9 = linalg.matmul ins(%6, %7 : tensor&lt;9x12xf32&gt;, tensor&lt;12x4xf32&gt;) outs(%8 : tensor&lt;9x4xf32&gt;) -&gt; tensor&lt;9x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">10 = tensor.expand_shape %9 [[0, 1, 2], [3]] : tensor&lt;9x4xf32&gt; into tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">11 = hal.tensor.export %10 : tensor&lt;1x3x3x4xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %11 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>IREE::Flow::createDetachElementwiseFromNamedOpsPass</p>
+<p>将<code>buffer = linalg.generic_op + linalg.named_payload_op</code>转换成<code>tmp_buffer = linalg.named_payload_op; buffer =  linalg.generic_op + tmp_buffer</code>，主要目的是将上游的<code>generic op</code>和<code>named_payload_op</code>分隔开，使得<code>named_payload_op</code>的结果写到一块新的buffer。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">func.func @test(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view, %arg2: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;1x4x4x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;2x2x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = hal.tensor.import %arg2 : !hal.buffer_view -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line">  </span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.init_tensor [1, 3, 3, 4] : tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = linalg.fill ins(%cst : f32) outs(%3 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%2 : tensor&lt;1x3x3x4xf32&gt;) outs(%4 : tensor&lt;1x3x3x4xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg3: f32, %arg4: f32):</span><br><span class="line">    %8 = arith.addf %arg3, %arg3 : f32</span><br><span class="line">    linalg.yield %8 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;1x3x3x4xf32&gt;</span><br><span class="line">  </span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">6 = linalg.conv_2d_nhwc_hwcf &#123;dilations = dense&lt;1&gt; : tensor&lt;2xi64&gt;, strides = dense&lt;1&gt; : tensor&lt;2xi64&gt;&#125; ins(%0, %1 : tensor&lt;1x4x4x3xf32&gt;, tensor&lt;2x2x3x4xf32&gt;) outs(%5 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">7 = hal.tensor.export %6 : tensor&lt;1x3x3x4xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %7 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">func.func @test(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view, %arg2: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;1x4x4x3xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;2x2x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = hal.tensor.import %arg2 : !hal.buffer_view -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line">  </span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.init_tensor [1, 3, 3, 4] : tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = linalg.fill ins(%cst : f32) outs(%3 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%2 : tensor&lt;1x3x3x4xf32&gt;) outs(%4 : tensor&lt;1x3x3x4xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg3: f32, %arg4: f32):</span><br><span class="line">    %11 = arith.addf %arg3, %arg3 : f32</span><br><span class="line">    linalg.yield %11 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;1x3x3x4xf32&gt;</span><br><span class="line">  </span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">6 = linalg.init_tensor [1, 3, 3, 4] : tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">7 = linalg.fill ins(%cst : f32) outs(%6 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">8 = linalg.conv_2d_nhwc_hwcf &#123;dilations = dense&lt;1&gt; : tensor&lt;2xi64&gt;, strides = dense&lt;1&gt; : tensor&lt;2xi64&gt;&#125; ins(%0, %1 : tensor&lt;1x4x4x3xf32&gt;, tensor&lt;2x2x3x4xf32&gt;) outs(%7 : tensor&lt;1x3x3x4xf32&gt;) -&gt; tensor&lt;1x3x3x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">9 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%8, %5 : tensor&lt;1x3x3x4xf32&gt;, tensor&lt;1x3x3x4xf32&gt;) outs(%7 : tensor&lt;1x3x3x4xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg3: f32, %arg4: f32, %arg5: f32):</span><br><span class="line">    %11 = arith.addf %arg3, %arg4 : f32</span><br><span class="line">    linalg.yield %11 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;1x3x3x4xf32&gt;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">10 = hal.tensor.export %9 : tensor&lt;1x3x3x4xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %10 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>IREE::Flow::createVerifyInputLegalityPass</p>
+<p>检查tosa dialect、mhlo
+dialect和UnrealizedConversionCastOp是否已经被转化完全。</p></li>
+<li><p>IREE::Flow::createConvertLinalgMatmulToMmt4DPass</p>
+<p>将2d的<code>linalg.matmul</code>
+tiling成<code>linalg.mmt4d</code>。默认不开启，可通过<code>--iree-flow-mmt4d-target-options="enable_generic_slow arch=cuda"</code>选项开启。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">func.func @test(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;256x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = linalg.init_tensor [128, 256] : tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.fill ins(%cst : f32) outs(%2 : tensor&lt;128x256xf32&gt;) -&gt; tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = linalg.matmul ins(%0, %1 : tensor&lt;128x256xf32&gt;, tensor&lt;256x256xf32&gt;) outs(%3 : tensor&lt;128x256xf32&gt;) -&gt; tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = hal.tensor.export %4 : tensor&lt;128x256xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %5 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">func.func @test(%arg0: !hal.buffer_view, %arg1: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">cst = arith.constant 0.000000e+00 : f32</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">0 = hal.tensor.import %arg0 : !hal.buffer_view -&gt; tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">1 = hal.tensor.import %arg1 : !hal.buffer_view -&gt; tensor&lt;256x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">2 = linalg.init_tensor [128, 256] : tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">3 = linalg.fill ins(%cst : f32) outs(%2 : tensor&lt;128x256xf32&gt;) -&gt; tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">4 = tensor.expand_shape %0 [[0, 1], [2, 3]] : tensor&lt;128x256xf32&gt; into tensor&lt;16x8x128x2xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">5 = tensor.expand_shape %1 [[0, 1], [2, 3]] : tensor&lt;256x256xf32&gt; into tensor&lt;128x2x64x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">6 = tensor.expand_shape %3 [[0, 1], [2, 3]] : tensor&lt;128x256xf32&gt; into tensor&lt;16x8x64x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">7 = linalg.init_tensor [16, 128, 8, 2] : tensor&lt;16x128x8x2xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">8 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d2, d1, d3)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%4 : tensor&lt;16x8x128x2xf32&gt;) outs(%7 : tensor&lt;16x128x8x2xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg2: f32, %arg3: f32):</span><br><span class="line">    linalg.yield %arg2 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;16x128x8x2xf32&gt;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">9 = linalg.init_tensor [64, 128, 4, 2] : tensor&lt;64x128x4x2xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">10 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3) -&gt; (d1, d3, d0, d2)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%5 : tensor&lt;128x2x64x4xf32&gt;) outs(%9 : tensor&lt;64x128x4x2xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg2: f32, %arg3: f32):</span><br><span class="line">    linalg.yield %arg2 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;64x128x4x2xf32&gt;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">11 = linalg.init_tensor [16, 64, 8, 4] : tensor&lt;16x64x8x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">12 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d2, d1, d3)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%6 : tensor&lt;16x8x64x4xf32&gt;) outs(%11 : tensor&lt;16x64x8x4xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg2: f32, %arg3: f32):</span><br><span class="line">    linalg.yield %arg2 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;16x64x8x4xf32&gt;</span><br><span class="line"><span class="meta prompt_">  //# </span><span class="language-bash">16 x (128x8x2) @ 64 x (128x4x2) =&gt; 16 x 64 x sum_&#123;128&#125;(8x2 * (4x2)^T)</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">13 = linalg.mmt4d &#123;comment = <span class="string">&quot;generic tiling parameters, as no known kernel was matched for this matmul and target&quot;</span>&#125; ins(%8, %10 : tensor&lt;16x128x8x2xf32&gt;, tensor&lt;64x128x4x2xf32&gt;) outs(%12 : tensor&lt;16x64x8x4xf32&gt;) -&gt; tensor&lt;16x64x8x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">14 = linalg.init_tensor [16, 8, 64, 4] : tensor&lt;16x8x64x4xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">15 = linalg.generic &#123;indexing_maps = [affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d2, d1, d3)&gt;, affine_map&lt;(d0, d1, d2, d3) -&gt; (d0, d1, d2, d3)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>, <span class="string">&quot;parallel&quot;</span>]&#125; ins(%13 : tensor&lt;16x64x8x4xf32&gt;) outs(%14 : tensor&lt;16x8x64x4xf32&gt;) &#123;</span></span><br><span class="line">  ^bb0(%arg2: f32, %arg3: f32):</span><br><span class="line">    linalg.yield %arg2 : f32</span><br><span class="line">  &#125; -&gt; tensor&lt;16x8x64x4xf32&gt;</span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">16 = tensor.collapse_shape %15 [[0, 1], [2, 3]] : tensor&lt;16x8x64x4xf32&gt; into tensor&lt;128x256xf32&gt;</span></span><br><span class="line"><span class="meta prompt_">  %</span><span class="language-bash">17 = hal.tensor.export %16 : tensor&lt;128x256xf32&gt; -&gt; !hal.buffer_view</span></span><br><span class="line">  return %17 : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>IREE::Flow::createPadLinalgOpsToIntegerMultiplePass</p>
+<p>将matmul的M、N和K扩充到paddingSize的整数倍，paddingSize默认为4。</p></li>
+<li><p>mlir::createLinalgNamedOpConversionPass</p></li>
+<li><p>IREE::Flow::createExpandTensorShapesPass</p></li>
+<li><p>buildGlobalOptimizationPassPipeline</p>
+<ul>
+<li>IREE::Util::createSimplifyGlobalAccessesPass</li>
+<li>IREE::Util::createApplyPatternsPass</li>
+<li>IREE::Util::createFoldGlobalsPass</li>
+<li>IREE::Util::createHoistIntoGlobalsPass</li>
+<li>IREE::Util::createHoistIntoGlobalsPass</li>
+</ul></li>
+<li><p>IREE::Flow::createTensorPadToTensorInsertSlicePass</p></li>
+<li><p>mlir::createConvertElementwiseToLinalgPass</p></li>
+<li><p>mlir::createLinalgFoldUnitExtentDimsPass</p></li>
+<li><p>createInterchangeGenericOpsPass</p></li>
+<li><p>memref::createResolveShapedTypeResultDimsPass</p></li>
+<li><p>mlir::createCanonicalizerPass</p></li>
+<li><p>mlir::createCSEPass</p></li>
+<li><p>createFusionOfTensorOpsPass</p></li>
+<li><p>mlir::createLinalgDetensorizePass</p></li>
+<li><p>mlir::createCanonicalizerPass</p></li>
+<li><p>mlir::createCSEPass</p></li>
+<li><p>createSplitReductionPass</p></li>
+<li><p>createInterchangeGenericOpsPass</p></li>
+<li><p>createInterchangeTransposeGenericOpsPass</p></li>
+<li><p>createDispatchWithTransformDialect</p></li>
+<li><p>createDispatchLinalgOnTensorsPass</p></li>
+<li><p>createDispatchLinalgOnTensorsViaRegionOpsPass</p></li>
+<li><p>createCaptureDispatchDynamicDimsPass</p></li>
+<li><p>mlir::createCanonicalizerPass</p></li>
+<li><p>createCSEPass</p></li>
+<li><p>createInitializeEmptyTensorsPass</p></li>
+<li><p>IREE::Flow::createOutlineDispatchRegionsPass</p></li>
+<li><p>IREE::Util::createStripDebugOpsPass</p></li>
+<li><p>mlir::createCanonicalizerPass</p></li>
+<li><p>IREE::Flow::createDeduplicateExecutablesPass</p></li>
+<li><p>IREE::Flow::createInjectDispatchTracingPass</p></li>
+<li><p>IREE::Flow::createCleanupTensorShapesPass</p></li>
+<li><p>mlir::createCanonicalizerPass</p></li>
+<li><p>mlir::createCSEPass</p></li>
+<li><p>mlir::createCanonicalizerPass</p></li>
+<li><p>mlir::createCSEPass</p></li>
+<li><p>mlir::createSymbolDCEPass</p></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Deep-Learning-Compiler/" rel="tag"># Deep Learning Compiler</a>
+              <a href="/tags/IREE/" rel="tag"># IREE</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/" rel="prev" title="IREE编译流程解析(四)">
+                  <i class="fa fa-chevron-left"></i> IREE编译流程解析(四)
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dou Jiang</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
