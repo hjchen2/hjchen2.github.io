@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="凌绝顶，众山小">
 <meta property="og:type" content="website">
@@ -77,6 +77,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -85,11 +86,37 @@
 
 <nav class="site-nav">
   <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">Home</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section">Tags</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </header>
         
@@ -115,7 +142,7 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Dou Jiang"
-      src="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      src="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
   <p class="site-author-name" itemprop="name">Dou Jiang</p>
   <div class="site-description" itemprop="description">凌绝顶，众山小</div>
 </div>
@@ -171,7 +198,7 @@
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2018/01/02/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E8%AE%B0%E5%BD%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -268,7 +295,7 @@ of Neural Networks using DropConnect</h2>
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/12/01/seq2seq%E4%B8%B2%E8%AE%B2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -365,7 +392,7 @@ corpus)。我们通常将输入和输出都是序列的模型叫做seq2seq，seq
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/08/22/KunPeng%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -459,7 +486,7 @@ and Its Applications in Alibaba and Ant Financial。</p>
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/07/03/C++%E8%B0%83%E7%94%A8Python%E6%8E%A5%E5%8F%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -553,7 +580,7 @@ API不是唯一的方式，也可以使用boost的Python模块，有时间再研
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/06/21/ASGD%E4%B8%ADmomentum%E7%9A%84%E5%BD%B1%E5%93%8D/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -645,7 +672,7 @@ API不是唯一的方式，也可以使用boost的Python模块，有时间再研
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/04/25/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -741,7 +768,7 @@ learning算法在实际应用中更加普遍。</p>
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/04/10/%E5%80%BC%E5%87%BD%E6%95%B0%E7%9A%84%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -835,7 +862,7 @@ Y\right]\right)}\)</span>。</p>
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/03/27/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -929,7 +956,7 @@ learning）运用在AlphaGo上，机器首次在复杂任务上取得了超过�
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/03/22/Mac%E4%B8%8A%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8EGithub%E7%9A%84Hexo%E5%8D%9A%E5%AE%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -1025,7 +1052,7 @@ target="_blank" rel="noopener" href="http://www.jianshu.com/p/13e64c9e2295">原�
     <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2017/01/19/caffe%E5%AD%A6%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="http://ww3.sinaimg.cn/mw690/7ee54514jw8f3qevr3d0oj20hs0hsgme.jpg">
+      <meta itemprop="image" content="https://tvax2.sinaimg.cn/crop.0.0.640.640.180/7ee54514ly8fdy9rqhodkj20hs0hsgme.jpg?KID=imgbed,tva&Expires=1675251458&ssig=vGC%2Fkvh25X">
       <meta itemprop="name" content="Dou Jiang">
     </span>
 
@@ -1146,7 +1173,9 @@ Berkeley攻读计算机科学博士学位时开发的一套深度学习框架，
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
 <script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
 
-  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
 
 
 
