@@ -2,6 +2,138 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2018/01/02/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E8%AE%B0%E5%BD%95/</loc>  
+      
+    <lastmod>2023-02-02T11:09:38.982Z</lastmod>  
+      
+    <date>1514901604000</date>  
+    <title>模型压缩之pruning | Don't Respond</title>  
+      
+    <desc>Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2017/04/25/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>  
+      
+    <lastmod>2023-02-02T11:09:25.775Z</lastmod>  
+      
+    <date>1493094668000</date>  
+    <title>强化学习（二） | Don't Respond</title>  
+      
+    <desc>DQN 前面我们讲到TD算法结合了动态规划和蒙特卡洛算法的优点，不依赖具体的环境模型，并且更新时采用滑动平均的方式，因此单步就能更新，而不需要生成整个episode，在非episode情况下仍然适用。TD算法又分为on policy的sarsa算法和off policy的Q learning算法，其中Q learning算法直接使用下一状态的最大动作值函数进行更新，加快了算法收敛速度，因此Q le</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2017/03/27/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/</loc>  
+      
+    <lastmod>2023-02-02T11:09:16.914Z</lastmod>  
+      
+    <date>1490589068000</date>  
+    <title>强化学习（一） | Don't Respond</title>  
+      
+    <desc>前言 近几年，由于DeepMind成功地将强化学习（reinforcement learning）运用在AlphaGo上，机器首次在复杂任务上取得了超过人类的表现，使得强化学习成为目前机器学习研究的前沿方向之一。强化学习由来已久，Sutton等在1979年就已经开始研究强化学习，1998年出版了强化学习介绍一书，并于2012年发布第二版，本文前几部分内容主要参考该书。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2018/02/03/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/</loc>  
+      
+    <lastmod>2023-02-02T11:09:01.734Z</lastmod>  
+      
+    <date>1517630404000</date>  
+    <title>混合精度训练 | Don't Respond</title>  
+      
+    <desc>MIXED PRECISION TRAINING https://arxiv.org/pdf/1710.03740.pdf 论文概述 nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2020/02/25/%E5%A6%82%E4%BD%95%E5%9C%A8XRT%E6%A1%86%E6%9E%B6%E4%B8%8B%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%90%8E%E7%AB%AF%E5%BC%95%E6%93%8E/</loc>  
+      
+    <lastmod>2023-02-02T11:08:52.446Z</lastmod>  
+      
+    <date>1582617978000</date>  
+    <title>如何在XRT框架下添加自定义的后端引擎 | Don't Respond</title>  
+      
+    <desc>XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括： 统一的DAG计算图表示 统一的子图表达、切分和折叠过程 统一的JIT子图编译接口和缓存机制 统一的Executable Launch接口 得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable launch接口的具体实现上。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2019/12/26/%E5%9B%BE%E6%9B%BF%E6%8D%A2/</loc>  
+      
+    <lastmod>2023-02-02T11:08:39.607Z</lastmod>  
+      
+    <date>1577339644000</date>  
+    <title>图替换 | Don't Respond</title>  
+      
+    <desc>背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。 一些常见的图优化技术： DCE CSE（公共子表达式消除） 常量折叠 数学公式简化 Op融合 Layout变换 内存优化（swap-in/swap-out、重计算）</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2017/12/01/seq2seq%E4%B8%B2%E8%AE%B2/</loc>  
+      
+    <lastmod>2023-02-02T11:08:27.892Z</lastmod>  
+      
+    <date>1512102248000</date>  
+    <title>NEURAL MACHINE TRANSLATION论文学习串讲 | Don't Respond</title>  
+      
+    <desc>seq2seq 主要学习的是论文Neural machine translation by jointly learning to align and translate (Dzmitry Bahdanau、Yoshua Bengio等，2016.05)和Neural machine translation (Minh-ThangLuong，2016.12)。 神经机器翻译的目的是将一门语言的文本</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2017/01/19/caffe%E5%AD%A6%E4%B9%A0/</loc>  
+      
+    <lastmod>2023-02-02T11:08:16.157Z</lastmod>  
+      
+    <date>1484800268000</date>  
+    <title>caffe学习总结 | Don't Respond</title>  
+      
+    <desc>#caffe学习总结 ##caffe的由来 caffe是贾扬清在UC Berkeley攻读计算机科学博士学位时开发的一套深度学习框架，由于高效、易读和模块化的设计，开源后经过nvidia的帮助优化和社区不断的完善，如今成为视觉领域主流的框架之一。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2020/01/10/TVM-PackedFunc%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6/</loc>  
+      
+    <lastmod>2023-02-02T11:08:08.856Z</lastmod>  
+      
+    <date>1578630248000</date>  
+    <title>TVM PackedFunc实现机制 | Don't Respond</title>  
+      
+    <desc>TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2017/08/22/KunPeng%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/</loc>  
+      
+    <lastmod>2023-02-02T11:07:46.876Z</lastmod>  
+      
+    <date>1503377588000</date>  
+    <title>阿里KunPeng框架学习 | Don't Respond</title>  
+      
+    <desc>KunPeng是阿里最新公布的一个大规模机器学习框架，不仅包括了数据/模型并行、负载均衡、模型同步、稀疏表达、工业级容错等特性，而且还提供了易于使用的接口，在很多机器学习算法上都带来了非常大的性能提升。 原始论文 KunPeng: Parameter Server based Distributed Learning Systems and Its Applications in Alibaba </desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2016/06/08/Kaldi%E5%86%B3%E7%AD%96%E6%A0%91%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8/</loc>  
+      
+    <lastmod>2023-02-02T11:07:33.752Z</lastmod>  
+      
+    <date>1465368844000</date>  
+    <title>决策树在Kaldi中如何使用 | Don't Respond</title>  
+      
+    <desc>说明：本文是kaldi主页相关内容的翻译（http://kaldi-asr.org/doc/tree_externals.html ）。目前网上已经有一个翻译的版本，但翻译的不是很清楚，导致我在刚学这部分内容的时候产生了一些误解，所以我希望结合我目前所知道的一些东西，尽量把这部分内容翻译地比较容易理解，但由于也是初学者，一些错误也是不可避免，希望大家发现后一起交流，以便我后期修正。好了，还是废话少</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2019/11/27/DeepFusion/</loc>  
+      
+    <lastmod>2023-02-02T11:07:18.370Z</lastmod>  
+      
+    <date>1574827204000</date>  
+    <title>FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs | Don't Respond</title>  
+      
+    <desc>FusionStitching系统概述 屏幕快照 2019-11-25 13.56.40 输入HloModule，经过以下三个阶段，最终输出LLVM IR。 Computation Fusion Schedule Planning Code Generation 论文主要针对XLA Fusion算法进行了改进，提出了实现Block合并策略的Schedule和Shared Memory Planni</desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/</loc>  
       
     <lastmod>2023-02-01T08:16:14.525Z</lastmod>  
@@ -10,17 +142,6 @@
     <title>IREE编译流程解析(五) | Don't Respond</title>  
       
     <desc>IREE Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op fusion等，最终将workload拆分成flow.executable。相关的passes及其作用如下。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2020/02/25/%E5%A6%82%E4%BD%95%E5%9C%A8XRT%E6%A1%86%E6%9E%B6%E4%B8%8B%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%90%8E%E7%AB%AF%E5%BC%95%E6%93%8E/</loc>  
-      
-    <lastmod>2023-01-08T03:06:54.790Z</lastmod>  
-      
-    <date>1582617978000</date>  
-    <title>如何在XRT框架下添加自定义的后端引擎 | Don't Respond</title>  
-      
-    <desc>XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括： 统一的DAG计算图表示 统一的子图表达、切分和折叠过程 统一的JIT子图编译接口和缓存机制 统一的Executable Launch接口 得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable launch接口的具体实现上。</desc>  
   </url>  
     
   <url>  
@@ -79,94 +200,6 @@
   </url>  
     
   <url>  
-    <loc>https://hjchen2.github.io/2018/01/02/%E6%A8%A1%E5%9E%8B%E5%8E%8B%E7%BC%A9%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E8%AE%B0%E5%BD%95/</loc>  
-      
-    <lastmod>2023-01-03T14:06:44.438Z</lastmod>  
-      
-    <date>1514901604000</date>  
-    <title>模型压缩之pruning | Don't Respond</title>  
-      
-    <desc>Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/04/25/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>  
-      
-    <lastmod>2023-01-03T14:06:33.028Z</lastmod>  
-      
-    <date>1493094668000</date>  
-    <title>强化学习（二） | Don't Respond</title>  
-      
-    <desc>DQN 前面我们讲到TD算法结合了动态规划和蒙特卡洛算法的优点，不依赖具体的环境模型，并且更新时采用滑动平均的方式，因此单步就能更新，而不需要生成整个episode，在非episode情况下仍然适用。TD算法又分为on policy的sarsa算法和off policy的Q learning算法，其中Q learning算法直接使用下一状态的最大动作值函数进行更新，加快了算法收敛速度，因此Q le</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/03/27/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%B8%80%EF%BC%89/</loc>  
-      
-    <lastmod>2023-01-03T14:06:23.421Z</lastmod>  
-      
-    <date>1490589068000</date>  
-    <title>强化学习（一） | Don't Respond</title>  
-      
-    <desc>前言 近几年，由于DeepMind成功地将强化学习（reinforcement learning）运用在AlphaGo上，机器首次在复杂任务上取得了超过人类的表现，使得强化学习成为目前机器学习研究的前沿方向之一。强化学习由来已久，Sutton等在1979年就已经开始研究强化学习，1998年出版了强化学习介绍一书，并于2012年发布第二版，本文前几部分内容主要参考该书。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2018/02/03/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/</loc>  
-      
-    <lastmod>2023-01-03T14:06:09.986Z</lastmod>  
-      
-    <date>1517630404000</date>  
-    <title>混合精度训练 | Don't Respond</title>  
-      
-    <desc>MIXED PRECISION TRAINING https://arxiv.org/pdf/1710.03740.pdf 论文概述 nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2019/12/26/%E5%9B%BE%E6%9B%BF%E6%8D%A2/</loc>  
-      
-    <lastmod>2023-01-03T14:05:42.560Z</lastmod>  
-      
-    <date>1577339644000</date>  
-    <title>图替换 | Don't Respond</title>  
-      
-    <desc>背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。 一些常见的图优化技术： DCE CSE（公共子表达式消除） 常量折叠 数学公式简化 Op融合 Layout变换 内存优化（swap-in/swap-out、重计算）</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/12/01/seq2seq%E4%B8%B2%E8%AE%B2/</loc>  
-      
-    <lastmod>2023-01-03T14:05:25.950Z</lastmod>  
-      
-    <date>1512102248000</date>  
-    <title>NEURAL MACHINE TRANSLATION论文学习串讲 | Don't Respond</title>  
-      
-    <desc>seq2seq 主要学习的是论文Neural machine translation by jointly learning to align and translate (Dzmitry Bahdanau、Yoshua Bengio等，2016.05)和Neural machine translation (Minh-ThangLuong，2016.12)。 神经机器翻译的目的是将一门语言的文本</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/01/19/caffe%E5%AD%A6%E4%B9%A0/</loc>  
-      
-    <lastmod>2023-01-03T14:05:16.106Z</lastmod>  
-      
-    <date>1484800268000</date>  
-    <title>caffe学习总结 | Don't Respond</title>  
-      
-    <desc>#caffe学习总结 ##caffe的由来 caffe是贾扬清在UC Berkeley攻读计算机科学博士学位时开发的一套深度学习框架，由于高效、易读和模块化的设计，开源后经过nvidia的帮助优化和社区不断的完善，如今成为视觉领域主流的框架之一。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2020/01/10/TVM-PackedFunc%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6/</loc>  
-      
-    <lastmod>2023-01-03T14:05:07.910Z</lastmod>  
-      
-    <date>1578630248000</date>  
-    <title>TVM PackedFunc实现机制 | Don't Respond</title>  
-      
-    <desc>TVM PackedFunc实现 为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。</desc>  
-  </url>  
-    
-  <url>  
     <loc>https://hjchen2.github.io/2017/03/22/Mac%E4%B8%8A%E6%90%AD%E5%BB%BA%E5%9F%BA%E4%BA%8EGithub%E7%9A%84Hexo%E5%8D%9A%E5%AE%A2/</loc>  
       
     <lastmod>2023-01-03T14:04:56.974Z</lastmod>  
@@ -175,39 +208,6 @@
     <title>Mac上搭建基于Github的Hexo博客 — Testing | Don't Respond</title>  
       
     <desc>博客搭建 搭建过程请参考原文链接。 注意在mac上安装hexo时选择安装hexo-cli，否则可能会出现以下报错： [Error: Cannot find module './DTraceProviderBindings']</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/08/22/KunPeng%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/</loc>  
-      
-    <lastmod>2023-01-03T14:04:48.173Z</lastmod>  
-      
-    <date>1503377588000</date>  
-    <title>阿里KunPeng框架学习 | Don't Respond</title>  
-      
-    <desc>KunPeng是阿里最新公布的一个大规模机器学习框架，不仅包括了数据/模型并行、负载均衡、模型同步、稀疏表达、工业级容错等特性，而且还提供了易于使用的接口，在很多机器学习算法上都带来了非常大的性能提升。 原始论文 KunPeng: Parameter Server based Distributed Learning Systems and Its Applications in Alibaba </desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2016/06/08/Kaldi%E5%86%B3%E7%AD%96%E6%A0%91%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8/</loc>  
-      
-    <lastmod>2023-01-03T14:04:35.627Z</lastmod>  
-      
-    <date>1465368844000</date>  
-    <title>决策树在Kaldi中如何使用 | Don't Respond</title>  
-      
-    <desc>说明：本文是kaldi主页相关内容的翻译（http://kaldi-asr.org/doc/tree_externals.html ）。目前网上已经有一个翻译的版本，但翻译的不是很清楚，导致我在刚学这部分内容的时候产生了一些误解，所以我希望结合我目前所知道的一些东西，尽量把这部分内容翻译地比较容易理解，但由于也是初学者，一些错误也是不可避免，希望大家发现后一起交流，以便我后期修正。好了，还是废话少</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2019/11/27/DeepFusion/</loc>  
-      
-    <lastmod>2023-01-03T14:04:24.168Z</lastmod>  
-      
-    <date>1574827204000</date>  
-    <title>FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs | Don't Respond</title>  
-      
-    <desc>FusionStitching系统概述 屏幕快照 2019-11-25 13.56.40 输入HloModule，经过以下三个阶段，最终输出LLVM IR。 Computation Fusion Schedule Planning Code Generation 论文主要针对XLA Fusion算法进行了改进，提出了实现Block合并策略的Schedule和Shared Memory Planni</desc>  
   </url>  
     
   <url>  
