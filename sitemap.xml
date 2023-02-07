@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2017/08/22/KunPeng%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/</loc>  
+      
+    <lastmod>2023-02-07T02:49:01.177Z</lastmod>  
+      
+    <date>1503377588000</date>  
+    <title>阿里KunPeng框架学习 | Don't Respond</title>  
+      
+    <desc>KunPeng是阿里最新公布的一个大规模机器学习框架，不仅包括了数据/模型并行、负载均衡、模型同步、稀疏表达、工业级容错等特性，而且还提供了易于使用的接口，在很多机器学习算法上都带来了非常大的性能提升。 原始论文 KunPeng: Parameter Server based Distributed Learning Systems and Its Applications in Alibaba </desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2020/01/10/TVM-PackedFunc%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6/</loc>  
       
     <lastmod>2023-02-07T02:41:00.291Z</lastmod>  
@@ -87,17 +98,6 @@
     <title>强化学习（一） | Don't Respond</title>  
       
     <desc>前言 近几年，由于DeepMind成功地将强化学习（reinforcement learning）运用在AlphaGo上，机器首次在复杂任务上取得了超过人类的表现，使得强化学习成为目前机器学习研究的前沿方向之一。强化学习由来已久，Sutton等在1979年就已经开始研究强化学习，1998年出版了强化学习介绍一书，并于2012年发布第二版，本文前几部分内容主要参考该书。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/08/22/KunPeng%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/</loc>  
-      
-    <lastmod>2023-02-07T02:39:10.167Z</lastmod>  
-      
-    <date>1503377588000</date>  
-    <title>阿里KunPeng框架学习 | Don't Respond</title>  
-      
-    <desc>KunPeng是阿里最新公布的一个大规模机器学习框架，不仅包括了数据/模型并行、负载均衡、模型同步、稀疏表达、工业级容错等特性，而且还提供了易于使用的接口，在很多机器学习算法上都带来了非常大的性能提升。 原始论文 KunPeng: Parameter Server based Distributed Learning Systems and Its Applications in Alibaba </desc>  
   </url>  
     
   <url>  

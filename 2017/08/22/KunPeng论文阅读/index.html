@@ -27,7 +27,7 @@
 <meta property="og:description" content="KunPeng是阿里最新公布的一个大规模机器学习框架，不仅包括了数据&#x2F;模型并行、负载均衡、模型同步、稀疏表达、工业级容错等特性，而且还提供了易于使用的接口，在很多机器学习算法上都带来了非常大的性能提升。 原始论文 KunPeng: Parameter Server based Distributed Learning Systems and Its Applications in Alibaba">
 <meta property="og:locale">
 <meta property="article:published_time" content="2017-08-22T04:53:08.000Z">
-<meta property="article:modified_time" content="2023-02-07T02:39:10.167Z">
+<meta property="article:modified_time" content="2023-02-07T02:49:01.177Z">
 <meta property="article:author" content="Dou Jiang">
 <meta property="article:tag" content="large scale ML framework">
 <meta property="article:tag" content="KunPeng">
@@ -234,7 +234,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-02-07 10:39:10" itemprop="dateModified" datetime="2023-02-07T10:39:10+08:00">2023-02-07</time>
+      <time title="Modified: 2023-02-07 10:49:01" itemprop="dateModified" datetime="2023-02-07T10:49:01+08:00">2023-02-07</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -278,13 +278,13 @@ server和MPI的优点，提供鲁棒的failover机制，高效的稀疏数据通
 <h3 id="apsara-cloud-platform">Apsara Cloud Platform</h3>
 <p>Apsara是阿里开发的一个大规模分布式操作系统，目前已运行在跨数十个机房的十几万台服务器上。下图中天蓝色部分就是Apsara的模块，白色部分为运行在Apsara之上的各种云服务，KunPeng就属于图中白色部分，运行在Apsara上，由Apsara提供任务调度和监控、文件系统等服务。
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/b2b0cb8a6973ec2b4281d68c328e4a0f.png"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/b2b0cb8a6973ec2b4281d68c328e4a0f.png?raw=true"
 alt="b2b0cb8a6973ec2b4281d68c328e4a0f" />
 图中红色边框的任务调度模块和资源管理模块被统称为Fuxi（伏羲），Fuxi支持多种特性以保证系统的可扩展性和容错性，这些特性包括：增量资源管理协议、用户透明的失败恢复、故障点自动检测和多级黑名单机制。</p>
 <h2 id="kunpeng-platform">KunPeng Platform</h2>
 <p>KunPeng分为ML-Bridge和PS-Core两个子系统，ML-Bridge是KunPeng提供的高级编程模型，用户通过脚本编程的workflow可以方便地实现数据预处理、训练、预测和评估等算法，PS-Core是一个分布式键值对存储的paramter
 server框架。 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/0313b564c3646a4c4fab16574f9c4b4e.png?api=v2%20=600"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/0313b564c3646a4c4fab16574f9c4b4e.png?raw=true%20=600"
 alt="0313b564c3646a4c4fab16574f9c4b4e" /> ML-Bridge由三个组件构成：</p>
 <ul>
 <li>解释器。将用户的脚本解释为系统支持的算法</li>
@@ -294,7 +294,7 @@ ML-Bridge简化了用户编程，比如一个算法流程包括数据入库与�
 </ul>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/ede2df215585fc86358bc9868565d1ce.png?api=v2%20=500"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/ede2df215585fc86358bc9868565d1ce.png?raw=true%20=500"
 alt="ede2df215585fc86358bc9868565d1ce" />
 <figcaption
 aria-hidden="true">ede2df215585fc86358bc9868565d1ce</figcaption>
@@ -312,7 +312,7 @@ for Block 0节点和Load Data for Block
 1节点。通过DAG接口用户可以自定义IO操作、计算和通信过程，可以很方便地实现各种模型更新算法。</p>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/e76cf7c13015b83ed7696b5fa7c8dac0.png?api=v2%20=600"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/e76cf7c13015b83ed7696b5fa7c8dac0.png?raw=true%20=600"
 alt="e76cf7c13015b83ed7696b5fa7c8dac0" />
 <figcaption
 aria-hidden="true">e76cf7c13015b83ed7696b5fa7c8dac0</figcaption>
@@ -321,7 +321,7 @@ aria-hidden="true">e76cf7c13015b83ed7696b5fa7c8dac0</figcaption>
 ASGD算法的C++实现，用户可以重写下面的Iterate函数实现自定义的算法。图中的mServerParam和mServerGrad对应servers上的模型参数和梯度，mWorkerParam和mWorkerGrad对应workers本地的模型参数和梯度，mSubDatasetPtr对应当前worker的数据子集。nSync为最大延迟迭代次数，nPull和nPush分别为从servers获取最新参数和将梯度发送给servers的频率。通过设置nSync、nPull和nPush可以很方便地在BSP和SSP之间切换，而去除SyncBarrier就成了ASP算法的实现。</p>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/69ed0d3573fbebf558494bc4a9a14c74.png?api=v2%20=450"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/69ed0d3573fbebf558494bc4a9a14c74.png?raw=true%20=450"
 alt="69ed0d3573fbebf558494bc4a9a14c74" />
 <figcaption
 aria-hidden="true">69ed0d3573fbebf558494bc4a9a14c74</figcaption>
@@ -350,7 +350,7 @@ otherwise\end{cases}\]</span> 下图表明了LR
 FTRL-Proximal算法单机更新过程。</p>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/66cf72a181547ae24831af8500b47d72.png?api=v2%20=500"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/66cf72a181547ae24831af8500b47d72.png?raw=true%20=500"
 alt="66cf72a181547ae24831af8500b47d72" />
 <figcaption
 aria-hidden="true">66cf72a181547ae24831af8500b47d72</figcaption>
@@ -388,7 +388,7 @@ region下更新模型。trust
 region的策略有两种：一种是当模型中的元素超出置信阈时，直接回退整个模型；另一种是通过映射的方式将模型的值限制在置信阈中。</p>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/0de2241d38a792bb79446944d65d8c66.png?api=v2%20=600"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/0de2241d38a792bb79446944d65d8c66.png?raw=true%20=600"
 alt="0de2241d38a792bb79446944d65d8c66" />
 <figcaption
 aria-hidden="true">0de2241d38a792bb79446944d65d8c66</figcaption>
@@ -437,7 +437,7 @@ Xeon CPU E5-2430 (2.2 GHz) CPU和96GB内存。</p>
 id="kunpengspark和mpi的lr算法对比">KunPeng、Spark和MPI的LR算法对比</h3>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/143e082b7f1a6b54e47e9c8b51026dbb.png?api=v2"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/143e082b7f1a6b54e47e9c8b51026dbb.png?raw=true"
 alt="143e082b7f1a6b54e47e9c8b51026dbb" />
 <figcaption
 aria-hidden="true">143e082b7f1a6b54e47e9c8b51026dbb</figcaption>
@@ -448,7 +448,7 @@ parameter都设置为10，并且使用同一个集群相同的CPU资源，在7�
 billion特征的数据集上，他们统计了KunPeng在不同workers数量时的加速比。</p>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/00c84f368394ba04d59dbe530f69c387.png?api=v2"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/00c84f368394ba04d59dbe530f69c387.png?raw=true"
 alt="00c84f368394ba04d59dbe530f69c387" />
 <figcaption
 aria-hidden="true">00c84f368394ba04d59dbe530f69c387</figcaption>
@@ -458,14 +458,14 @@ aria-hidden="true">00c84f368394ba04d59dbe530f69c387</figcaption>
 <p>下图分别为KunPeng-MAR和XGBoost在不同任务上的峰值内存占用和训练时间对比。</p>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/1b0888cab293242eaccdc2b6e5bf25d9.png?api=v2%20=500"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/1b0888cab293242eaccdc2b6e5bf25d9.png?raw=true%20=500"
 alt="1b0888cab293242eaccdc2b6e5bf25d9" />
 <figcaption
 aria-hidden="true">1b0888cab293242eaccdc2b6e5bf25d9</figcaption>
 </figure>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/3b99dc82bc268d3da394a688c0234908.png?api=v2%20=500"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/3b99dc82bc268d3da394a688c0234908.png?raw=true%20=500"
 alt="3b99dc82bc268d3da394a688c0234908" />
 <figcaption
 aria-hidden="true">3b99dc82bc268d3da394a688c0234908</figcaption>
@@ -475,7 +475,7 @@ id="kunpeng-fmlibfm和difacto的对比">KunPeng-FM、LibFM和DiFacto的对比</h
 <p>下面是在单机情况下的训练效果对比，并没有训练时间的对比数据和多机实验相关的数据。</p>
 <figure>
 <img
-src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/KunPeng/da511a1bb0db987fb74ebb08fa5352c9.png?api=v2%20=500"
+src="https://github.com/hjchen2/personal/blob/master/blog/KunPeng/da511a1bb0db987fb74ebb08fa5352c9.png?raw=true%20=500"
 alt="da511a1bb0db987fb74ebb08fa5352c9" />
 <figcaption
 aria-hidden="true">da511a1bb0db987fb74ebb08fa5352c9</figcaption>
