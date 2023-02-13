@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha256-Z1K5uhUaJXA7Ll0XrZ/0JhX4lAtZFpT6jkKrEDT0drU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="IREE::Stream::StreamTransformPassPipeline">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IREE编译流程解析(六)">
+<meta property="og:url" content="https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="IREE::Stream::StreamTransformPassPipeline">
+<meta property="og:locale">
+<meta property="article:published_time" content="2023-02-13T13:57:20.000Z">
+<meta property="article:modified_time" content="2023-02-13T14:02:57.915Z">
+<meta property="article:author" content="Dou Jiang">
+<meta property="article:tag" content="Deep Learning Compiler">
+<meta property="article:tag" content="IREE">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/","path":"2023/02/13/IREE编译流程6/","title":"IREE编译流程解析(六)"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>IREE编译流程解析(六) | Don't Respond</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Don't Respond</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section">Home</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section">Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section">Archives</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section">Tags</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Dou Jiang"
+      src="https://github.com/hjchen2/personal/blob/master/images/ETO_Logo%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5_%E5%90%91%E9%87%91%E5%AD%97%E5%A1%94%E9%AB%98%E4%B8%BE%E5%8F%8C%E8%87%82.jpg?raw=true">
+  <p class="site-author-name" itemprop="name">Dou Jiang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/hjchen2" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;hjchen2" rel="noopener me" target="_blank">GitHub</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://github.com/hjchen2/personal/blob/master/images/ETO_Logo%E8%AE%BE%E8%AE%A1%E7%90%86%E5%BF%B5_%E5%90%91%E9%87%91%E5%AD%97%E5%A1%94%E9%AB%98%E4%B8%BE%E5%8F%8C%E8%87%82.jpg?raw=true">
+      <meta itemprop="name" content="Dou Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="IREE编译流程解析(六) | Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IREE编译流程解析(六)
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2023-02-13 21:57:20 / Modified: 22:02:57" itemprop="dateCreated datePublished" datetime="2023-02-13T21:57:20+08:00">2023-02-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/DL-Compiler/" itemprop="url" rel="index"><span itemprop="name">DL Compiler</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>IREE::Stream::StreamTransformPassPipeline</p>
+<span id="more"></span>
+<ul>
+<li><p>buildStreamTensorPassPipeline</p>
+<ul>
+<li><p>IREE::Stream::createVerifyInputPass</p>
+<p>检查Program的合法性。</p></li>
+<li><p>IREE::Stream::createOutlineConstantsPass</p>
+<p>将module内部的dense constant转换成global dense constant。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">  %cst = arith.constant dense&lt;[<span class="number">0.000000e+00</span>, <span class="number">0.00999999977</span>, <span class="number">2.000000e-02</span>, <span class="number">3.000000e-02</span>, <span class="number">4.000000e-02</span>, <span class="number">5.000000e-02</span>, <span class="number">6.000000e-02</span>, <span class="number">7.000000e-02</span>, <span class="number">8.000000e-02</span>, <span class="number">9.000000e-02</span>]&gt; : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">  %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">  %<span class="number">0</span> = hal.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt;</span><br><span class="line">  %<span class="number">1</span> = flow.tensor.reshape %<span class="number">0</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">  %<span class="number">2</span> = flow.tensor.empty : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">  %<span class="number">3</span> = flow.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%<span class="number">1</span>, %cst, %<span class="number">2</span>) : (tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;) -&gt; %<span class="number">2</span></span><br><span class="line">  %<span class="number">4</span> = flow.tensor.reshape %<span class="number">3</span> : tensor&lt;<span class="number">10</span>xf32&gt; -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt;</span><br><span class="line">  %<span class="number">5</span> = hal.tensor.<span class="keyword">export</span> %<span class="number">4</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; -&gt; !hal.buffer_view</span><br><span class="line">  <span class="keyword">return</span> %<span class="number">5</span> : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">util.global <span class="keyword">private</span> @_constant &#123;noinline&#125; = dense&lt;[<span class="number">0.000000e+00</span>, <span class="number">0.00999999977</span>, <span class="number">2.000000e-02</span>, <span class="number">3.000000e-02</span>, <span class="number">4.000000e-02</span>, <span class="number">5.000000e-02</span>, <span class="number">6.000000e-02</span>, <span class="number">7.000000e-02</span>, <span class="number">8.000000e-02</span>, <span class="number">9.000000e-02</span>]&gt; : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">  %_constant = util.global.load @_constant : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">  %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">  %<span class="number">0</span> = hal.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt;</span><br><span class="line">  %<span class="number">1</span> = flow.tensor.reshape %<span class="number">0</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">  %<span class="number">2</span> = flow.tensor.empty : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">  %<span class="number">3</span> = flow.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%<span class="number">1</span>, %_constant, %<span class="number">2</span>) : (tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;) -&gt; %<span class="number">2</span></span><br><span class="line">  %<span class="number">4</span> = flow.tensor.reshape %<span class="number">3</span> : tensor&lt;<span class="number">10</span>xf32&gt; -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt;</span><br><span class="line">  %<span class="number">5</span> = hal.tensor.<span class="keyword">export</span> %<span class="number">4</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; -&gt; !hal.buffer_view</span><br><span class="line">  <span class="keyword">return</span> %<span class="number">5</span> : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>addCleanupPatterns</p></li>
+<li><p>IREE::Stream::createConvertToStreamPass</p>
+<p>将<code>IREE::Util</code>、<code>IREE::Flow</code>、<code>IREE::HAL</code>以及<code>std</code>
+dialect转换到<code>IREE::Stream</code> dialect。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> &#123;</span><br><span class="line">  util.global <span class="keyword">private</span> @_constant &#123;noinline&#125; = dense&lt;[<span class="number">0.000000e+00</span>, <span class="number">0.00999999977</span>, <span class="number">2.000000e-02</span>, <span class="number">3.000000e-02</span>, <span class="number">4.000000e-02</span>, <span class="number">5.000000e-02</span>, <span class="number">6.000000e-02</span>, <span class="number">7.000000e-02</span>, <span class="number">8.000000e-02</span>, <span class="number">9.000000e-02</span>]&gt; : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">  flow.executable <span class="keyword">private</span> @test_dispatch_0 &#123;</span><br><span class="line">    flow.executable.<span class="keyword">export</span> <span class="keyword">public</span> @test_dispatch_0_generic_10 <span class="built_in">workgroups</span>(%arg0: index) -&gt; (index, index, index) &#123;</span><br><span class="line">      %x, %y, %z = flow.dispatch.workgroup_count_from_dag_root %arg0</span><br><span class="line">      flow.<span class="keyword">return</span> %x, %y, %z : index, index, index</span><br><span class="line">    &#125;</span><br><span class="line">    builtin.<span class="keyword">module</span> &#123;</span><br><span class="line">      func.func @<span class="built_in">test_dispatch_0_generic_10</span>(%arg0: !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt;, %arg1: !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt;, %arg2: !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xf32&gt;&gt;) &#123;</span><br><span class="line">        %<span class="number">0</span> = flow.dispatch.tensor.load %arg0, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        %<span class="number">1</span> = flow.dispatch.tensor.load %arg1, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        %<span class="number">2</span> = flow.dispatch.tensor.load %arg2, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xf32&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        %<span class="number">3</span> = linalg.generic &#123;indexing_maps = [<span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>]&#125; <span class="built_in">ins</span>(%<span class="number">0</span>, %<span class="number">1</span> : tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;) <span class="built_in">outs</span>(%<span class="number">2</span> : tensor&lt;<span class="number">10</span>xf32&gt;) &#123;</span><br><span class="line">        ^<span class="built_in">bb0</span>(%in: f32, %in_0: f32, %out: f32):</span><br><span class="line">          %<span class="number">4</span> = arith.addf %in, %in_0 : f32</span><br><span class="line">          linalg.yield %<span class="number">4</span> : f32</span><br><span class="line">        &#125; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        flow.dispatch.tensor.store %<span class="number">3</span>, %arg2, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : tensor&lt;<span class="number">10</span>xf32&gt; -&gt; !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xf32&gt;&gt;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">    %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">    %_constant = util.global.load @_constant : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">    %<span class="number">0</span> = hal.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt;</span><br><span class="line">    %<span class="number">1</span> = flow.tensor.reshape %<span class="number">0</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">    %<span class="number">2</span> = flow.tensor.empty : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">    %<span class="number">3</span> = flow.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%<span class="number">1</span>, %_constant, %<span class="number">2</span>) : (tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;) -&gt; %<span class="number">2</span></span><br><span class="line">    %<span class="number">4</span> = flow.tensor.reshape %<span class="number">3</span> : tensor&lt;<span class="number">10</span>xf32&gt; -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt;</span><br><span class="line">    %<span class="number">5</span> = hal.tensor.<span class="keyword">export</span> %<span class="number">4</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; -&gt; !hal.buffer_view</span><br><span class="line">    <span class="keyword">return</span> %<span class="number">5</span> : !hal.buffer_view</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换为</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> &#123;</span><br><span class="line">  util.global <span class="keyword">private</span> @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">  util.global <span class="keyword">private</span> @_constant__size : index</span><br><span class="line">  util.initializer &#123;</span><br><span class="line">    %cst = stream.tensor.constant : tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;constant&gt; = dense&lt;[<span class="number">0.000000e+00</span>, <span class="number">0.00999999977</span>, <span class="number">2.000000e-02</span>, <span class="number">3.000000e-02</span>, <span class="number">4.000000e-02</span>, <span class="number">5.000000e-02</span>, <span class="number">6.000000e-02</span>, <span class="number">7.000000e-02</span>, <span class="number">8.000000e-02</span>, <span class="number">9.000000e-02</span>]&gt; : tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">    %<span class="number">0</span> = stream.resource.size %cst : !stream.resource&lt;constant&gt;</span><br><span class="line">    util.global.store %cst, @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">    util.global.store %<span class="number">0</span>, @_constant__size : index</span><br><span class="line">    util.initializer.<span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  stream.executable <span class="keyword">private</span> @test_dispatch_0 &#123;</span><br><span class="line">    stream.executable.<span class="keyword">export</span> <span class="keyword">public</span> @test_dispatch_0_generic_10 <span class="built_in">workgroups</span>(%arg0: index) -&gt; (index, index, index) &#123;</span><br><span class="line">      %x, %y, %z = flow.dispatch.workgroup_count_from_dag_root %arg0</span><br><span class="line">      stream.<span class="keyword">return</span> %x, %y, %z : index, index, index</span><br><span class="line">    &#125;</span><br><span class="line">    builtin.<span class="keyword">module</span> &#123;</span><br><span class="line">      func.func @<span class="built_in">test_dispatch_0_generic_10</span>(%arg0: !stream.binding, %arg1: !stream.binding, %arg2: !stream.binding) &#123;</span><br><span class="line">        %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">        %<span class="number">0</span> = stream.binding.subspan %arg0[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt;</span><br><span class="line">        %<span class="number">1</span> = stream.binding.subspan %arg1[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt;</span><br><span class="line">        %<span class="number">2</span> = stream.binding.subspan %arg2[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xf32&gt;&gt;</span><br><span class="line">        %<span class="number">3</span> = flow.dispatch.tensor.load %<span class="number">0</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        %<span class="number">4</span> = flow.dispatch.tensor.load %<span class="number">1</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xf32&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        %<span class="number">5</span> = flow.dispatch.tensor.load %<span class="number">2</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xf32&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        %<span class="number">6</span> = linalg.generic &#123;indexing_maps = [<span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>]&#125; <span class="built_in">ins</span>(%<span class="number">3</span>, %<span class="number">4</span> : tensor&lt;<span class="number">10</span>xf32&gt;, tensor&lt;<span class="number">10</span>xf32&gt;) <span class="built_in">outs</span>(%<span class="number">5</span> : tensor&lt;<span class="number">10</span>xf32&gt;) &#123;</span><br><span class="line">        ^<span class="built_in">bb0</span>(%in: f32, %in_0: f32, %out: f32):</span><br><span class="line">          %<span class="number">7</span> = arith.addf %in, %in_0 : f32</span><br><span class="line">          linalg.yield %<span class="number">7</span> : f32</span><br><span class="line">        &#125; -&gt; tensor&lt;<span class="number">10</span>xf32&gt;</span><br><span class="line">        flow.dispatch.tensor.store %<span class="number">6</span>, %<span class="number">2</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : tensor&lt;<span class="number">10</span>xf32&gt; -&gt; !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xf32&gt;&gt;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">    %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">    %_constant = util.global.load @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">    %_constant__size = util.global.load @_constant__size : index</span><br><span class="line">    %<span class="number">0</span> = stream.async.transfer %_constant : !stream.resource&lt;constant&gt;&#123;%_constant__size&#125; -&gt; !stream.resource&lt;*&gt;&#123;%_constant__size&#125;</span><br><span class="line">    %c553648160_i32 = arith.constant <span class="number">553648160</span> : i32</span><br><span class="line">    %c1_i32 = arith.constant <span class="number">1</span> : i32</span><br><span class="line">    %c1 = arith.constant <span class="number">1</span> : index</span><br><span class="line">    %c10_0 = arith.constant <span class="number">10</span> : index</span><br><span class="line">    hal.buffer_view.assert&lt;%arg0 : !hal.buffer_view&gt; <span class="built_in">message</span>(<span class="string">&quot;tensor&quot;</span>) <span class="built_in">shape</span>([%c1, %c10_0]) <span class="built_in">type</span>(%c553648160_i32) <span class="built_in">encoding</span>(%c1_i32)</span><br><span class="line">    %<span class="number">1</span> = stream.tensor.<span class="keyword">sizeof</span> tensor&lt;<span class="number">1</span>x10xf32&gt; : index</span><br><span class="line">    %<span class="number">2</span> = stream.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;external&gt;&#123;%<span class="number">1</span>&#125;</span><br><span class="line">    %<span class="number">3</span> = stream.async.transfer %<span class="number">2</span> : !stream.resource&lt;external&gt;&#123;%<span class="number">1</span>&#125; -&gt; !stream.resource&lt;*&gt;&#123;%<span class="number">1</span>&#125;</span><br><span class="line">    %<span class="number">4</span> = stream.tensor.<span class="keyword">sizeof</span> tensor&lt;<span class="number">10</span>xf32&gt; : index</span><br><span class="line">    %<span class="number">5</span> = stream.tensor.clone %<span class="number">3</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;*&gt;&#123;%<span class="number">1</span>&#125; -&gt; tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;*&gt;&#123;%<span class="number">4</span>&#125;</span><br><span class="line">    %<span class="number">6</span> = stream.tensor.<span class="keyword">sizeof</span> tensor&lt;<span class="number">10</span>xf32&gt; : index</span><br><span class="line">    %empty = stream.tensor.empty : tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;*&gt;&#123;%<span class="number">6</span>&#125;</span><br><span class="line">    %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">    %<span class="number">7</span> = stream.async.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%<span class="number">5</span>[%c0 to %<span class="number">4</span> <span class="keyword">for</span> %<span class="number">4</span>], %<span class="number">0</span>[%c0 to %_constant__size <span class="keyword">for</span> %_constant__size], %empty[%c0 to %<span class="number">6</span> <span class="keyword">for</span> %<span class="number">6</span>]) : (!stream.resource&lt;*&gt;&#123;%<span class="number">4</span>&#125;, !stream.resource&lt;*&gt;&#123;%_constant__size&#125;, !stream.resource&lt;*&gt;&#123;%<span class="number">6</span>&#125;) -&gt; %empty&#123;%<span class="number">6</span>&#125;</span><br><span class="line">    %<span class="number">8</span> = stream.tensor.<span class="keyword">sizeof</span> tensor&lt;<span class="number">1</span>x10xf32&gt; : index</span><br><span class="line">    %<span class="number">9</span> = stream.tensor.clone %<span class="number">7</span> : tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;*&gt;&#123;%<span class="number">6</span>&#125; -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;*&gt;&#123;%<span class="number">8</span>&#125;</span><br><span class="line">    %<span class="number">10</span> = stream.async.transfer %<span class="number">9</span> : !stream.resource&lt;*&gt;&#123;%<span class="number">8</span>&#125; -&gt; !stream.resource&lt;external&gt;&#123;%<span class="number">8</span>&#125;</span><br><span class="line">    %<span class="number">11</span> = stream.tensor.<span class="keyword">export</span> %<span class="number">10</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;external&gt;&#123;%<span class="number">8</span>&#125; -&gt; !hal.buffer_view</span><br><span class="line">    <span class="keyword">return</span> %<span class="number">11</span> : !hal.buffer_view</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到除了<code>flow.executable</code>，module中<code>tensor</code>
+type都被转换成<code>stream.resource</code>和<code>index</code>，但<code>hal.buffer_view</code>
+type仍然被保留。初始值为tensor的<code>util.global</code>
+constant被转换为不带初始值的
+<code>stream.resource</code>和<code>index</code>，同时生成了一个<code>util.initializer</code>对
+<code>stream.resource</code>和<code>index</code>进行初始化。
+<code>util.global.load</code>被转换成<code>util.global.load</code> +
+<code>stream.async.transfer</code>，<code>hal.tensor.import</code>被转换成<code>stream.tensor.import</code>
++
+<code>stream.async.transfer</code>，<code>hal.tensor.export</code>被转换为<code>stream.async.transfer</code>
++
+<code>stream.tensor.export</code>，<code>flow.tensor.reshape</code>被转换成<code>stream.tensor.clone</code>，<code>flow.executable</code>转换为<code>stream.executable</code>，内部的<code>flow.executable.export</code>转换为<code>stream.executable.export</code>
+，内部的func
+op的argument由<code>flow.dispatch.tensor</code>转换为<code>stream.binding</code>。</p></li>
+<li><p>IREE::Stream::createVerifyLoweringToTensorsPass</p>
+<p>检查Program的合法性。</p></li>
+<li><p>addCleanupPatterns</p></li>
+<li><p>IREE::Util::createCombineInitializersPass</p>
+<p>合并所有的<code>util.initializer</code> ops。</p></li>
+</ul></li>
+<li><p>buildStreamAsyncPassPipeline</p>
+<ul>
+<li><p>IREE::Stream::createEncodeHostTensorsPass</p>
+<p>主要作用是将tensor的元素位宽（bit）扩充为2的幂大小，并按字节对齐。其中i1~i7转换为i8（1
+byte），i9~i15转换为i16 (2 bytes)，i17~i31转换为i32 (4
+bytes)，i33~i63转换为i64（8 bytes）。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">util.initializer &#123;</span><br><span class="line">  %cst = stream.tensor.constant : tensor&lt;<span class="number">10</span>xi4&gt; in !stream.resource&lt;constant&gt; = dense&lt;[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">-8</span>, <span class="number">-7</span>]&gt; : tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">  %<span class="number">0</span> = stream.resource.size %cst : !stream.resource&lt;constant&gt;</span><br><span class="line">  util.global.store %cst, @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">  util.global.store %<span class="number">0</span>, @_constant__size : index</span><br><span class="line">  util.initializer.<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换为</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">util.initializer &#123;</span><br><span class="line">  %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">  %cst = stream.async.constant : !stream.resource&lt;constant&gt;&#123;%c10&#125; = dense&lt;[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>]&gt; : tensor&lt;<span class="number">10</span>xi8&gt;</span><br><span class="line">  util.global.store %cst, @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">  util.global.store %c10, @_constant__size : index</span><br><span class="line">  util.initializer.<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>%cst</code>的类型从i4转成了i8。</p></li>
+<li><p>IREE::Stream::createEncodeDeviceTensorsPass</p>
+<p>和createEncodeHostTensorsPass作用一样，区别是createEncodeDeviceTensorsPass作用的是<code>stream.executable</code>中的op。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">builtin.<span class="keyword">module</span> &#123;</span><br><span class="line">    func.func @<span class="built_in">test_dispatch_0_generic_10</span>(%arg0: !stream.binding, %arg1: !stream.binding, %arg2: !stream.binding) &#123;</span><br><span class="line">      %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">      %<span class="number">0</span> = stream.binding.subspan %arg0[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi4&gt;&gt;</span><br><span class="line">      %<span class="number">1</span> = stream.binding.subspan %arg1[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi4&gt;&gt;</span><br><span class="line">      %<span class="number">2</span> = stream.binding.subspan %arg2[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xi4&gt;&gt;</span><br><span class="line">      %<span class="number">3</span> = flow.dispatch.tensor.load %<span class="number">0</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi4&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      %<span class="number">4</span> = flow.dispatch.tensor.load %<span class="number">1</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi4&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      %<span class="number">5</span> = flow.dispatch.tensor.load %<span class="number">2</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xi4&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      %<span class="number">6</span> = linalg.generic &#123;indexing_maps = [<span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>]&#125; <span class="built_in">ins</span>(%<span class="number">3</span>, %<span class="number">4</span> : tensor&lt;<span class="number">10</span>xi4&gt;, tensor&lt;<span class="number">10</span>xi4&gt;) <span class="built_in">outs</span>(%<span class="number">5</span> : tensor&lt;<span class="number">10</span>xi4&gt;) &#123;</span><br><span class="line">      ^<span class="built_in">bb0</span>(%in: i4, %in_0: i4, %out: i4):</span><br><span class="line">        %<span class="number">7</span> = arith.addi %in, %in_0 : i4</span><br><span class="line">        linalg.yield %<span class="number">7</span> : i4</span><br><span class="line">      &#125; -&gt; tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      flow.dispatch.tensor.store %<span class="number">6</span>, %<span class="number">2</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : tensor&lt;<span class="number">10</span>xi4&gt; -&gt; !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xi4&gt;&gt;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换为，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">builtin.<span class="keyword">module</span> &#123;</span><br><span class="line">    func.func @<span class="built_in">test_dispatch_0_generic_10</span>(%arg0: !stream.binding, %arg1: !stream.binding, %arg2: !stream.binding) &#123;</span><br><span class="line">      %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">      %<span class="number">0</span> = stream.binding.subspan %arg0[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi8&gt;&gt;</span><br><span class="line">      %<span class="number">1</span> = stream.binding.subspan %arg1[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi8&gt;&gt;</span><br><span class="line">      %<span class="number">2</span> = stream.binding.subspan %arg2[%c0] : !stream.binding -&gt; !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xi8&gt;&gt;</span><br><span class="line">      %<span class="number">3</span> = flow.dispatch.tensor.load %<span class="number">0</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi8&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xi8&gt;</span><br><span class="line">      %<span class="number">4</span> = arith.trunci %<span class="number">3</span> : tensor&lt;<span class="number">10</span>xi8&gt; to tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      %<span class="number">5</span> = flow.dispatch.tensor.load %<span class="number">1</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readonly:tensor&lt;<span class="number">10</span>xi8&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xi8&gt;</span><br><span class="line">      %<span class="number">6</span> = arith.trunci %<span class="number">5</span> : tensor&lt;<span class="number">10</span>xi8&gt; to tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      %<span class="number">7</span> = flow.dispatch.tensor.load %<span class="number">2</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xi8&gt;&gt; -&gt; tensor&lt;<span class="number">10</span>xi8&gt;</span><br><span class="line">      %<span class="number">8</span> = arith.trunci %<span class="number">7</span> : tensor&lt;<span class="number">10</span>xi8&gt; to tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      %<span class="number">9</span> = linalg.generic &#123;indexing_maps = [<span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;, <span class="built_in">affine_map</span>&lt;(d0) -&gt; (d0)&gt;], iterator_types = [<span class="string">&quot;parallel&quot;</span>]&#125; <span class="built_in">ins</span>(%<span class="number">4</span>, %<span class="number">6</span> : tensor&lt;<span class="number">10</span>xi4&gt;, tensor&lt;<span class="number">10</span>xi4&gt;) <span class="built_in">outs</span>(%<span class="number">8</span> : tensor&lt;<span class="number">10</span>xi4&gt;) &#123;</span><br><span class="line">      ^<span class="built_in">bb0</span>(%in: i4, %in_0: i4, %out: i4):</span><br><span class="line">        %<span class="number">11</span> = arith.addi %in, %in_0 : i4</span><br><span class="line">        linalg.yield %<span class="number">11</span> : i4</span><br><span class="line">      &#125; -&gt; tensor&lt;<span class="number">10</span>xi4&gt;</span><br><span class="line">      %<span class="number">10</span> = arith.extui %<span class="number">9</span> : tensor&lt;<span class="number">10</span>xi4&gt; to tensor&lt;<span class="number">10</span>xi8&gt;</span><br><span class="line">      flow.dispatch.tensor.store %<span class="number">10</span>, %<span class="number">2</span>, offsets = [<span class="number">0</span>], sizes = [<span class="number">10</span>], strides = [<span class="number">1</span>] : tensor&lt;<span class="number">10</span>xi8&gt; -&gt; !flow.dispatch.tensor&lt;readwrite:tensor&lt;<span class="number">10</span>xi8&gt;&gt;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到<code>stream.binding.subspan</code>的result
+type从i4转换成了i8，并且在<code>flow.dispatch.tensor.load</code>之后插入了一个<code>arith.trunci</code>，将i8截断为i4，进而参与<code>linalg.generic</code>中的计算。</p></li>
+<li><p>IREE::Stream::createMaterializeBuiltinsPass</p></li>
+<li><p>addCleanupPatterns</p></li>
+<li><p>IREE::Stream::createMaterializeCopyOnWritePass</p>
+<p>写入时插入一次拷贝，以更有效地支持inplace更新，并且确保正确的执行语义。</p></li>
+<li><p>IREE::Stream::createElideAsyncCopiesPass</p>
+<p>消除MaterializeCopyOnWritePass中插入的不必要的拷贝。</p></li>
+<li><p>mlir::createCanonicalizerPass</p></li>
+<li><p>IREE::Stream::createEmplaceAllocationsPass</p>
+<p>尝试消除<code>stream.async.dispatch</code>后的<code>stream.async.update</code>
+op。当<code>stream.async.dispatch</code>的结果没有绑定一个value时，就可以把<code>stream.async.update</code>的target绑定到<code>stream.async.dispatch</code>的结果，使得<code>stream.async.dispatch</code>直接把计算结果更新到target。</p></li>
+<li><p>IREE::Stream::createRefineUsagePass</p>
+<p>确定每个<code>stream.resource</code>的生命期，推导<code>stream.resource</code>的类型。<code>stream.resource</code>类型包括：</p>
+<ul>
+<li>Unknown: <code>stream.resource&lt;*&gt;</code></li>
+<li>External：<code>stream.resource&lt;external&gt;</code>
+由外部程序管理的内存</li>
+<li>Staging：<code>stream.resource&lt;staging&gt;</code>
+用于上传/下载的暂存缓冲区</li>
+<li>Transient：<code>stream.resource&lt;transient&gt;</code>
+跨stream的一段临时值</li>
+<li>Variable：<code>stream.resource&lt;variable&gt;</code>
+跨stream的一段持续值</li>
+<li>Constant：<code>stream.resource&lt;constant&gt;</code>
+整个程序中持续存在的立即值（常量）。</li>
+</ul>
+<p>除此之外还消除了冗余的<code>stream.async.transfer</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">    %c40 = arith.constant <span class="number">40</span> : index</span><br><span class="line">    %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">    %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">    %c553648160_i32 = arith.constant <span class="number">553648160</span> : i32</span><br><span class="line">    %c1_i32 = arith.constant <span class="number">1</span> : i32</span><br><span class="line">    hal.buffer_view.assert&lt;%arg0 : !hal.buffer_view&gt; <span class="built_in">message</span>(<span class="string">&quot;tensor&quot;</span>) <span class="built_in">shape</span>([%c10]) <span class="built_in">type</span>(%c553648160_i32) <span class="built_in">encoding</span>(%c1_i32)</span><br><span class="line">    %<span class="number">0</span> = stream.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">    %<span class="number">1</span> = stream.async.transfer %<span class="number">0</span> : !stream.resource&lt;external&gt;&#123;%c40&#125; -&gt; !stream.resource&lt;*&gt;&#123;%c40&#125;</span><br><span class="line">    %<span class="number">2</span> = stream.async.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%<span class="number">1</span>[%c0 to %c40 <span class="keyword">for</span> %c40]) : (!stream.resource&lt;*&gt;&#123;%c40&#125;) -&gt; !stream.resource&lt;*&gt;&#123;%c40&#125;</span><br><span class="line">    %<span class="number">3</span> = stream.async.transfer %<span class="number">2</span> : !stream.resource&lt;*&gt;&#123;%c40&#125; -&gt; !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">    %<span class="number">4</span> = stream.tensor.<span class="keyword">export</span> %<span class="number">3</span> : tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125; -&gt; !hal.buffer_view</span><br><span class="line">    <span class="keyword">return</span> %<span class="number">4</span> : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换为</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">    %c40 = arith.constant <span class="number">40</span> : index</span><br><span class="line">    %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">    %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">    %c553648160_i32 = arith.constant <span class="number">553648160</span> : i32</span><br><span class="line">    %c1_i32 = arith.constant <span class="number">1</span> : i32</span><br><span class="line">    hal.buffer_view.assert&lt;%arg0 : !hal.buffer_view&gt; <span class="built_in">message</span>(<span class="string">&quot;tensor&quot;</span>) <span class="built_in">shape</span>([%c10]) <span class="built_in">type</span>(%c553648160_i32) <span class="built_in">encoding</span>(%c1_i32)</span><br><span class="line">    %<span class="number">0</span> = stream.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">    %<span class="number">1</span> = stream.async.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%<span class="number">0</span>[%c0 to %c40 <span class="keyword">for</span> %c40]) : (!stream.resource&lt;external&gt;&#123;%c40&#125;) -&gt; !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">    %<span class="number">2</span> = stream.tensor.<span class="keyword">export</span> %<span class="number">1</span> : tensor&lt;<span class="number">10</span>xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125; -&gt; !hal.buffer_view</span><br><span class="line">    <span class="keyword">return</span> %<span class="number">2</span> : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到<code>!stream.resource&lt;*&gt;&#123; %c40&#125;</code>被推导为<code>!stream.resource&lt;external&gt;&#123; %c40&#125;</code>，并且有两处<code>stream.async.transfer</code>被删除了。</p></li>
+<li><p>addCleanupPatterns</p></li>
+<li><p>IREE::Stream::createScheduleExecutionPass</p>
+<p>根据启发式算法将每个callable（包括<code>util.initializer</code>）划分成多个part进行调度，每个part独立构成一个<code>stream.async.execute</code>，并且每个<code>stream.async.execute</code>后面都跟了一个<code>stream.timepoint.await</code>操作用于同步执行结果。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">  %c40 = arith.constant <span class="number">40</span> : index</span><br><span class="line">  %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">  %c553648160_i32 = arith.constant <span class="number">553648160</span> : i32</span><br><span class="line">  %c1_i32 = arith.constant <span class="number">1</span> : i32</span><br><span class="line">  %c1 = arith.constant <span class="number">1</span> : index</span><br><span class="line">  %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">  %_constant = util.global.load @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">  hal.buffer_view.assert&lt;%arg0 : !hal.buffer_view&gt; <span class="built_in">message</span>(<span class="string">&quot;tensor&quot;</span>) <span class="built_in">shape</span>([%c1, %c10]) <span class="built_in">type</span>(%c553648160_i32) <span class="built_in">encoding</span>(%c1_i32)</span><br><span class="line">  %<span class="number">0</span> = stream.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">  %<span class="number">1</span> = stream.async.alloca : !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">  %<span class="number">2</span> = stream.async.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%<span class="number">0</span>[%c0 to %c40 <span class="keyword">for</span> %c40], %_constant[%c0 to %c40 <span class="keyword">for</span> %c40], %<span class="number">1</span>[%c0 to %c40 <span class="keyword">for</span> %c40]) : (!stream.resource&lt;external&gt;&#123;%c40&#125;, !stream.resource&lt;constant&gt;&#123;%c40&#125;, !stream.resource&lt;external&gt;&#123;%c40&#125;) -&gt; %<span class="number">1</span>&#123;%c40&#125;</span><br><span class="line">  %<span class="number">3</span> = stream.tensor.<span class="keyword">export</span> %<span class="number">2</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125; -&gt; !hal.buffer_view</span><br><span class="line">  <span class="keyword">return</span> %<span class="number">3</span> : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">func.func @<span class="built_in">test</span>(%arg0: !hal.buffer_view) -&gt; !hal.buffer_view attributes &#123;iree.abi.stub&#125; &#123;</span><br><span class="line">  %c40 = arith.constant <span class="number">40</span> : index</span><br><span class="line">  %c10 = arith.constant <span class="number">10</span> : index</span><br><span class="line">  %c553648160_i32 = arith.constant <span class="number">553648160</span> : i32</span><br><span class="line">  %c1_i32 = arith.constant <span class="number">1</span> : i32</span><br><span class="line">  %c1 = arith.constant <span class="number">1</span> : index</span><br><span class="line">  %c0 = arith.constant <span class="number">0</span> : index</span><br><span class="line">  %_constant = util.global.load @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">  hal.buffer_view.assert&lt;%arg0 : !hal.buffer_view&gt; <span class="built_in">message</span>(<span class="string">&quot;tensor&quot;</span>) <span class="built_in">shape</span>([%c1, %c10]) <span class="built_in">type</span>(%c553648160_i32) <span class="built_in">encoding</span>(%c1_i32)</span><br><span class="line">  %<span class="number">0</span> = stream.tensor.<span class="keyword">import</span> %arg0 : !hal.buffer_view -&gt; tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">  %results, %result_timepoint = stream.async.execute <span class="built_in">with</span>(%<span class="number">0</span> as %arg1: !stream.resource&lt;external&gt;&#123;%c40&#125;, %_constant as %arg2: !stream.resource&lt;constant&gt;&#123;%c40&#125;) -&gt; !stream.resource&lt;external&gt;&#123;%c40&#125; &#123;</span><br><span class="line">    %<span class="number">3</span> = stream.async.alloca : !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">    %<span class="number">4</span> = stream.async.dispatch @test_dispatch_0::@test_dispatch_0_generic_10[%c10](%arg1[%c0 to %c40 <span class="keyword">for</span> %c40], %arg2[%c0 to %c40 <span class="keyword">for</span> %c40], %<span class="number">3</span>[%c0 to %c40 <span class="keyword">for</span> %c40]) : (!stream.resource&lt;external&gt;&#123;%c40&#125;, !stream.resource&lt;constant&gt;&#123;%c40&#125;, !stream.resource&lt;external&gt;&#123;%c40&#125;) -&gt; %<span class="number">3</span>&#123;%c40&#125;</span><br><span class="line">    stream.yield %<span class="number">4</span> : !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">  &#125; =&gt; !stream.timepoint</span><br><span class="line">  %<span class="number">1</span> = stream.timepoint.await %result_timepoint =&gt; %results : !stream.resource&lt;external&gt;&#123;%c40&#125;</span><br><span class="line">  %<span class="number">2</span> = stream.tensor.<span class="keyword">export</span> %<span class="number">1</span> : tensor&lt;<span class="number">1</span>x10xf32&gt; in !stream.resource&lt;external&gt;&#123;%c40&#125; -&gt; !hal.buffer_view</span><br><span class="line">  <span class="keyword">return</span> %<span class="number">2</span> : !hal.buffer_view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意：该示例中只有一个part。</p></li>
+<li><p>IREE::Stream::createScheduleConcurrencyPass</p>
+<p>继续将<code>stream.async.execute</code>划分为多个并行调度区，每个并行调度区构成一个<code>stream.async.concurrent</code>
+。</p></li>
+<li><p>IREE::Stream::createPropagateTimepointsPass</p>
+<p>给<code>stream.resource</code> 绑定一个
+<code>stream.timepoint</code>，在代码中用<code>stream.resource + stream.timepoint</code>
+的pair
+替换原来的<code>stream.resource</code>，并在需要的地方插入await。</p>
+<ul>
+<li><p><code>util.global</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">util.global <span class="keyword">private</span> @_constant : !stream.resource&lt;constant&gt;</span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">util.global <span class="keyword">private</span> <span class="keyword">mutable</span> @_constant__timepoint = <span class="meta">#stream.timepoint<span class="string">&lt;immediate&gt;</span> : !stream.timepoint</span></span><br><span class="line">util.global <span class="keyword">private</span> @_constant : !stream.resource&lt;constant&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>util.global.load</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">%_constant = util.global.load @_constant : !stream.resource&lt;constant&gt;</span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">%_constant__timepoint = util.global.load @_constant__timepoint : !stream.timepoint</span><br><span class="line">%_constant = util.global.load @_constant : !stream.resource&lt;constant&gt;</span><br><span class="line">%<span class="number">0</span> = stream.timepoint.await %_constant__timepoint =&gt; %_constant : !stream.resource&lt;constant&gt;&#123;%c40&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>util.global.store</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">util.global.store %<span class="number">0</span>, @_constant : !stream.resource&lt;constant&gt;</span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">util.global.store %result_timepoint, @_constant__timepoint : !stream.timepoint</span><br><span class="line">util.global.store %results, @_constant : !stream.resource&lt;constant&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>func.func</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">func.func @<span class="built_in">foo</span>(%<span class="number">0</span>: !stream.resource) &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">func.func @<span class="built_in">foo</span>(%t: !stream.timepoint, %<span class="number">0</span>: !stream.resource) &#123;</span><br><span class="line">  %<span class="number">1</span> = stream.timepoint.await %t, %<span class="number">0</span></span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p><code>call</code></p>
+<p>由于func内部已经插入了await，因此call之前的冗余await可以删除，call之后需要再插入一个func返回值的await。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">%<span class="number">1</span> = stream.timepoint.await %t, %<span class="number">0</span></span><br><span class="line">%r = call @<span class="built_in">foo</span>(%<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">%rt, %r = call @<span class="built_in">foo</span>(%t, %<span class="number">0</span>)</span><br><span class="line">stream.timepoint.await %rt, %t</span><br></pre></td></tr></table></figure></li>
+<li><p><code>return</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">%<span class="number">1</span> = stream.timepoint.await %t, %<span class="number">0</span></span><br><span class="line"><span class="keyword">return</span> %<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> %t, %<span class="number">0</span></span><br></pre></td></tr></table></figure></li>
+<li><p><code>branch</code></p>
+<p>将参数的await挪到branch里面。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">%<span class="number">1</span> = stream.timepoint.await %t, %<span class="number">0</span></span><br><span class="line">br ^<span class="built_in">bb1</span>(%<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">^<span class="built_in">bb1</span>(%b):</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">br ^<span class="built_in">bb1</span>(%t, %<span class="number">0</span>)</span><br><span class="line">^<span class="built_in">bb1</span>(%a, %b):</span><br><span class="line">  %<span class="number">1</span> = stream.timepoint.await %a, %b</span><br></pre></td></tr></table></figure></li>
+<li><p><code>stream.async.execute</code></p>
+<p>为每个未绑定<code>stream.timepoint</code>的输入参数绑定一个<code>stream.timepoint</code>，并在<code>stream.async.execute</code>之前计算参数的最大timepoint，<code>stream.async.execute</code>
+则await这个最大timepoint。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">%results, %result_timepoint = stream.async.execute <span class="built_in">with</span>(%<span class="number">0</span> as %arg1: !stream.resource&lt;external&gt;&#123;%c40&#125;, %_constant as %arg2: !stream.resource&lt;constant&gt;&#123;%c40&#125;) -&gt; !stream.resource&lt;external&gt;&#123;%c40&#125; &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>转换成</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">%<span class="number">3</span> = stream.timepoint.join <span class="built_in">max</span>(%<span class="number">2</span>, %_constant__timepoint) =&gt; !stream.timepoint</span><br><span class="line">%results, %result_timepoint = stream.async.execute <span class="built_in">await</span>(%<span class="number">3</span>) =&gt; <span class="built_in">with</span>(%<span class="number">1</span> as %arg1: !stream.resource&lt;external&gt;&#123;%c40&#125;, %_constant as %arg2: !stream.resource&lt;constant&gt;&#123;%c40&#125;) -&gt; !stream.resource&lt;external&gt;&#123;%c40&#125; &#123;</span><br><span class="line">   ...</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></li>
+</ul></li>
+<li><p>addCleanupPatterns</p></li>
+<li><p>IREE::Stream::createVerifyLoweringToAsyncPass</p>
+<p>验证LoweringToAsyncPass阶段Program的合法性。</p></li>
+</ul></li>
+<li><p>buildStreamCmdPassPipeline</p>
+<ul>
+<li>IREE::Stream::createScheduleAllocationPas</li>
+<li>IREE::Stream::createPackConstantsPass</li>
+<li>IREE::Stream::createPackAllocationsPass</li>
+<li>IREE::Stream::createLayoutSlicesPass</li>
+<li>IREE::Util::createPropagateSubrangesPass</li>
+<li>addCleanupPatterns</li>
+<li>IREE::Stream::createVerifyLoweringToCmdPass</li>
+</ul></li>
+<li><p>buildStreamOptimizationPassPipeline</p>
+<ul>
+<li>addCleanupPatterns</li>
+<li>mlir::createConvertSCFToCFPass</li>
+<li>addCleanupPatterns</li>
+<li>IREE::Stream::createElideTimepointsPass</li>
+<li>IREE::Util::createFixedPointIteratorPass</li>
+<li>IREE::Stream::createFuseDispatchBindingsPass</li>
+<li>IREE::Stream::createPackDispatchOperandsPass</li>
+<li>mlir::createCSEPass</li>
+<li>IREE::Stream::createFoldUniformOperandsPass</li>
+<li>IREE::Stream::createAnnotateDispatchArgumentsPass</li>
+</ul></li>
+<li><p>IREE::Stream::createMemoizeChannelsPass</p></li>
+<li><p>addCleanupPatterns</p></li>
+<li><p>mlir::createSymbolDCEPass</p></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Deep-Learning-Compiler/" rel="tag"># Deep Learning Compiler</a>
+              <a href="/tags/IREE/" rel="tag"># IREE</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/" rel="prev" title="IREE编译流程解析(五)">
+                  <i class="fa fa-chevron-left"></i> IREE编译流程解析(五)
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class=""></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Dou Jiang</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"hjchen2","repo":"hjchen2.github.io","client_id":"5248e75f54358b4eded8","client_secret":"d8b8ae05a0d4625d8ac01e4ab167f88cd0e0f2b1","admin_user":"hjchen2","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/gitalk/1.8.0/gitalk.min.js","integrity":"sha256-MVK9MGD/XJaGyIghSVrONSnoXoGh3IFxLw0zfvzpxR4="},"path_md5":"c550a004e87d982d3f5cfc23db91f60c"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>

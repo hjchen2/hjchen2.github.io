@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/</loc>  
+      
+    <lastmod>2023-02-13T14:02:57.915Z</lastmod>  
+      
+    <date>1676296640000</date>  
+    <title>IREE编译流程解析(六) | Don't Respond</title>  
+      
+    <desc>IREE::Stream::StreamTransformPassPipeline</desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2017/08/22/KunPeng%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/</loc>  
       
     <lastmod>2023-02-07T02:49:01.177Z</lastmod>  
