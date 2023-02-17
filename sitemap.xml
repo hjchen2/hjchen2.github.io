@@ -2,6 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/</loc>  
+      
+    <lastmod>2023-02-17T11:57:53.436Z</lastmod>  
+      
+    <date>1672838120000</date>  
+    <title>IREE编译流程解析(四) | Don't Respond</title>  
+      
+    <desc>IREE Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op fusion等，最终将workload拆分成flow.executable。相关的passes及其作用如下。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/</loc>  
+      
+    <lastmod>2023-02-17T11:57:13.735Z</lastmod>  
+      
+    <date>1672834452000</date>  
+    <title>IREE编译流程解析(一) | Don't Respond</title>  
+      
+    <desc>IREE InputConversionPassPipeline的主要作用是将不同的输入（MHLO、XLA、Torch Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf dialect和tensor dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要</desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</loc>  
       
     <lastmod>2023-02-17T11:55:47.250Z</lastmod>  
@@ -24,17 +46,6 @@
   </url>  
     
   <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/</loc>  
-      
-    <lastmod>2023-02-17T11:31:54.742Z</lastmod>  
-      
-    <date>1672838120000</date>  
-    <title>IREE编译流程解析(四) | Don't Respond</title>  
-      
-    <desc>IREE Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op fusion等，最终将workload拆分成flow.executable。相关的passes及其作用如下。</desc>  
-  </url>  
-    
-  <url>  
     <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B3/</loc>  
       
     <lastmod>2023-02-17T11:31:47.491Z</lastmod>  
@@ -54,17 +65,6 @@
     <title>IREE编译流程解析(二) | Don't Respond</title>  
       
     <desc>IREE CommonInputConversionPassPipeline主要作用是将IREE::Input dialect lower成IREE::Util、IREE::Flow和IREE::HAL dialect，包括以下几个passes。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/</loc>  
-      
-    <lastmod>2023-02-17T11:31:31.771Z</lastmod>  
-      
-    <date>1672834452000</date>  
-    <title>IREE编译流程解析(一) | Don't Respond</title>  
-      
-    <desc>IREE InputConversionPassPipeline的主要作用是将不同的输入（MHLO、XLA、Torch Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf dialect和tensor dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要</desc>  
   </url>  
     
   <url>  
