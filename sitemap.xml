@@ -2,14 +2,69 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
-    <loc>https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/</loc>  
+    <loc>https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/</loc>  
       
-    <lastmod>2023-02-16T13:47:54.325Z</lastmod>  
+    <lastmod>2023-02-17T11:32:02.532Z</lastmod>  
       
     <date>1676296640000</date>  
-    <title>IREE编译流程解析(六) | Don't Respond</title>  
+    <title>IREE编译流程解析(五) | Don't Respond</title>  
       
-    <desc>IREE::Stream::StreamTransformPassPipeline</desc>  
+    <desc>IREE::Stream::StreamTransformPassPipeline 的主要作用是将program转换到stream dialect，优化变量编码方式，划分调度子图，生成异步调度策略，并实现内存规划策略。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/</loc>  
+      
+    <lastmod>2023-02-17T11:31:54.742Z</lastmod>  
+      
+    <date>1672838120000</date>  
+    <title>IREE编译流程解析(四) | Don't Respond</title>  
+      
+    <desc>IREE Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op fusion等，最终将workload拆分成flow.executable。相关的passes及其作用如下。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B3/</loc>  
+      
+    <lastmod>2023-02-17T11:31:47.491Z</lastmod>  
+      
+    <date>1672835412000</date>  
+    <title>IREE编译流程解析(三) | Don't Respond</title>  
+      
+    <desc>IREE ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导出到外部的接口参数统一成标准标量类型或hal.buffer_view类型（hal.buffer_view对应tensor），包含以下几个passes。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B2/</loc>  
+      
+    <lastmod>2023-02-17T11:31:40.295Z</lastmod>  
+      
+    <date>1672834812000</date>  
+    <title>IREE编译流程解析(二) | Don't Respond</title>  
+      
+    <desc>IREE CommonInputConversionPassPipeline主要作用是将IREE::Input dialect lower成IREE::Util、IREE::Flow和IREE::HAL dialect，包括以下几个passes。</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/</loc>  
+      
+    <lastmod>2023-02-17T11:31:31.771Z</lastmod>  
+      
+    <date>1672834452000</date>  
+    <title>IREE编译流程解析(一) | Don't Respond</title>  
+      
+    <desc>IREE InputConversionPassPipeline的主要作用是将不同的输入（MHLO、XLA、Torch Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf dialect和tensor dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要</desc>  
+  </url>  
+    
+  <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</loc>  
+      
+    <lastmod>2023-02-17T11:30:15.107Z</lastmod>  
+      
+    <date>1672804804000</date>  
+    <title>IREE编译流程解析 | Don't Respond</title>  
+      
+    <desc>IREE支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin </desc>  
   </url>  
     
   <url>  
@@ -142,61 +197,6 @@
     <title>图替换 | Don't Respond</title>  
       
     <desc>背景 图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。 一些常见的图优化技术： DCE CSE（公共子表达式消除） 常量折叠 数学公式简化 Op融合 Layout变换 内存优化（swap-in/swap-out、重计算）</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/</loc>  
-      
-    <lastmod>2023-02-01T08:16:14.525Z</lastmod>  
-      
-    <date>1672838120000</date>  
-    <title>IREE编译流程解析(五) | Don't Respond</title>  
-      
-    <desc>IREE Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op fusion等，最终将workload拆分成flow.executable。相关的passes及其作用如下。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/</loc>  
-      
-    <lastmod>2023-01-05T06:56:42.638Z</lastmod>  
-      
-    <date>1672835412000</date>  
-    <title>IREE编译流程解析(四) | Don't Respond</title>  
-      
-    <desc>IREE ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导出到外部的接口参数统一成标准标量类型或hal.buffer_view类型（hal.buffer_view对应tensor），包含以下几个passes。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B3/</loc>  
-      
-    <lastmod>2023-01-05T06:56:18.960Z</lastmod>  
-      
-    <date>1672834812000</date>  
-    <title>IREE编译流程解析(三) | Don't Respond</title>  
-      
-    <desc>IREE CommonInputConversionPassPipeline主要作用是将IREE::Input dialect lower成IREE::Util、IREE::Flow和IREE::HAL dialect，包括以下几个passes。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B2/</loc>  
-      
-    <lastmod>2023-01-05T06:56:05.920Z</lastmod>  
-      
-    <date>1672834452000</date>  
-    <title>IREE编译流程解析(二) | Don't Respond</title>  
-      
-    <desc>IREE InputConversionPassPipeline的主要作用是将不同的输入（MHLO、XLA、Torch Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf dialect和tensor dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</loc>  
-      
-    <lastmod>2023-01-04T12:13:13.579Z</lastmod>  
-      
-    <date>1672804804000</date>  
-    <title>IREE编译流程解析(一) | Don't Respond</title>  
-      
-    <desc>IREE支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin </desc>  
   </url>  
     
   <url>  

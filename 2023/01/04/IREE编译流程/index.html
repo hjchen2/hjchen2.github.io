@@ -21,13 +21,13 @@
 
     <meta name="description" content="IREE支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin">
 <meta property="og:type" content="article">
-<meta property="og:title" content="IREE编译流程解析(一)">
+<meta property="og:title" content="IREE编译流程解析">
 <meta property="og:url" content="https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Don&#39;t Respond">
 <meta property="og:description" content="IREE支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin">
 <meta property="og:locale">
 <meta property="article:published_time" content="2023-01-04T04:00:04.000Z">
-<meta property="article:modified_time" content="2023-01-04T12:13:13.579Z">
+<meta property="article:modified_time" content="2023-02-17T11:30:15.107Z">
 <meta property="article:author" content="Dou Jiang">
 <meta property="article:tag" content="Deep Learning Compiler">
 <meta property="article:tag" content="IREE">
@@ -38,10 +38,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/","path":"2023/01/04/IREE编译流程/","title":"IREE编译流程解析(一)"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-Hans","comments":true,"permalink":"https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/","path":"2023/01/04/IREE编译流程/","title":"IREE编译流程解析"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>IREE编译流程解析(一) | Don't Respond</title>
+<title>IREE编译流程解析 | Don't Respond</title>
   
 
 
@@ -210,12 +210,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="IREE编译流程解析(一) | Don't Respond">
+      <meta itemprop="name" content="IREE编译流程解析 | Don't Respond">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          IREE编译流程解析(一)
+          IREE编译流程解析
         </h1>
 
         <div class="post-meta-container">
@@ -225,9 +225,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2023-01-04 12:00:04 / Modified: 20:13:13" itemprop="dateCreated datePublished" datetime="2023-01-04T12:00:04+08:00">2023-01-04</time>
+      <time title="Created: 2023-01-04 12:00:04" itemprop="dateCreated datePublished" datetime="2023-01-04T12:00:04+08:00">2023-01-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-02-17 19:30:15" itemprop="dateModified" datetime="2023-02-17T19:30:15+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -269,7 +275,9 @@ lower成IREE::Util、IREE::Flow和IREE::HAL dialect。</p></li>
 <li><p>Flow::FlowTransformPassPipeline</p>
 <p>主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
 fusion等。</p></li>
-<li><p>Stream::StreamTransformPassPipeline</p></li>
+<li><p>Stream::StreamTransformPassPipeline</p>
+<p>主要作用是将program转换到stream
+dialect，优化变量编码方式，划分调度子图，生成异步调度策略，并实现内存规划策略。</p></li>
 <li><p>HAL::HALTransformPassPipeline</p></li>
 <li><p>VM::VMTransformPassPipeline</p></li>
 </ul>
@@ -295,8 +303,8 @@ fusion等。</p></li>
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B2/" rel="next" title="IREE编译流程解析(二)">
-                  IREE编译流程解析(二) <i class="fa fa-chevron-right"></i>
+                <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/" rel="next" title="IREE编译流程解析(一)">
+                  IREE编译流程解析(一) <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>

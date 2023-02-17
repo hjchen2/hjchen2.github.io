@@ -190,7 +190,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://github.com/hjchen2/personal/blob/master/images/baby.jpg?raw=true">
@@ -208,7 +208,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/" class="post-title-link" itemprop="url">IREE编译流程解析(六)</a>
+          <a href="/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/" class="post-title-link" itemprop="url">IREE编译流程解析(五)</a>
         </h2>
 
         <div class="post-meta-container">
@@ -226,7 +226,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-02-16 21:47:54" itemprop="dateModified" datetime="2023-02-16T21:47:54+08:00">2023-02-16</time>
+      <time title="Modified: 2023-02-17 19:32:02" itemprop="dateModified" datetime="2023-02-17T19:32:02+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -248,104 +248,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>IREE::Stream::StreamTransformPassPipeline</p>
+          <p>IREE::Stream::StreamTransformPassPipeline
+的主要作用是将program转换到stream
+dialect，优化变量编码方式，划分调度子图，生成异步调度策略，并实现内存规划策略。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="https://github.com/hjchen2/personal/blob/master/images/baby.jpg?raw=true">
-      <meta itemprop="name" content="Dou Jiang">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Don't Respond">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Don't Respond">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/" class="post-title-link" itemprop="url">IREE编译流程解析(五)</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-
-      <time title="Created: 2023-01-04 21:15:20" itemprop="dateCreated datePublished" datetime="2023-01-04T21:15:20+08:00">2023-01-04</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-02-01 16:16:14" itemprop="dateModified" datetime="2023-02-01T16:16:14+08:00">2023-02-01</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/DL-Compiler/" itemprop="url" rel="index"><span itemprop="name">DL Compiler</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>IREE
-Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
-fusion等，最终将workload拆分成<code>flow.executable</code>。相关的passes及其作用如下。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/#more" rel="contents">
+              <a class="btn" href="/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -405,14 +313,14 @@ fusion等，最终将workload拆分成<code>flow.executable</code>。相关的pa
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2023-01-04 20:30:12" itemprop="dateCreated datePublished" datetime="2023-01-04T20:30:12+08:00">2023-01-04</time>
+      <time title="Created: 2023-01-04 21:15:20" itemprop="dateCreated datePublished" datetime="2023-01-04T21:15:20+08:00">2023-01-04</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-01-05 14:56:42" itemprop="dateModified" datetime="2023-01-05T14:56:42+08:00">2023-01-05</time>
+      <time title="Modified: 2023-02-17 19:31:54" itemprop="dateModified" datetime="2023-02-17T19:31:54+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -435,7 +343,8 @@ fusion等，最终将workload拆分成<code>flow.executable</code>。相关的pa
     
     <div class="post-body" itemprop="articleBody">
           <p>IREE
-ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导出到外部的接口参数统一成标准标量类型或<code>hal.buffer_view</code>类型（<code>hal.buffer_view</code>对应tensor），包含以下几个passes。</p>
+Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
+fusion等，最终将workload拆分成<code>flow.executable</code>。相关的passes及其作用如下。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/#more" rel="contents">
@@ -498,14 +407,14 @@ ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
-      <time title="Created: 2023-01-04 20:20:12" itemprop="dateCreated datePublished" datetime="2023-01-04T20:20:12+08:00">2023-01-04</time>
+      <time title="Created: 2023-01-04 20:30:12" itemprop="dateCreated datePublished" datetime="2023-01-04T20:30:12+08:00">2023-01-04</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-01-05 14:56:18" itemprop="dateModified" datetime="2023-01-05T14:56:18+08:00">2023-01-05</time>
+      <time title="Modified: 2023-02-17 19:31:47" itemprop="dateModified" datetime="2023-02-17T19:31:47+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -527,9 +436,8 @@ ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导
     
     
     <div class="post-body" itemprop="articleBody">
-          <p>IREE CommonInputConversionPassPipeline主要作用是将IREE::Input dialect
-lower成IREE::Util、IREE::Flow和IREE::HAL
-dialect，包括以下几个passes。</p>
+          <p>IREE
+ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导出到外部的接口参数统一成标准标量类型或<code>hal.buffer_view</code>类型（<code>hal.buffer_view</code>对应tensor），包含以下几个passes。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B3/#more" rel="contents">
@@ -592,6 +500,100 @@ dialect，包括以下几个passes。</p>
       </span>
       <span class="post-meta-item-text">Posted on</span>
 
+      <time title="Created: 2023-01-04 20:20:12" itemprop="dateCreated datePublished" datetime="2023-01-04T20:20:12+08:00">2023-01-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-02-17 19:31:40" itemprop="dateModified" datetime="2023-02-17T19:31:40+08:00">2023-02-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/DL-Compiler/" itemprop="url" rel="index"><span itemprop="name">DL Compiler</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>IREE CommonInputConversionPassPipeline主要作用是将IREE::Input dialect
+lower成IREE::Util、IREE::Flow和IREE::HAL
+dialect，包括以下几个passes。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B2/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://github.com/hjchen2/personal/blob/master/images/baby.jpg?raw=true">
+      <meta itemprop="name" content="Dou Jiang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Don't Respond">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/" class="post-title-link" itemprop="url">IREE编译流程解析(一)</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
       <time title="Created: 2023-01-04 20:14:12" itemprop="dateCreated datePublished" datetime="2023-01-04T20:14:12+08:00">2023-01-04</time>
     </span>
     <span class="post-meta-item">
@@ -599,7 +601,7 @@ dialect，包括以下几个passes。</p>
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-01-05 14:56:05" itemprop="dateModified" datetime="2023-01-05T14:56:05+08:00">2023-01-05</time>
+      <time title="Modified: 2023-02-17 19:31:31" itemprop="dateModified" datetime="2023-02-17T19:31:31+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -628,7 +630,7 @@ dialect和tensor
 dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要作用。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B2/#more" rel="contents">
+              <a class="btn" href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -677,7 +679,7 @@ dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/" class="post-title-link" itemprop="url">IREE编译流程解析(一)</a>
+          <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/" class="post-title-link" itemprop="url">IREE编译流程解析</a>
         </h2>
 
         <div class="post-meta-container">
@@ -687,9 +689,15 @@ dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">Posted on</span>
-      
 
-      <time title="Created: 2023-01-04 12:00:04 / Modified: 20:13:13" itemprop="dateCreated datePublished" datetime="2023-01-04T12:00:04+08:00">2023-01-04</time>
+      <time title="Created: 2023-01-04 12:00:04" itemprop="dateCreated datePublished" datetime="2023-01-04T12:00:04+08:00">2023-01-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">Edited on</span>
+      <time title="Modified: 2023-02-17 19:30:15" itemprop="dateModified" datetime="2023-02-17T19:30:15+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
