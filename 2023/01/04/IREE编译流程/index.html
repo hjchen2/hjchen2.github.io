@@ -19,15 +19,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"hjchen2.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.14.1","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"gitalk","storage":true,"lazyload":false,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="IREE支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin">
+    <meta name="description" content="IREE目前支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IREE编译流程解析">
 <meta property="og:url" content="https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Don&#39;t Respond">
-<meta property="og:description" content="IREE支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin">
+<meta property="og:description" content="IREE目前支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin">
 <meta property="og:locale">
 <meta property="article:published_time" content="2023-01-04T04:00:04.000Z">
-<meta property="article:modified_time" content="2023-02-17T11:30:15.107Z">
+<meta property="article:modified_time" content="2023-02-17T11:55:47.250Z">
 <meta property="article:author" content="Dou Jiang">
 <meta property="article:tag" content="Deep Learning Compiler">
 <meta property="article:tag" content="IREE">
@@ -233,7 +233,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">Edited on</span>
-      <time title="Modified: 2023-02-17 19:30:15" itemprop="dateModified" datetime="2023-02-17T19:30:15+08:00">2023-02-17</time>
+      <time title="Modified: 2023-02-17 19:55:47" itemprop="dateModified" datetime="2023-02-17T19:55:47+08:00">2023-02-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -255,27 +255,32 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>IREE支持将MHLO、XLA、Torch
-Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM
-bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM
-bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin
+        <p>IREE目前支持将MHLO、XLA、Torch
+Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM
+bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM
+bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin
 kernel。</p>
 <span id="more"></span>
-<p>IREE编译的主要流程是IREEVMTransformPassPipeline，IREEVMTransformPassPipeline又被分成InputConversionPassPipeline、CommonInputConversionPassPipeline、ABI::TransformPassPipeline、Flow::FlowTransformPassPipeline、Stream::StreamTransformPassPipeline（仅CUDA后端）、HAL::HALTransformPassPipeline、VM::VMTransformPassPipeline等几个子阶段。</p>
+<p>IREE编译的入口是IREEVMTransformPassPipeline，IREEVMTransformPassPipeline又被分成InputConversionPassPipeline、CommonInputConversionPassPipeline、ABI::TransformPassPipeline、Flow::FlowTransformPassPipeline、Stream::StreamTransformPassPipeline（仅CUDA后端）、HAL::HALTransformPassPipeline、VM::VMTransformPassPipeline等几个阶段。</p>
 <ul>
 <li><p>InputConversionPassPipeline</p>
+<a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/" title="IREE编译流程解析(一)">IREE编译流程解析(一)</a>
 <p>主要作用是将不同的输入（MHLO、XLA、Torch
 Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf
 dialect和tensor dialect。</p></li>
 <li><p>CommonInputConversionPassPipeline</p>
+<a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B2/" title="IREE编译流程解析(二)">IREE编译流程解析(二)</a>
 <p>主要作用是将IREE::Input dialect
 lower成IREE::Util、IREE::Flow和IREE::HAL dialect。</p></li>
 <li><p>ABI::TransformPassPipeline</p>
+<a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B3/" title="IREE编译流程解析(三)">IREE编译流程解析(三)</a>
 <p>主要作用是将外部导入的接口和本module导出到外部的接口参数统一成标准标量类型或<code>hal.buffer_view</code>类型（<code>hal.buffer_view</code>对应tensor）。</p></li>
 <li><p>Flow::FlowTransformPassPipeline</p>
+<a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/" title="IREE编译流程解析(四)">IREE编译流程解析(四)</a>
 <p>主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
 fusion等。</p></li>
 <li><p>Stream::StreamTransformPassPipeline</p>
+<a href="/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/" title="IREE编译流程解析(五)">IREE编译流程解析(五)</a>
 <p>主要作用是将program转换到stream
 dialect，优化变量编码方式，划分调度子图，生成异步调度策略，并实现内存规划策略。</p></li>
 <li><p>HAL::HALTransformPassPipeline</p></li>

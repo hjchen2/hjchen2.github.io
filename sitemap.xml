@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</loc>  
+      
+    <lastmod>2023-02-17T11:55:47.250Z</lastmod>  
+      
+    <date>1672804804000</date>  
+    <title>IREE编译流程解析 | Don't Respond</title>  
+      
+    <desc>IREE目前支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin </desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/</loc>  
       
     <lastmod>2023-02-17T11:32:02.532Z</lastmod>  
@@ -54,17 +65,6 @@
     <title>IREE编译流程解析(一) | Don't Respond</title>  
       
     <desc>IREE InputConversionPassPipeline的主要作用是将不同的输入（MHLO、XLA、Torch Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf dialect和tensor dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</loc>  
-      
-    <lastmod>2023-02-17T11:30:15.107Z</lastmod>  
-      
-    <date>1672804804000</date>  
-    <title>IREE编译流程解析 | Don't Respond</title>  
-      
-    <desc>IREE支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列优化passes编译成IREE定义的VM bytecode文件，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用。比如CUDA相关的计算代码会被lowering成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin </desc>  
   </url>  
     
   <url>  
