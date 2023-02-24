@@ -128,7 +128,7 @@ learning使得agent玩Atari 2600游戏的水平超越了人类水平。在Atari
 2600游戏中，每个游戏画面都是一个状态，如果每个画面都是像素为84*84的256灰度图像，那么将会产生<span
 class="math inline">\(256^{84\cdot84}\)</span>个状态，用表格进行存储将会变得非常不现实。为了解决状态数爆炸的问题，通常可以使用函数逼近的方法。下面有几种函数表示的方式：</p>
 <div data-align="center">
-<img src="https://github.com/hjchen2/personal/blob/master/blog/pictures/30EFF3D4-0562-4544-BFF9-D43B3EC7AFF7.png?raw=true">
+<img src="https://github.com/hjchen2/personal/blob/master/blog/pictures/30EFF3D4-0562-4544-BFF9-D43B3EC7AFF7.png?raw=true" width=600>
 </div>
 <p></br></p>
 <p>并且逼近函数的形式可以采用：</p>
@@ -171,7 +171,7 @@ learning在一些复杂任务上得到广泛应用，但仍然没有解决动作
 Learning】论文中，由于需要直接输入图像画面，因此论文中使用CNN来表示Q函数，下面简单剖析一下该论文。</p>
 <p>使用的是典型的CNN，其结构为：</p>
 <div data-align="center">
-<img src="https://github.com/hjchen2/personal/blob/master/blog/pictures/93F5C516-8E53-4F89-B03E-3EDD95DF1C76.png?raw=true">
+<img src="https://github.com/hjchen2/personal/blob/master/blog/pictures/93F5C516-8E53-4F89-B03E-3EDD95DF1C76.png?raw=true" width=600>
 </div>
 <p></br>
 与一般的CNN有所不同的是，没有pooling层，因为我们这里不是做图像分类，pooling层带来的旋转和数值不变性对分类是有作用的，但在这个任务中对物体的具体位置是非常敏感的，因此移除了pooling层。</p>
