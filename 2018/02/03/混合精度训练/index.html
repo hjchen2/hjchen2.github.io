@@ -1,71 +1,121 @@
-<!DOCTYPE HTML>
-<html>
+
+ <!DOCTYPE HTML>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   
-  <title>混合精度训练 › Don&#39;t Respond</title>
-  <meta name="author" content="Dou Jiang">
-  
-  <meta name="description" content="MIXED PRECISION TRAINING
-https://arxiv.org/pdf/1710.03740.pdf
-论文概述
-nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla
-V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。">
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>混合精度训练 | Don&#39;t Respond</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Dou Jiang">
+    
 
-  <meta property="og:title" content="混合精度训练"/>
-  <meta property="og:site_name" content="Don&#39;t Respond"/>
+    
+    <meta name="description" content="MIXED PRECISION TRAINING https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1710.03740.pdf 论文概述 nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="混合精度训练">
+<meta property="og:url" content="https://hjchen2.github.io/2018/02/03/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:description" content="MIXED PRECISION TRAINING https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1710.03740.pdf 论文概述 nvidia的Pascal和Volta系列显卡除了支持标准的单精度计算外，也支持了低精度的计算，比如最新的Tesla V100硬件支持了FP16的计算加速，P4和P40支持INT8的计算加速，而且低精度计算的峰值要远高于单精浮点的计算峰值。">
+<meta property="og:locale">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/95247900845ca0aa285aea86b971c6ec.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/b89a595f09deb2caf14d44176f931440.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/fc960bb10d950d111404cda831aa5cbe.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/a9166bfb03d36772c83f4aa56e591374.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/3dbc1922becd3b150d50bc71aacecb1e.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/0369372f891c65571c845b04960aafda.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/237914e80a50fe0f2cac573c36733e5c.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/f1c1f41006c8f637c29208ac8652310b.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/f54c9019a7174299761d48094d1f0dab.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/9b304e74b8dbc9ec6324c56d05b85f24.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/4a18c89da9676673a73c899987564e10.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/2f5405a955c03cd522b5b1f17e7300cd.png?raw=true">
+<meta property="og:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/55d321517c2de03fe92f7c32aff1d87a.png?raw=true">
+<meta property="article:published_time" content="2018-02-03T04:00:04.000Z">
+<meta property="article:modified_time" content="2023-02-07T02:39:53.138Z">
+<meta property="article:author" content="Dou Jiang">
+<meta property="article:tag" content="int16">
+<meta property="article:tag" content="fp16">
+<meta property="article:tag" content="混合精度训练">
+<meta property="article:tag" content="loss scaling">
+<meta property="article:tag" content="QVNNI16">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/95247900845ca0aa285aea86b971c6ec.png?raw=true">
 
-  
-    <meta property="og:image" content=""/>
-  
-
-  <link href="/favicon.png" rel="icon">
-  <link rel="alternate" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-  
+    
+    <link rel="alternative" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
+    
+    
+    
+    
+<link rel="stylesheet" href="/css/style.css">
 
 <meta name="generator" content="Hexo 6.3.0"></head>
 
-
-<body>
-  <header id="header"><div class="meta inner">
-  <h1><a href="/">Don&#39;t Respond</a></h1>
-  <h2><a href="/"></a></h2>
-  <nav id="main-nav">
-    <ul>
-      
-      <li><a href="/about">About</a></li>
-      
-      <li><a href="/archives">Archives</a></li>
-      
-      <li><a href="/atom.xml">RSS</a></li>
-      
-    </ul>
-    <div class="clearfix"></div>
-  </nav>
-</div>
-<div class="clearfix"></div>
-</header>
-  <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
-  <div class="post-content">
+  <body>
     <header>
       
-  
-    <h1 class="title">混合精度训练</h1>
-  
-
-      
-        <time datetime="2018-02-03T04:00:04.000Z">2018-02-03</time>
-      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Don&#39;t Respond">Don&#39;t Respond</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:hjchen2.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
     </header>
-    <div class="entry">
-      
-        <h2 id="mixed-precision-training">MIXED PRECISION TRAINING</h2>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2018/02/03/混合精度训练/" title="混合精度训练" itemprop="url">混合精度训练</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2018-02-03T04:00:04.000Z" itemprop="datePublished"> Published 2018-02-03</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#mixed-precision-training"><span class="toc-number">1.</span> <span class="toc-text">MIXED PRECISION TRAINING</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">论文概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E7%9A%84%E5%BF%85%E8%A6%81%E6%80%A7"><span class="toc-number">1.2.</span> <span class="toc-text">混合精度的必要性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#loss-scaling"><span class="toc-number">1.3.</span> <span class="toc-text">Loss scaling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">1.4.</span> <span class="toc-text">实验结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mixed-precision-training-of-convolutional-neural-networks-using-integer-operations"><span class="toc-number">2.</span> <span class="toc-text">MIXED
+PRECISION TRAINING OF CONVOLUTIONAL NEURAL NETWORKS USING INTEGER
+OPERATIONS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%A6%82%E8%BF%B0-1"><span class="toc-number">2.1.</span> <span class="toc-text">论文概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dfpdynamic-fixed-point"><span class="toc-number">2.2.</span> <span class="toc-text">DFP（Dynamic Fixed Point）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dfp%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83"><span class="toc-number">2.3.</span> <span class="toc-text">DFP混合精度训练</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.4.</span> <span class="toc-text">指令实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C-1"><span class="toc-number">2.5.</span> <span class="toc-text">实验结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#abs_max%E9%87%8F%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">2.6.</span> <span class="toc-text">ABS_MAX量化方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dfp%E4%B8%8Eabs_max%E9%87%8F%E5%8C%96%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">2.7.</span> <span class="toc-text">DFP与ABS_MAX量化的区别</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<h2 id="mixed-precision-training">MIXED PRECISION TRAINING</h2>
 <p><a
 target="_blank" rel="noopener" href="https://email.baidu.com/OWA/redir.aspx?C=G_TpaBQZHjfotfty5PDuHfO3av_KUOGPcZOg_60U2vdUx9QS42vVCA..&amp;URL=https%3a%2f%2farxiv.org%2fpdf%2f1710.03740.pdf">https://arxiv.org/pdf/1710.03740.pdf</a></p>
 <h3 id="论文概述">论文概述</h3>
@@ -187,143 +237,481 @@ CPU上进行，DFP-16相比FP32训练加速1.8X。</p>
 <p><img src='https://github.com/hjchen2/personal/blob/master/blog/mixed-precision/55d321517c2de03fe92f7c32aff1d87a.png?raw=true'></p>
 <h3 id="abs_max量化方案">ABS_MAX量化方案</h3>
 <h3 id="dfp与abs_max量化的区别">DFP与ABS_MAX量化的区别</h3>
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
 
-      
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/low-bitwidth/">low bitwidth</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/int16/">int16</a><a href="/tags/fp16/">fp16</a><a href="/tags/混合精度训练/">混合精度训练</a><a href="/tags/loss-scaling/">loss scaling</a><a href="/tags/QVNNI16/">QVNNI16</a>
+  </div>
+
+</div>
+
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2019/11/27/DeepFusion/" title="FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs">
+  <strong>上一篇：</strong><br/>
+  <span>
+  FusionStitching, Deep Fusion and Code Generation for Tensorflow Computations on GPUs</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2018/01/02/模型压缩论文阅读记录/"  title="模型压缩之pruning">
+ <strong>下一篇：</strong><br/> 
+ <span>模型压缩之pruning
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#mixed-precision-training"><span class="toc-number">1.</span> <span class="toc-text">MIXED PRECISION TRAINING</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%A6%82%E8%BF%B0"><span class="toc-number">1.1.</span> <span class="toc-text">论文概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E7%9A%84%E5%BF%85%E8%A6%81%E6%80%A7"><span class="toc-number">1.2.</span> <span class="toc-text">混合精度的必要性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#loss-scaling"><span class="toc-number">1.3.</span> <span class="toc-text">Loss scaling</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C"><span class="toc-number">1.4.</span> <span class="toc-text">实验结果</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mixed-precision-training-of-convolutional-neural-networks-using-integer-operations"><span class="toc-number">2.</span> <span class="toc-text">MIXED
+PRECISION TRAINING OF CONVOLUTIONAL NEURAL NETWORKS USING INTEGER
+OPERATIONS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E6%A6%82%E8%BF%B0-1"><span class="toc-number">2.1.</span> <span class="toc-text">论文概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dfpdynamic-fixed-point"><span class="toc-number">2.2.</span> <span class="toc-text">DFP（Dynamic Fixed Point）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dfp%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83"><span class="toc-number">2.3.</span> <span class="toc-text">DFP混合精度训练</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E4%BB%A4%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.4.</span> <span class="toc-text">指令实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C-1"><span class="toc-number">2.5.</span> <span class="toc-text">实验结果</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#abs_max%E9%87%8F%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-number">2.6.</span> <span class="toc-text">ABS_MAX量化方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#dfp%E4%B8%8Eabs_max%E9%87%8F%E5%8C%96%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-number">2.7.</span> <span class="toc-text">DFP与ABS_MAX量化的区别</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/DL-Compiler/" title="DL Compiler">DL Compiler<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Daily/" title="Daily">Daily<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML-framework/" title="ML framework">ML framework<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/XRT/" title="XRT">XRT<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/code/" title="code">code<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/deep-learning/" title="deep learning">deep learning<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/graph-optimization-图优化/" title="graph optimization, 图优化">graph optimization, 图优化<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/kaldi-decision-tree-决策树/" title="kaldi, decision tree, 决策树">kaldi, decision tree, 决策树<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/low-bitwidth/" title="low bitwidth">low bitwidth<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/model-compression/" title="model compression">model compression<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/neural-machine-translation/" title="neural machine translation">neural machine translation<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/reinforcement-learning/" title="reinforcement learning">reinforcement learning<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tvm-knowledge/" title="tvm knowledge">tvm knowledge<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Deep-Learning-Compiler/" title="Deep Learning Compiler">Deep Learning Compiler<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/IREE/" title="IREE">IREE<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/reinforcement-learning/" title="reinforcement learning">reinforcement learning<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/caffe/" title="caffe">caffe<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/deep-learning/" title="deep learning">deep learning<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/momentum/" title="momentum">momentum<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/c/" title="c++">c++<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/embedding/" title="embedding">embedding<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XLA/" title="XLA">XLA<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/FusionStitching/" title="FusionStitching">FusionStitching<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/kaldi/" title="kaldi">kaldi<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/decision-tree/" title="decision tree">decision tree<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/决策树/" title="决策树">决策树<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HMM/" title="HMM">HMM<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/上下文相关音素/" title="上下文相关音素">上下文相关音素<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TVM/" title="TVM">TVM<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/PackedFunc/" title="PackedFunc">PackedFunc<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/large-scale-ML-framework/" title="large scale ML framework">large scale ML framework<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+</aside>
+</div>
     </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2023 
+		
+		<a href="/about" target="_blank" title="Dou Jiang">Dou Jiang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
       
-      <footer>
+      $('#toc.toc-aside').css('display', 'none');
         
-  
-  <div class="categories">
-    <a href="/categories/low-bitwidth/">low bitwidth</a>
-  </div>
+    }
+  });
+});
+</script>
 
-        
-  
-  <div class="tags">
-    <a href="/tags/int16/">int16</a>, <a href="/tags/fp16/">fp16</a>, <a href="/tags/混合精度训练/">混合精度训练</a>, <a href="/tags/loss-scaling/">loss scaling</a>, <a href="/tags/QVNNI16/">QVNNI16</a>
-  </div>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
 
-        
-      
-      <div class="clearfix"></div>
-      </footer>
-  </div>
-</article>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
 
 
-<section id="comment">
-  
-</section>
 
 
 
 
-  
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     tex2jax: {
       inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    }
-  });
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for(i=0; i < all.length; i += 1) {
-        all[i].SourceElement().parentNode.className += ' has-jax';
+      processEscapes: true
     }
   });
 </script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.8/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 
+<!-- MathJax End -->
 
-</div></div>
-    <aside id="sidebar" class="alignright">
-  <div class="search">
-  <form action="//google.com/search" method="get" accept-charset="utf-8">
-    <input type="search" name="q" results="0" placeholder="Search">
-    <input type="hidden" name="q" value="site:hjchen2.github.io">
-  </form>
-</div>
+<!-- Tiny_search Begin -->
 
-  
-<div class="widget tag">
-  <h3 class="title">Recent Posts</h3>
-  <ul class="entry">
-    
-      <li>
-        <a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a>
-      </li>
-    
-  </ul>
-</div>
+<!-- Tiny_search End -->
 
-
-  
-<div class="widget tag">
-  <h3 class="title">Categories</h3>
-  <ul class="entry">
-  
-    <li><a href="/categories/DL-Compiler/">DL Compiler</a><small>8</small></li>
-  
-    <li><a href="/categories/Daily/">Daily</a><small>1</small></li>
-  
-    <li><a href="/categories/ML-framework/">ML framework</a><small>2</small></li>
-  
-    <li><a href="/categories/XRT/">XRT</a><small>1</small></li>
-  
-    <li><a href="/categories/code/">code</a><small>1</small></li>
-  
-    <li><a href="/categories/deep-learning/">deep learning</a><small>1</small></li>
-  
-    <li><a href="/categories/graph-optimization-图优化/">graph optimization, 图优化</a><small>1</small></li>
-  
-    <li><a href="/categories/kaldi-decision-tree-决策树/">kaldi, decision tree, 决策树</a><small>1</small></li>
-  
-    <li><a href="/categories/low-bitwidth/">low bitwidth</a><small>1</small></li>
-  
-    <li><a href="/categories/model-compression/">model compression</a><small>1</small></li>
-  
-    <li><a href="/categories/neural-machine-translation/">neural machine translation</a><small>1</small></li>
-  
-    <li><a href="/categories/reinforcement-learning/">reinforcement learning</a><small>3</small></li>
-  
-    <li><a href="/categories/tvm-knowledge/">tvm knowledge</a><small>1</small></li>
-  
-  </ul>
-</div>
-
-</aside>
-    <div class="clearfix"></div>
-  </div>
-  <footer id="footer" class="inner"><div class="alignleft">
-  
-  &copy; 2023 Dou Jiang
-  
-</div>
-<div class="clearfix"></div></footer>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
-
-
-</body>
+  </body>
 </html>
-

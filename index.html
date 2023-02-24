@@ -1,327 +1,527 @@
-<!DOCTYPE HTML>
-<html>
+
+ <!DOCTYPE HTML>
+<html lang="zh-Hans">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   
-  <title>Don&#39;t Respond</title>
-  <meta name="author" content="Dou Jiang">
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Don&#39;t Respond</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="Dou Jiang">
+    
 
-  
-  <meta property="og:site_name" content="Don&#39;t Respond"/>
+    
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Don&#39;t Respond">
+<meta property="og:url" content="https://hjchen2.github.io/index.html">
+<meta property="og:site_name" content="Don&#39;t Respond">
+<meta property="og:locale">
+<meta property="article:author" content="Dou Jiang">
+<meta name="twitter:card" content="summary">
 
-  
-    <meta property="og:image" content=""/>
-  
-
-  <link href="/favicon.png" rel="icon">
-  <link rel="alternate" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
-  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
-  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-  
+    
+    <link rel="alternative" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
+    
+    
+    
+    
+<link rel="stylesheet" href="/css/style.css">
 
 <meta name="generator" content="Hexo 6.3.0"></head>
 
-
-<body>
-  <header id="header"><div class="meta inner">
-  <h1><a href="/">Don&#39;t Respond</a></h1>
-  <h2><a href="/"></a></h2>
-  <nav id="main-nav">
-    <ul>
-      
-      <li><a href="/about">About</a></li>
-      
-      <li><a href="/archives">Archives</a></li>
-      
-      <li><a href="/atom.xml">RSS</a></li>
-      
-    </ul>
-    <div class="clearfix"></div>
-  </nav>
-</div>
-<div class="clearfix"></div>
-</header>
-  <div id="content" class="inner">
-    <div id="main-col" class="alignleft"><div id="wrapper">
-  <article class="post">
-  <div class="post-content">
+  <body>
     <header>
       
-  
-    <h1 class="title"><a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a></h1>
-  
-
-      
-        <time datetime="2023-02-24T10:47:11.000Z">2023-02-24</time>
-      
+<div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Don&#39;t Respond">Don&#39;t Respond</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:hjchen2.github.io">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
     </header>
-    <div class="entry">
-      
+    <div id="container">
+      <div id="main">
+
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2023/02/24/IREE编译流程6/" title="IREE编译流程解析(六)" itemprop="url">IREE编译流程解析(六)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2023-02-24T10:47:11.000Z" itemprop="datePublished"> Published 2023-02-24</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>HAL::HALTransformPassPipeline的主要作用是进行tiling、vectorization和bufferization等操作，分配计算负载，最终生成target
 device的代码。比如cuda target的dispatch source code会被递降为NVVM
 IR。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2023/02/24/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2023/02/24/IREE编译流程6/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DL-Compiler/">DL Compiler</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Deep-Learning-Compiler/">Deep Learning Compiler</a><a href="/tags/IREE/">IREE</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a></h1>
-  
 
-      
-        <time datetime="2023-02-13T13:57:20.000Z">2023-02-13</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2023/02/13/IREE编译流程5/" title="IREE编译流程解析(五)" itemprop="url">IREE编译流程解析(五)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2023-02-13T13:57:20.000Z" itemprop="datePublished"> Published 2023-02-13</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>IREE::Stream::StreamTransformPassPipeline
 的主要作用是将program转换到stream
 dialect，优化变量编码方式，划分调度子图，生成异步调度策略，并实现内存规划策略。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2023/02/13/IREE编译流程5/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DL-Compiler/">DL Compiler</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Deep-Learning-Compiler/">Deep Learning Compiler</a><a href="/tags/IREE/">IREE</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a></h1>
-  
 
-      
-        <time datetime="2023-01-04T13:15:20.000Z">2023-01-04</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2023/01/04/IREE编译流程4/" title="IREE编译流程解析(四)" itemprop="url">IREE编译流程解析(四)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2023-01-04T13:15:20.000Z" itemprop="datePublished"> Published 2023-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>IREE
 Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
 fusion等，最终将workload拆分成<code>flow.executable</code>。相关的passes及其作用如下。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2023/01/04/IREE编译流程4/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DL-Compiler/">DL Compiler</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Deep-Learning-Compiler/">Deep Learning Compiler</a><a href="/tags/IREE/">IREE</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a></h1>
-  
 
-      
-        <time datetime="2023-01-04T12:30:12.000Z">2023-01-04</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2023/01/04/IREE编译流程3/" title="IREE编译流程解析(三)" itemprop="url">IREE编译流程解析(三)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2023-01-04T12:30:12.000Z" itemprop="datePublished"> Published 2023-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>IREE
 ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导出到外部的接口参数统一成标准标量类型或<code>hal.buffer_view</code>类型（<code>hal.buffer_view</code>对应tensor），包含以下几个passes。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B3/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2023/01/04/IREE编译流程3/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DL-Compiler/">DL Compiler</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Deep-Learning-Compiler/">Deep Learning Compiler</a><a href="/tags/IREE/">IREE</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a></h1>
-  
 
-      
-        <time datetime="2023-01-04T12:20:12.000Z">2023-01-04</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2023/01/04/IREE编译流程2/" title="IREE编译流程解析(二)" itemprop="url">IREE编译流程解析(二)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2023-01-04T12:20:12.000Z" itemprop="datePublished"> Published 2023-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>IREE CommonInputConversionPassPipeline主要作用是将IREE::Input dialect
 lower成IREE::Util、IREE::Flow和IREE::HAL
 dialect，包括以下几个passes。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B2/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2023/01/04/IREE编译流程2/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DL-Compiler/">DL Compiler</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Deep-Learning-Compiler/">Deep Learning Compiler</a><a href="/tags/IREE/">IREE</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2023/01/04/IREE编译流程1/">IREE编译流程解析(一)</a></h1>
-  
 
-      
-        <time datetime="2023-01-04T12:14:12.000Z">2023-01-04</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2023/01/04/IREE编译流程1/" title="IREE编译流程解析(一)" itemprop="url">IREE编译流程解析(一)</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2023-01-04T12:14:12.000Z" itemprop="datePublished"> Published 2023-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>IREE
 InputConversionPassPipeline的主要作用是将不同的输入（MHLO、XLA、Torch
 Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf
 dialect和tensor
 dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要作用。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B1/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2023/01/04/IREE编译流程1/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DL-Compiler/">DL Compiler</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Deep-Learning-Compiler/">Deep Learning Compiler</a><a href="/tags/IREE/">IREE</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2023/01/04/IREE编译流程/">IREE编译流程解析</a></h1>
-  
 
-      
-        <time datetime="2023-01-04T04:00:04.000Z">2023-01-04</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2023/01/04/IREE编译流程/" title="IREE编译流程解析" itemprop="url">IREE编译流程解析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2023-01-04T04:00:04.000Z" itemprop="datePublished"> Published 2023-01-04</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>IREE目前支持将MHLO或XLA、Torch
 Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM
 bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM
 bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin
 kernel。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2023/01/04/IREE编译流程/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/DL-Compiler/">DL Compiler</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/Deep-Learning-Compiler/">Deep Learning Compiler</a><a href="/tags/IREE/">IREE</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2020/02/25/如何在XRT框架下添加自定义的后端引擎/">如何在XRT框架下添加自定义的后端引擎</a></h1>
-  
 
-      
-        <time datetime="2020-02-25T08:06:18.000Z">2020-02-25</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/02/25/如何在XRT框架下添加自定义的后端引擎/" title="如何在XRT框架下添加自定义的后端引擎" itemprop="url">如何在XRT框架下添加自定义的后端引擎</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2020-02-25T08:06:18.000Z" itemprop="datePublished"> Published 2020-02-25</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <p>XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括：</p>
 <ul>
 <li>统一的DAG计算图表示</li>
@@ -331,76 +531,126 @@ kernel。</p>
 </ul>
 <p>得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable
 launch接口的具体实现上。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2020/02/25/%E5%A6%82%E4%BD%95%E5%9C%A8XRT%E6%A1%86%E6%9E%B6%E4%B8%8B%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84%E5%90%8E%E7%AB%AF%E5%BC%95%E6%93%8E/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2020/02/25/如何在XRT框架下添加自定义的后端引擎/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/XRT/">XRT</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/XRT/">XRT</a><a href="/tags/Compiler/">Compiler</a><a href="/tags/TensorFlow-XLA/">TensorFlow XLA</a><a href="/tags/TensorRT/">TensorRT</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2020/01/10/TVM-PackedFunc实现机制/">TVM PackedFunc实现机制</a></h1>
-  
 
-      
-        <time datetime="2020-01-10T04:24:08.000Z">2020-01-10</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/01/10/TVM-PackedFunc实现机制/" title="TVM PackedFunc实现机制" itemprop="url">TVM PackedFunc实现机制</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2020-01-10T04:24:08.000Z" itemprop="datePublished"> Published 2020-01-10</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <h2 id="tvm-packedfunc实现">TVM PackedFunc实现</h2>
 <p>为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。</p>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2020/01/10/TVM-PackedFunc%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2020/01/10/TVM-PackedFunc实现机制/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/tvm-knowledge/">tvm knowledge</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/TVM/">TVM</a><a href="/tags/PackedFunc/">PackedFunc</a>
   </div>
-</article>
+
+</div>
+
+
+
+<div class="comments-count">
+	
+</div>
+
+</footer>
+
+
+    </article>
 
 
 
 
 
-  <article class="post">
-  <div class="post-content">
-    <header>
-      
-  
-    <h1 class="title"><a href="/2019/12/26/图替换/">图替换</a></h1>
-  
 
-      
-        <time datetime="2019-12-26T05:54:04.000Z">2019-12-26</time>
-      
-    </header>
-    <div class="entry">
-      
+   
+    
+    <article class="post-expand post" itemprop="articleBody"> 
+        <header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2019/12/26/图替换/" title="图替换" itemprop="url">图替换</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="Dou Jiang" target="_blank" itemprop="author">Dou Jiang</a>
+		
+  <p class="article-time">
+    <time datetime="2019-12-26T05:54:04.000Z" itemprop="datePublished"> Published 2019-12-26</time>
+    
+  </p>
+</header>
+    <div class="article-content">
+        
         <h3 id="背景">背景</h3>
 <p>图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow
 r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。</p>
@@ -416,118 +666,390 @@ r1.14版本中就包含了155个替换子，而且实现这些替换子的总代
 <li><p>内存优化（swap-in/swap-out、重计算）</p></li>
 </ul>
 </blockquote>
-      
+        
+        
+        <p class="article-more-link">
+          
+            <a href="/2019/12/26/%E5%9B%BE%E6%9B%BF%E6%8D%A2/#more">Read More</a>
+          
+       </p>
     </div>
-      
-        
-        <footer>
-          <div class="alignleft">
-            <a href="/2019/12/26/图替换/#more" class="more-link">Read More ›</a>
-          </div>
-        
-        
-      
-      <div class="clearfix"></div>
-      </footer>
+    <footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/graph-optimization-%E5%9B%BE%E4%BC%98%E5%8C%96/">graph optimization, 图优化</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/图替换/">图替换</a><a href="/tags/超优化/">超优化</a><a href="/tags/graph-optimization/">graph optimization</a><a href="/tags/super-optimization/">super optimization</a><a href="/tags/substitution/">substitution</a>
   </div>
-</article>
 
-
-
-
-
-
-<nav id="pagination">
-  
-  
-    <a href="/page/2/" class="alignright next">Next</a>
-  
-  <div class="clearfix"></div>
-</nav></div></div>
-    <aside id="sidebar" class="alignright">
-  <div class="search">
-  <form action="//google.com/search" method="get" accept-charset="utf-8">
-    <input type="search" name="q" results="0" placeholder="Search">
-    <input type="hidden" name="q" value="site:hjchen2.github.io">
-  </form>
-</div>
-
-  
-<div class="widget tag">
-  <h3 class="title">Recent Posts</h3>
-  <ul class="entry">
-    
-      <li>
-        <a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a>
-      </li>
-    
-      <li>
-        <a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a>
-      </li>
-    
-  </ul>
 </div>
 
 
-  
-<div class="widget tag">
-  <h3 class="title">Categories</h3>
-  <ul class="entry">
-  
-    <li><a href="/categories/DL-Compiler/">DL Compiler</a><small>8</small></li>
-  
-    <li><a href="/categories/Daily/">Daily</a><small>1</small></li>
-  
-    <li><a href="/categories/ML-framework/">ML framework</a><small>2</small></li>
-  
-    <li><a href="/categories/XRT/">XRT</a><small>1</small></li>
-  
-    <li><a href="/categories/code/">code</a><small>1</small></li>
-  
-    <li><a href="/categories/deep-learning/">deep learning</a><small>1</small></li>
-  
-    <li><a href="/categories/graph-optimization-图优化/">graph optimization, 图优化</a><small>1</small></li>
-  
-    <li><a href="/categories/kaldi-decision-tree-决策树/">kaldi, decision tree, 决策树</a><small>1</small></li>
-  
-    <li><a href="/categories/low-bitwidth/">low bitwidth</a><small>1</small></li>
-  
-    <li><a href="/categories/model-compression/">model compression</a><small>1</small></li>
-  
-    <li><a href="/categories/neural-machine-translation/">neural machine translation</a><small>1</small></li>
-  
-    <li><a href="/categories/reinforcement-learning/">reinforcement learning</a><small>3</small></li>
-  
-    <li><a href="/categories/tvm-knowledge/">tvm knowledge</a><small>1</small></li>
-  
-  </ul>
+
+<div class="comments-count">
+	
 </div>
+
+</footer>
+
+
+    </article>
+
+
+
+
+
+
+
+  <nav id="page-nav" class="clearfix">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">Next&lt;span&gt;&lt;&#x2F;span&gt;</a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/DL-Compiler/" title="DL Compiler">DL Compiler<sup>8</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/Daily/" title="Daily">Daily<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/ML-framework/" title="ML framework">ML framework<sup>2</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/XRT/" title="XRT">XRT<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/code/" title="code">code<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/deep-learning/" title="deep learning">deep learning<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/graph-optimization-图优化/" title="graph optimization, 图优化">graph optimization, 图优化<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/kaldi-decision-tree-决策树/" title="kaldi, decision tree, 决策树">kaldi, decision tree, 决策树<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/low-bitwidth/" title="low bitwidth">low bitwidth<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/model-compression/" title="model compression">model compression<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/neural-machine-translation/" title="neural machine translation">neural machine translation<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/reinforcement-learning/" title="reinforcement learning">reinforcement learning<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/tvm-knowledge/" title="tvm knowledge">tvm knowledge<sup>1</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/Deep-Learning-Compiler/" title="Deep Learning Compiler">Deep Learning Compiler<sup>8</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/IREE/" title="IREE">IREE<sup>7</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/reinforcement-learning/" title="reinforcement learning">reinforcement learning<sup>3</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/caffe/" title="caffe">caffe<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/deep-learning/" title="deep learning">deep learning<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/machine-learning/" title="machine learning">machine learning<sup>2</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/momentum/" title="momentum">momentum<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/c/" title="c++">c++<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/python/" title="python">python<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/embedding/" title="embedding">embedding<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/XLA/" title="XLA">XLA<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/FusionStitching/" title="FusionStitching">FusionStitching<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/kaldi/" title="kaldi">kaldi<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/decision-tree/" title="decision tree">decision tree<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/决策树/" title="决策树">决策树<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/HMM/" title="HMM">HMM<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/上下文相关音素/" title="上下文相关音素">上下文相关音素<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/TVM/" title="TVM">TVM<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/PackedFunc/" title="PackedFunc">PackedFunc<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/large-scale-ML-framework/" title="large scale ML framework">large scale ML framework<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
 
 </aside>
-    <div class="clearfix"></div>
-  </div>
-  <footer id="footer" class="inner"><div class="alignleft">
-  
-  &copy; 2023 Dou Jiang
-  
 </div>
-<div class="clearfix"></div></footer>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2023 
+		
+		<a href="/about" target="_blank" title="Dou Jiang">Dou Jiang</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+});
+</script>
 
 
 
-</body>
-</html>
 
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?e6d1f421bbc9962127a50488f9ed37d1";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+ </html>
