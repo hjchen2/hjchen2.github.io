@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</loc>  
+      
+    <lastmod>2023-02-24T11:52:22.895Z</lastmod>  
+      
+    <date>1672804804000</date>  
+    <title>IREE编译流程解析 | Don't Respond</title>  
+      
+    <desc>IREE目前支持将MHLO或XLA、Torch Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin </desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2023/02/24/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/</loc>  
       
     <lastmod>2023-02-24T11:03:14.679Z</lastmod>  
@@ -10,17 +21,6 @@
     <title>IREE编译流程解析(六) | Don't Respond</title>  
       
     <desc>HAL::HALTransformPassPipeline的主要作用是进行tiling、vectorization和bufferization等操作，分配计算负载，最终生成target device的代码。比如cuda target的dispatch source code会被递降为NVVM IR。</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B/</loc>  
-      
-    <lastmod>2023-02-24T10:47:05.252Z</lastmod>  
-      
-    <date>1672804804000</date>  
-    <title>IREE编译流程解析 | Don't Respond</title>  
-      
-    <desc>IREE目前支持将MHLO、XLA、Torch Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin </desc>  
   </url>  
     
   <url>  
