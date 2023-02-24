@@ -88,7 +88,7 @@ lower成IREE::Util、IREE::Flow和IREE::HAL dialect。</p></li>
 <li><p>Flow::FlowTransformPassPipeline</p>
 <a href="/2023/01/04/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B4/" title="IREE编译流程解析(四)">IREE编译流程解析(四)</a>
 <p>主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
-fusion等。</p></li>
+fusion等，最终将workload拆分成<code>flow.executable</code>。</p></li>
 <li><p>Stream::StreamTransformPassPipeline</p>
 <a href="/2023/02/13/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B5/" title="IREE编译流程解析(五)">IREE编译流程解析(五)</a>
 <p>主要作用是将program转换到stream
