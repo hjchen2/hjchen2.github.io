@@ -1,0 +1,303 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>TVM PackedFunc实现机制 › Don&#39;t Respond</title>
+  <meta name="author" content="Dou Jiang">
+  
+  <meta name="description" content="TVM PackedFunc实现
+为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="TVM PackedFunc实现机制"/>
+  <meta property="og:site_name" content="Don&#39;t Respond"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  <header id="header"><div class="meta inner">
+  <h1><a href="/">Don&#39;t Respond</a></h1>
+  <h2><a href="/"></a></h2>
+  <nav id="main-nav">
+    <ul>
+      
+      <li><a href="/about">About</a></li>
+      
+      <li><a href="/archives">Archives</a></li>
+      
+      <li><a href="/atom.xml">RSS</a></li>
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+</div>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title">TVM PackedFunc实现机制</h1>
+  
+
+      
+        <time datetime="2020-01-10T04:24:08.000Z">2020-01-10</time>
+      
+    </header>
+    <div class="entry">
+      
+        <h2 id="tvm-packedfunc实现">TVM PackedFunc实现</h2>
+<p>为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。</p>
+<span id="more"></span>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/tvm/屏幕快照%202020-01-10%2010.55.45.png?raw=true" style="zoom:36%;" /></p>
+<h3 id="预备知识">预备知识</h3>
+<h4 id="python-ctypes混合编程">Python ctypes混合编程</h4>
+<p>ctypes是Python自带的跨语言函数调用库，ctypes提供了简单的C数据类型，可以将C/C++动态库中的函数包装成Python函数进行调用。</p>
+<ul>
+<li><p>导出C++函数</p>
+<p>首先在C++中定义一个全局函数，并编译生成C++动态库。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test.h</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// test.cc</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;test.h&quot;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用ctypes模块在Python中加载生成的动态库（test.so），并调用C++中的函数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line"></span><br><span class="line"><span class="comment"># Load shared library</span></span><br><span class="line">_LIB = ctypes.CDLL(<span class="string">&quot;./test.so&quot;</span>, ctypes.RTLD_GLOBAL)</span><br><span class="line"></span><br><span class="line">a = ctypes.c_int(<span class="number">1</span>)</span><br><span class="line">b = ctypes.c_int(<span class="number">2</span>)</span><br><span class="line"><span class="comment"># Call C func in Python</span></span><br><span class="line"><span class="built_in">print</span>(_LIB.add(a, b))</span><br><span class="line"><span class="comment"># Or</span></span><br><span class="line"><span class="built_in">print</span>(_LIB.add(<span class="number">1</span>, <span class="number">2</span>))</span><br></pre></td></tr></table></figure></li>
+<li><p>传递Python函数到C++</p>
+<p>ctypes也支持将Python函数转换成C类型的函数，并在C/C++中进行调用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">a, b</span>):</span><br><span class="line">  <span class="keyword">return</span> a + b</span><br></pre></td></tr></table></figure>
+<p>Python
+add有两个参数a和b，返回值类型与a和b的类型一致。在C++中可以为Python
+add定义一个函数原型 int(int, int)。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">int</span> <span class="params">(*PyCFunc)</span><span class="params">(<span class="type">int</span>, <span class="type">int</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">call_py_func</span><span class="params">(PyCFunc f, <span class="type">int</span> a, <span class="type">int</span> b)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;test.h&quot;</span></span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">call_py_func</span><span class="params">(PyCFunc f, <span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">f</span>(a, b);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用ctypes将Python函数转换成C function，传入C++中进行调用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ctypes</span><br><span class="line"></span><br><span class="line">cfunc = ctypes.CFUNCTYPE(</span><br><span class="line">    ctypes.c_int, <span class="comment"># return type</span></span><br><span class="line">    ctypes.c_int, <span class="comment"># arg0 type</span></span><br><span class="line">    ctypes.c_int  <span class="comment"># arg1 type</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">f = cfunc(add)</span><br><span class="line"><span class="comment"># CFUNCTYPE is callable in Python</span></span><br><span class="line"><span class="built_in">print</span>(f(<span class="number">5</span>, <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># Call Python func in C</span></span><br><span class="line"><span class="built_in">print</span>(_LIB.call_py_func(f, <span class="number">5</span>, <span class="number">1</span>))</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="packedfunc实现">PackedFunc实现</h3>
+<h4 id="packedfunc定义">PackedFunc定义</h4>
+<p>ctypes可以很方便的将C/C++中的函数导出到Python，调用时直接传入对应的参数即可，但如果需要将Python函数导入到C/C++，则需要在C/C++中提前定义好对应的函数原型（比如上面的PyCFunc），并提供对应函数的调用入口（call_py_func）。为了支持更加灵活的函数定义，TVM将不同类型的函数包装成统一的函数原型。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">void</span>(TVMArgs args, TVMRetValue *rv);</span><br></pre></td></tr></table></figure>
+<p>统一的函数原型被封装成PackedFunc对象，提供通用的调用接口，直接与调用者进行交互。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">PackedFunc</span> &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">using</span> FType = std::function&lt;<span class="built_in">void</span> (TVMArgs args, TVMRetValue* rv)&gt;;</span><br><span class="line">  <span class="function"><span class="keyword">template</span>&lt;<span class="keyword">typename</span>... Args&gt;</span></span><br><span class="line"><span class="function">  <span class="keyword">inline</span> TVMRetValue <span class="title">operator</span><span class="params">()</span><span class="params">(Args&amp;&amp; ...args)</span> <span class="type">const</span></span>;</span><br><span class="line">  <span class="function"><span class="keyword">inline</span> <span class="type">void</span> <span class="title">CallPacked</span><span class="params">(TVMArgs args, TVMRetValue* rv)</span> <span class="type">const</span></span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span>:</span><br><span class="line">  <span class="comment">/*! \brief internal container of packed function */</span></span><br><span class="line">  FType body_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>当获得一个PackedFunc对象时，我们就可以像调用普通函数一样调用PackedFunc打包的函数。比如：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PackedFunc f;</span><br><span class="line"><span class="comment">// f(1, 2)首先会自动将参数1，2打包成TVMArgs，接着调用CallPacked，CallPacked最终的执行体是body_</span></span><br><span class="line">TVMRetValue ret = <span class="built_in">f</span>(<span class="number">1</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="函数打包">函数打包</h4>
+<p>TVM支持对各类函数进行打包，包括一般的函数、类的成员函数以及lamda表达式。</p>
+<ul>
+<li><p>函数原型萃取</p>
+<p>萃取函数原型是为了得到函数的参数和返回值类型。TVM中使用decltype和模版结构体function_signature来实现。</p>
+<p>比如定义一个简单的C函数，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来就可以使用如下的代码来萃取add的函数原型，</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> ...Args&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">function_signature</span>&lt;<span class="built_in">R</span>(Args...)&gt; &#123;</span><br><span class="line">  <span class="keyword">using</span> FType = <span class="built_in">R</span>(Args...);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 萃取add的函数原型</span></span><br><span class="line"><span class="keyword">using</span> FType = function_signature&lt;<span class="keyword">decltype</span>(add)&gt;::FType;</span><br></pre></td></tr></table></figure>
+<p>此外只需要特化function_signature就可以支持函数指针和lambda表达式。注意：TVM
+function_signature不支持普通成员函数的类型萃取，因此TVM需要借助一个辅助function_signature_helper来对lambda表达式类型进行萃取，而我们这里的function_signature支持普通成员函数，因此lambda表达式类型萃取可以通过递归的function_signature来实现。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 普通函数指针</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> ...Args&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">function_signature</span>&lt;<span class="built_in">R</span>(*)(Args...)&gt; &#123;</span><br><span class="line">  <span class="keyword">using</span> FType = <span class="built_in">R</span>(Args...);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 非const类的成员函数指针</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> R, <span class="keyword">typename</span> ...Args&gt;</span><br><span class="line"> <span class="keyword">struct</span> <span class="title class_">function_signature</span>&lt;<span class="built_in">R</span>(T::*)(Args...)&gt; &#123;</span><br><span class="line">   <span class="keyword">using</span> FType = <span class="built_in">R</span>(Args...);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// const类的成员函数指针</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> R, <span class="keyword">typename</span> ...Args&gt;</span><br><span class="line"> <span class="keyword">struct</span> <span class="title class_">function_signature</span>&lt;<span class="built_in">R</span>(T::*)(Args...) <span class="type">const</span>&gt; &#123;</span><br><span class="line">   <span class="keyword">using</span> FType = <span class="built_in">R</span>(Args...);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// lambda表达式</span></span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">function_signature</span> &#123;</span><br><span class="line">  <span class="keyword">using</span> FType = <span class="keyword">typename</span> function_signature&lt;<span class="keyword">decltype</span>(&amp;T::<span class="built_in">operator</span>())&gt;::FType;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li><p>函数打包</p>
+<p>一旦萃取到了函数原型，TVM就利用TypedPackedFunc对普通函数或lambda表达式进行打包。TypedPackedFunc只支持对R(Args...)类型的函数打包，所以如果被打包的函数是一个函数指针，则需要创建一个lambda表达式，转换成R(Args...)类型之后再用TypedPackedFunc对创建的lambda表达式进行打包。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> ...Args&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TypedPackedFunc</span>&lt;<span class="built_in">R</span>(Args...)&gt; &#123;</span><br><span class="line"> <span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">using</span> TSelf = TypedPackedFunc&lt;<span class="built_in">R</span>(Args...)&gt;;</span><br><span class="line">  <span class="keyword">template</span>&lt;<span class="keyword">typename</span> FLambda,</span><br><span class="line">           <span class="keyword">typename</span> = <span class="keyword">typename</span> std::enable_if&lt;</span><br><span class="line">             std::is_convertible&lt;FLambda,</span><br><span class="line">                                 std::function&lt;<span class="built_in">R</span>(Args...)&gt;</span><br><span class="line">                                 &gt;::value&gt;::type&gt;</span><br><span class="line">  <span class="built_in">TypedPackedFunc</span>(<span class="type">const</span> FLambda&amp; typed_lambda) &#123;  <span class="comment">// NOLINT(*)</span></span><br><span class="line">    <span class="keyword">this</span>-&gt;<span class="built_in">AssignTypedLambda</span>(typed_lambda);</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line"> <span class="keyword">private</span>:</span><br><span class="line">  ...</span><br><span class="line">  PackedFunc packed_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>当被打包的函数用来实例化TypedPackedFunc对象时，会立刻调用AssignTypedLambda将被打包的函数打包成PackedFunc。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> R, <span class="keyword">typename</span> ...Args&gt;</span><br><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> FType&gt;</span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> TypedPackedFunc&lt;<span class="built_in">R</span>(Args...)&gt;::<span class="built_in">AssignTypedLambda</span>(FType flambda) &#123;</span><br><span class="line">  packed_ = <span class="built_in">PackedFunc</span>([flambda](<span class="type">const</span> TVMArgs&amp; args, TVMRetValue* rv) &#123;</span><br><span class="line">      detail::<span class="built_in">unpack_call</span>&lt;R, <span class="keyword">sizeof</span>...(Args)&gt;(flambda, args, rv);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>AssignTypedLambda实际上是将被打包的函数先封装成了一个函数原型为void(const
+TVMArgs &amp;args, TVMRetValue
+*rv)的lambda表达式，然后将这个lambda表达式作为PackedFunc对象的一个成员，通过设置合适的接口（重载operator
+()），使得PackedFunc与被打包的源函数表现的完全一样了。</p></li>
+</ul>
+<h3 id="自动导出函数">自动导出函数</h3>
+<p>TVM将需要从C++自动导出的函数打包成PackedFunc，然后通过宏TVM_REGISTER_GLOBAL注册到全局的一个map中。比如：
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">TVM_REGISTER_GLOBAL</span>(<span class="string">&quot;_Var&quot;</span>)</span><br><span class="line">.<span class="built_in">set_body_typed</span>([](std::string s, DataType t) &#123;</span><br><span class="line">    <span class="keyword">return</span> VarNode::<span class="built_in">make</span>(t, s);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>当Python加载编译好的动态库时，会自动查询map中静态注册的函数，每个函数都包装成Python中的Function对象，最终添加到Python模块中。Function重定义了函数调用接口，自动完成参数打包过程。
+如果是在Python中动态注册的函数，则需要在Python中通过函数名和来查询PackedFunc，返回一个PackedFunc的handle（函数指针），并封装成Function。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_global_func</span>(<span class="params">name, allow_missing=<span class="literal">False</span></span>):</span><br><span class="line">    handle = FunctionHandle()</span><br><span class="line">    check_call(_LIB.TVMFuncGetGlobal(c_str(name), ctypes.byref(handle)))</span><br><span class="line">    <span class="keyword">if</span> handle.value:</span><br><span class="line">        <span class="keyword">return</span> Function(handle, <span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> allow_missing:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">raise</span> ValueError(<span class="string">&quot;Cannot find global function %s&quot;</span> % name)</span><br></pre></td></tr></table></figure>
+<p>注：TVMFuncGetGlobal是通过ctypes导出的C++接口，FunctionHandle是ctypes中表示void指针类型（c_void_p）。</p>
+<h3 id="从python注册函数">从Python注册函数</h3>
+<p>由于TVM中PackedFunc的精心设计，我们只需要将Python中的函数转换成统一的函数原型void(const
+TVMArgs,
+TVMRetValue)，然后将函数转换成PackedFunc并动态地注册到全局的map中。</p>
+<p>先将Python函数用ctypes转成int(TVMValue <em>, int </em>, int, void
+<em>, void </em>)的C函数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">TVMPackedCFunc = ctypes.CFUNCTYPE(</span><br><span class="line">    ctypes.c_int,</span><br><span class="line">    ctypes.POINTER(TVMValue),</span><br><span class="line">    ctypes.POINTER(ctypes.c_int),</span><br><span class="line">    ctypes.c_int,</span><br><span class="line">    ctypes.c_void_p,</span><br><span class="line">    ctypes.c_void_p)</span><br></pre></td></tr></table></figure>
+<p>然后通过TVMFuncCreateFromCFunc将上面的C函数转换成统一的PackedFunc函数。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">TVMFuncCreateFromCFunc</span><span class="params">(TVMPackedCFunc func,</span></span></span><br><span class="line"><span class="params"><span class="function">                           <span class="type">void</span>* resource_handle,</span></span></span><br><span class="line"><span class="params"><span class="function">                           TVMPackedCFuncFinalizer fin,</span></span></span><br><span class="line"><span class="params"><span class="function">                           TVMFunctionHandle *out)</span> </span>&#123;</span><br><span class="line">  <span class="built_in">API_BEGIN</span>();</span><br><span class="line">  <span class="keyword">if</span> (fin == <span class="literal">nullptr</span>) &#123;</span><br><span class="line">    *out = <span class="keyword">new</span> <span class="built_in">PackedFunc</span>(</span><br><span class="line">        [func, resource_handle](TVMArgs args, TVMRetValue* rv) &#123;</span><br><span class="line">          <span class="type">int</span> ret = <span class="built_in">func</span>((TVMValue*)args.values, (<span class="type">int</span>*)args.type_codes, <span class="comment">// NOLINT(*)</span></span><br><span class="line">                         args.num_args, rv, resource_handle);</span><br><span class="line">          <span class="keyword">if</span> (ret != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> dmlc::<span class="built_in">Error</span>(<span class="built_in">TVMGetLastError</span>() + ::dmlc::<span class="built_in">StackTrace</span>());</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">API_END</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后通过接口TVMFuncRegisterGlobal注册到全局的map中。下面是从Python中注册一个函数，并在Python中调用的例子。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">targs = (<span class="number">10</span>, <span class="number">10.0</span>, <span class="string">&quot;hello&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@tvm.register_func</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">my_packed_func</span>(<span class="params">*args</span>):</span><br><span class="line">    <span class="keyword">assert</span>(<span class="built_in">tuple</span>(args) == targs)</span><br><span class="line">    <span class="keyword">return</span> <span class="number">10</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Get it out from global function table</span></span><br><span class="line">f = tvm.get_global_func(<span class="string">&quot;my_packed_func&quot;</span>)</span><br><span class="line"><span class="keyword">assert</span> <span class="built_in">isinstance</span>(f, tvm.nd.Function)</span><br><span class="line">y = f(*targs)</span><br><span class="line"><span class="keyword">assert</span> y == <span class="number">10</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+      
+      <footer>
+        
+  
+  <div class="categories">
+    <a href="/categories/tvm-knowledge/">tvm knowledge</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/TVM/">TVM</a>, <a href="/tags/PackedFunc/">PackedFunc</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  
+</section>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.8/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="q" value="site:hjchen2.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">Recent Posts</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">Categories</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/DL-Compiler/">DL Compiler</a><small>8</small></li>
+  
+    <li><a href="/categories/Daily/">Daily</a><small>1</small></li>
+  
+    <li><a href="/categories/ML-framework/">ML framework</a><small>2</small></li>
+  
+    <li><a href="/categories/XRT/">XRT</a><small>1</small></li>
+  
+    <li><a href="/categories/code/">code</a><small>1</small></li>
+  
+    <li><a href="/categories/deep-learning/">deep learning</a><small>1</small></li>
+  
+    <li><a href="/categories/graph-optimization-图优化/">graph optimization, 图优化</a><small>1</small></li>
+  
+    <li><a href="/categories/kaldi-decision-tree-决策树/">kaldi, decision tree, 决策树</a><small>1</small></li>
+  
+    <li><a href="/categories/low-bitwidth/">low bitwidth</a><small>1</small></li>
+  
+    <li><a href="/categories/model-compression/">model compression</a><small>1</small></li>
+  
+    <li><a href="/categories/neural-machine-translation/">neural machine translation</a><small>1</small></li>
+  
+    <li><a href="/categories/reinforcement-learning/">reinforcement learning</a><small>3</small></li>
+  
+    <li><a href="/categories/tvm-knowledge/">tvm knowledge</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">Tag Cloud</h3>
+  <div class="entry">
+    <a href="/tags/Attention/" style="font-size: 10px;">Attention</a> <a href="/tags/Compiler/" style="font-size: 10px;">Compiler</a> <a href="/tags/Deep-Learning-Compiler/" style="font-size: 20px;">Deep Learning Compiler</a> <a href="/tags/Encoder-Decoder/" style="font-size: 10px;">Encoder-Decoder</a> <a href="/tags/FusionStitching/" style="font-size: 10px;">FusionStitching</a> <a href="/tags/HMM/" style="font-size: 10px;">HMM</a> <a href="/tags/IREE/" style="font-size: 17.5px;">IREE</a> <a href="/tags/KunPeng/" style="font-size: 10px;">KunPeng</a> <a href="/tags/PackedFunc/" style="font-size: 10px;">PackedFunc</a> <a href="/tags/QVNNI16/" style="font-size: 10px;">QVNNI16</a> <a href="/tags/TVM/" style="font-size: 10px;">TVM</a> <a href="/tags/TensorFlow-XLA/" style="font-size: 10px;">TensorFlow XLA</a> <a href="/tags/TensorRT/" style="font-size: 10px;">TensorRT</a> <a href="/tags/XLA/" style="font-size: 10px;">XLA</a> <a href="/tags/XRT/" style="font-size: 10px;">XRT</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/caffe/" style="font-size: 12.5px;">caffe</a> <a href="/tags/decision-tree/" style="font-size: 10px;">decision tree</a> <a href="/tags/deep-learning/" style="font-size: 12.5px;">deep learning</a> <a href="/tags/embedding/" style="font-size: 10px;">embedding</a> <a href="/tags/fp16/" style="font-size: 10px;">fp16</a> <a href="/tags/framework/" style="font-size: 10px;">framework</a> <a href="/tags/graph-optimization/" style="font-size: 10px;">graph optimization</a> <a href="/tags/int16/" style="font-size: 10px;">int16</a> <a href="/tags/kaldi/" style="font-size: 10px;">kaldi</a> <a href="/tags/large-scale-ML-framework/" style="font-size: 10px;">large scale ML framework</a> <a href="/tags/loss-scaling/" style="font-size: 10px;">loss scaling</a> <a href="/tags/machine-learning/" style="font-size: 12.5px;">machine learning</a> <a href="/tags/machine-learning%EF%BC%8C%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC/" style="font-size: 10px;">machine learning，贝尔曼公式推导</a> <a href="/tags/machine-translation/" style="font-size: 10px;">machine translation</a> <a href="/tags/momentum/" style="font-size: 10px;">momentum</a> <a href="/tags/pruning/" style="font-size: 10px;">pruning</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/reinforcement-learning/" style="font-size: 15px;">reinforcement learning</a> <a href="/tags/seq2seq/" style="font-size: 10px;">seq2seq</a> <a href="/tags/substitution/" style="font-size: 10px;">substitution</a> <a href="/tags/super-optimization/" style="font-size: 10px;">super optimization</a> <a href="/tags/web-technology/" style="font-size: 10px;">web technology</a> <a href="/tags/%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9B%B8%E5%85%B3%E9%9F%B3%E7%B4%A0/" style="font-size: 10px;">上下文相关音素</a> <a href="/tags/%E5%86%B3%E7%AD%96%E6%A0%91/" style="font-size: 10px;">决策树</a> <a href="/tags/%E5%9B%BE%E6%9B%BF%E6%8D%A2/" style="font-size: 10px;">图替换</a> <a href="/tags/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/" style="font-size: 10px;">混合精度训练</a> <a href="/tags/%E8%B6%85%E4%BC%98%E5%8C%96/" style="font-size: 10px;">超优化</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2023 Dou Jiang
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+
+</body>
+</html>
+

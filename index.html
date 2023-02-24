@@ -1,0 +1,542 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Don&#39;t Respond</title>
+  <meta name="author" content="Dou Jiang">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+  <meta property="og:site_name" content="Don&#39;t Respond"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  <header id="header"><div class="meta inner">
+  <h1><a href="/">Don&#39;t Respond</a></h1>
+  <h2><a href="/"></a></h2>
+  <nav id="main-nav">
+    <ul>
+      
+      <li><a href="/about">About</a></li>
+      
+      <li><a href="/archives">Archives</a></li>
+      
+      <li><a href="/atom.xml">RSS</a></li>
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+</div>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper">
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a></h1>
+  
+
+      
+        <time datetime="2023-02-24T10:47:11.000Z">2023-02-24</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>HAL::HALTransformPassPipeline的主要作用是进行tiling、vectorization和bufferization等操作，分配计算负载，最终生成target
+device的代码。比如cuda target的dispatch source code会被递降为NVVM
+IR。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2023/02/24/IREE编译流程6/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a></h1>
+  
+
+      
+        <time datetime="2023-02-13T13:57:20.000Z">2023-02-13</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>IREE::Stream::StreamTransformPassPipeline
+的主要作用是将program转换到stream
+dialect，优化变量编码方式，划分调度子图，生成异步调度策略，并实现内存规划策略。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2023/02/13/IREE编译流程5/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a></h1>
+  
+
+      
+        <time datetime="2023-01-04T13:15:20.000Z">2023-01-04</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>IREE
+Flow::buildFlowTransformPassPipeline主要作用是执行一系列窥孔优化，比如1x1的conv2d转换成matmul、tiling、op
+fusion等，最终将workload拆分成<code>flow.executable</code>。相关的passes及其作用如下。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2023/01/04/IREE编译流程4/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a></h1>
+  
+
+      
+        <time datetime="2023-01-04T12:30:12.000Z">2023-01-04</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>IREE
+ABI::TransformPassPipeline主要作用是将外部导入的接口和本module导出到外部的接口参数统一成标准标量类型或<code>hal.buffer_view</code>类型（<code>hal.buffer_view</code>对应tensor），包含以下几个passes。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2023/01/04/IREE编译流程3/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a></h1>
+  
+
+      
+        <time datetime="2023-01-04T12:20:12.000Z">2023-01-04</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>IREE CommonInputConversionPassPipeline主要作用是将IREE::Input dialect
+lower成IREE::Util、IREE::Flow和IREE::HAL
+dialect，包括以下几个passes。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2023/01/04/IREE编译流程2/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2023/01/04/IREE编译流程1/">IREE编译流程解析(一)</a></h1>
+  
+
+      
+        <time datetime="2023-01-04T12:14:12.000Z">2023-01-04</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>IREE
+InputConversionPassPipeline的主要作用是将不同的输入（MHLO、XLA、Torch
+Tensor和TOSA）统一lower成linalg dialect和builtin的arith dialect、scf
+dialect和tensor
+dialect。下面以MHLO输入为例，列举了InputConversionPassPipeline中各个pass以及它们的主要作用。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2023/01/04/IREE编译流程1/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2023/01/04/IREE编译流程/">IREE编译流程解析</a></h1>
+  
+
+      
+        <time datetime="2023-01-04T04:00:04.000Z">2023-01-04</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>IREE目前支持将MHLO或XLA、Torch
+Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM
+bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM
+bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin
+kernel。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2023/01/04/IREE编译流程/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2020/02/25/如何在XRT框架下添加自定义的后端引擎/">如何在XRT框架下添加自定义的后端引擎</a></h1>
+  
+
+      
+        <time datetime="2020-02-25T08:06:18.000Z">2020-02-25</time>
+      
+    </header>
+    <div class="entry">
+      
+        <p>XRT为不同的后端引擎提供了统一的上层功能和接口抽象，这些功能和接口包括：</p>
+<ul>
+<li>统一的DAG计算图表示</li>
+<li>统一的子图表达、切分和折叠过程</li>
+<li>统一的JIT子图编译接口和缓存机制</li>
+<li>统一的Executable Launch接口</li>
+</ul>
+<p>得益于上层统一的抽象和模块化的设计，后端引擎只需要处理一些差异化的接口，并且这些差异化通常只体现在子图的编译和executable
+launch接口的具体实现上。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2020/02/25/如何在XRT框架下添加自定义的后端引擎/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2020/01/10/TVM-PackedFunc实现机制/">TVM PackedFunc实现机制</a></h1>
+  
+
+      
+        <time datetime="2020-01-10T04:24:08.000Z">2020-01-10</time>
+      
+    </header>
+    <div class="entry">
+      
+        <h2 id="tvm-packedfunc实现">TVM PackedFunc实现</h2>
+<p>为了便于Python和C++混合编程，TVM使用了统一的PackedFunc机制。PackedFunc可以将C++中的各类函数打包成统一的函数接口，并自动导出到Python模块中进行调用，并且也支持从Python中注册一个函数，并伪装成PackedFunc在C++和Python中调用。</p>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2020/01/10/TVM-PackedFunc实现机制/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+  <article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title"><a href="/2019/12/26/图替换/">图替换</a></h1>
+  
+
+      
+        <time datetime="2019-12-26T05:54:04.000Z">2019-12-26</time>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="背景">背景</h3>
+<p>图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow
+r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。</p>
+<blockquote>
+<p>一些常见的图优化技术：</p>
+<ul>
+<li><p>DCE</p></li>
+<li><p>CSE（公共子表达式消除）</p></li>
+<li><p>常量折叠</p></li>
+<li><p>数学公式简化</p></li>
+<li><p>Op融合</p></li>
+<li><p>Layout变换</p></li>
+<li><p>内存优化（swap-in/swap-out、重计算）</p></li>
+</ul>
+</blockquote>
+      
+    </div>
+      
+        
+        <footer>
+          <div class="alignleft">
+            <a href="/2019/12/26/图替换/#more" class="more-link">Read More ›</a>
+          </div>
+        
+        
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+
+
+
+
+<nav id="pagination">
+  
+  
+    <a href="/page/2/" class="alignright next">Next</a>
+  
+  <div class="clearfix"></div>
+</nav></div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="q" value="site:hjchen2.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">Recent Posts</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">Categories</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/DL-Compiler/">DL Compiler</a><small>8</small></li>
+  
+    <li><a href="/categories/Daily/">Daily</a><small>1</small></li>
+  
+    <li><a href="/categories/ML-framework/">ML framework</a><small>2</small></li>
+  
+    <li><a href="/categories/XRT/">XRT</a><small>1</small></li>
+  
+    <li><a href="/categories/code/">code</a><small>1</small></li>
+  
+    <li><a href="/categories/deep-learning/">deep learning</a><small>1</small></li>
+  
+    <li><a href="/categories/graph-optimization-图优化/">graph optimization, 图优化</a><small>1</small></li>
+  
+    <li><a href="/categories/kaldi-decision-tree-决策树/">kaldi, decision tree, 决策树</a><small>1</small></li>
+  
+    <li><a href="/categories/low-bitwidth/">low bitwidth</a><small>1</small></li>
+  
+    <li><a href="/categories/model-compression/">model compression</a><small>1</small></li>
+  
+    <li><a href="/categories/neural-machine-translation/">neural machine translation</a><small>1</small></li>
+  
+    <li><a href="/categories/reinforcement-learning/">reinforcement learning</a><small>3</small></li>
+  
+    <li><a href="/categories/tvm-knowledge/">tvm knowledge</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">Tag Cloud</h3>
+  <div class="entry">
+    <a href="/tags/Attention/" style="font-size: 10px;">Attention</a> <a href="/tags/Compiler/" style="font-size: 10px;">Compiler</a> <a href="/tags/Deep-Learning-Compiler/" style="font-size: 20px;">Deep Learning Compiler</a> <a href="/tags/Encoder-Decoder/" style="font-size: 10px;">Encoder-Decoder</a> <a href="/tags/FusionStitching/" style="font-size: 10px;">FusionStitching</a> <a href="/tags/HMM/" style="font-size: 10px;">HMM</a> <a href="/tags/IREE/" style="font-size: 17.5px;">IREE</a> <a href="/tags/KunPeng/" style="font-size: 10px;">KunPeng</a> <a href="/tags/PackedFunc/" style="font-size: 10px;">PackedFunc</a> <a href="/tags/QVNNI16/" style="font-size: 10px;">QVNNI16</a> <a href="/tags/TVM/" style="font-size: 10px;">TVM</a> <a href="/tags/TensorFlow-XLA/" style="font-size: 10px;">TensorFlow XLA</a> <a href="/tags/TensorRT/" style="font-size: 10px;">TensorRT</a> <a href="/tags/XLA/" style="font-size: 10px;">XLA</a> <a href="/tags/XRT/" style="font-size: 10px;">XRT</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/caffe/" style="font-size: 12.5px;">caffe</a> <a href="/tags/decision-tree/" style="font-size: 10px;">decision tree</a> <a href="/tags/deep-learning/" style="font-size: 12.5px;">deep learning</a> <a href="/tags/embedding/" style="font-size: 10px;">embedding</a> <a href="/tags/fp16/" style="font-size: 10px;">fp16</a> <a href="/tags/framework/" style="font-size: 10px;">framework</a> <a href="/tags/graph-optimization/" style="font-size: 10px;">graph optimization</a> <a href="/tags/int16/" style="font-size: 10px;">int16</a> <a href="/tags/kaldi/" style="font-size: 10px;">kaldi</a> <a href="/tags/large-scale-ML-framework/" style="font-size: 10px;">large scale ML framework</a> <a href="/tags/loss-scaling/" style="font-size: 10px;">loss scaling</a> <a href="/tags/machine-learning/" style="font-size: 12.5px;">machine learning</a> <a href="/tags/machine-learning%EF%BC%8C%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC/" style="font-size: 10px;">machine learning，贝尔曼公式推导</a> <a href="/tags/machine-translation/" style="font-size: 10px;">machine translation</a> <a href="/tags/momentum/" style="font-size: 10px;">momentum</a> <a href="/tags/pruning/" style="font-size: 10px;">pruning</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/reinforcement-learning/" style="font-size: 15px;">reinforcement learning</a> <a href="/tags/seq2seq/" style="font-size: 10px;">seq2seq</a> <a href="/tags/substitution/" style="font-size: 10px;">substitution</a> <a href="/tags/super-optimization/" style="font-size: 10px;">super optimization</a> <a href="/tags/web-technology/" style="font-size: 10px;">web technology</a> <a href="/tags/%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9B%B8%E5%85%B3%E9%9F%B3%E7%B4%A0/" style="font-size: 10px;">上下文相关音素</a> <a href="/tags/%E5%86%B3%E7%AD%96%E6%A0%91/" style="font-size: 10px;">决策树</a> <a href="/tags/%E5%9B%BE%E6%9B%BF%E6%8D%A2/" style="font-size: 10px;">图替换</a> <a href="/tags/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/" style="font-size: 10px;">混合精度训练</a> <a href="/tags/%E8%B6%85%E4%BC%98%E5%8C%96/" style="font-size: 10px;">超优化</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2023 Dou Jiang
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+
+</body>
+</html>
+

@@ -1,0 +1,369 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>图替换 › Don&#39;t Respond</title>
+  <meta name="author" content="Dou Jiang">
+  
+  <meta name="description" content="背景
+图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow
+r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。
+
+一些常见的图优化技术：
+
+DCE
+CSE（公共子表达式消除）
+常量折叠
+数学公式简化
+Op融合
+Layout变换
+内存优化（swap-in/swap-out、重计算）">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="图替换"/>
+  <meta property="og:site_name" content="Don&#39;t Respond"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  <header id="header"><div class="meta inner">
+  <h1><a href="/">Don&#39;t Respond</a></h1>
+  <h2><a href="/"></a></h2>
+  <nav id="main-nav">
+    <ul>
+      
+      <li><a href="/about">About</a></li>
+      
+      <li><a href="/archives">Archives</a></li>
+      
+      <li><a href="/atom.xml">RSS</a></li>
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+</div>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title">图替换</h1>
+  
+
+      
+        <time datetime="2019-12-26T05:54:04.000Z">2019-12-26</time>
+      
+    </header>
+    <div class="entry">
+      
+        <h3 id="背景">背景</h3>
+<p>图替换（或者叫图改写）是一种重要的图优化技术，几乎在所有的开源框架（尤其是移动端框架）中都有应用。比如tensorflow
+r1.14版本中就包含了155个替换子，而且实现这些替换子的总代码量接近53k行。</p>
+<blockquote>
+<p>一些常见的图优化技术：</p>
+<ul>
+<li><p>DCE</p></li>
+<li><p>CSE（公共子表达式消除）</p></li>
+<li><p>常量折叠</p></li>
+<li><p>数学公式简化</p></li>
+<li><p>Op融合</p></li>
+<li><p>Layout变换</p></li>
+<li><p>内存优化（swap-in/swap-out、重计算）</p></li>
+</ul>
+</blockquote>
+<span id="more"></span>
+<p>由于目前的编译器技术通常基于low-level的中间表达，注重对局部计算的优化，对于跨多个粗粒度op的优化要不无能为力，要不就得增加编译器的分析难度并导致代码膨胀。一般来说AI框架支持的粗粒度op非常有限，而且这些op的组合常常也比较固定，比如convolution通常和bias_add、relu组合使用，因此基于高层中间表达的图替换成为一种比较可行的优化方案。经过图替换优化后的计算图再经过编译器的优化后，生成最终的硬件代码。</p>
+<p>目前主流开源框架的图替换都是基于经验和手工设置的替换子来实现的，在这里统称为经典图替换技术。</p>
+<h3 id="经典图替换">经典图替换</h3>
+<p>图替换是将原始计算图替换成另一个优化后的等价计算图，替换后的计算图通常是硬件友好的，比如可以消除中间结果，降低内存占用，减少访存和计算量，并且不影响最终的计算结果。</p>
+<p>在进行图替换之前，首先需要定义出源计算图到目标计算图的替换规则（替换子），由于这些替换规则往往需要依靠人的经验一条条手工去定义，因此称之为经典图替换。给出一条替换子，我们需要在原始计算图中不断地去匹配替换子的源计算子图，一旦匹配到满足要求的子图后，就将源计算子图重新映射为替换子中的目标计算图。</p>
+<p>在一些开源框架中，替换子的定义形式不尽相同。在TensorFlow中源图匹配和替换的定义是非常松散的，它甚至没有直接定义出替换子的源图，而是定义一系列约束来判断是否匹配。PaddlePaddle中则是将一个替换过程定义为一个pass，pass执行时动态构建相应的替换子源图，执行匹配算法并回调源图到目标图的替换函数。比如下面是TensorFlow中将Conv+BiasAdd替换成FusedConv的过程。</p>
+<ul>
+<li><p>定义匹配约束</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">ContractionWithBiasAdd</span> &#123;</span><br><span class="line">  <span class="type">int</span> constraction;</span><br><span class="line">  <span class="type">int</span> bias_add;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// node为输入的grapper node， pattern为输出的ContractionWithBiasAdd.</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">FindContractionWithBias</span><span class="params">(node，*pattern)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 开始列举匹配的constractions.</span></span><br><span class="line">  <span class="number">1</span>、如果node存在控制边，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">2</span>、如果node不是BiasAdd，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">3</span>、如果node的父节点不是Conv或MatMul，返回<span class="literal">false</span></span><br><span class="line">  <span class="number">4</span>、...</span><br><span class="line">  <span class="comment">// 如果以上所有constructions都满足，则将需要替换的node id写到特定的pattern中。</span></span><br><span class="line">  pattern-&gt;constraction = node的父节点;</span><br><span class="line">  pattern-&gt;bias_add = node；</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.21.png?raw=true" style="zoom:33%;" /></p>
+<ul>
+<li><p>定义替换过程</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pattern为输入的ContractionWithBiasAdd，</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">AddFusedContractionNode</span><span class="params">(pattern, *invalidated_nodes)</span> </span>&#123;</span><br><span class="line">  <span class="number">1</span>、创建一个新的node：fused_op</span><br><span class="line">  <span class="number">2</span>、将Conv或MatMul的input和filter添加到fused_op的输入中，并将BiasAdd的bias加到fused_op的输入</span><br><span class="line">  <span class="number">3</span>、根据Conv或MatMul的一些参数设置fused_op的参数，比如conv的kernel、channel、padding等等，以及matmul的transpose等</span><br><span class="line">  <span class="number">4</span>、将fused_op加入到graph，同时将Conv或MatMul和BiasAdd加入到invalidated_nodes</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.03.35.png?raw=true" style="zoom:33%;" /></p>
+<p>TensorFlow采用的定义匹配约束的方式与直接定义出子图的方式本质上是等价的，但相比后者可读性较差，而优点就是代码可复用性高，比如上面的FindContractionWithBias可以同时匹配Conv+BiasAdd和MatMul+BiasAdd两种子图，并且这些约束便于嵌套使用。</p>
+<p>无论是TensorFlow还是PaddlePaddle，图替换都是不完全的。比如说对于Conv+BiasAdd+BiasAdd这种计算图，第一次只能匹配到Conv+BiasAdd，替换后又变成了一个Conv+BiasAdd的计算图，因此TensorFlow中默认采用了两遍优化。根据TensorFlow公开的一些数据，基本上第二次优化的机会已经非常少了。</p>
+<ul>
+<li><p>InceptionV3</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.29.51.png?raw=true" style="zoom:40%;" /></p></li>
+<li><p>Seq2Seq</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-26%2011.30.01.png?raw=true" style="zoom:40%;" /></p></li>
+</ul>
+<h3 id="基于超优化的图替换">基于超优化的图替换</h3>
+<p>超优化（Superoptimization）是现代编译器中的一种指令优化技术，其主要工作原理是通过随机生成指令序列以及暴力搜索的方式自动找到一组优化的指令序列，并等价替换原有的指令序列。1992年第一个Superoptimizer被集成到了GCC编译器，之后Google也为LLVM开发了一个Superoptimizer，取名为Souper。</p>
+<p>依靠人工设定的编译器往往对代码的优化不够彻底，给生成的code留下了大量的优化空隙，而且人工设定的优化规则往往没有经过充分验证，经常导致各种极端条件下的代码bug。Superoptimization将指令序列优化问题转换为自动搜索问题，并加入了自动化验证和一阶逻辑验证，在发现代码优化空隙的同时优化结果也更加可靠。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/jiazhihao/TASO">TASO</a>（Tensor Algebra
+SuperOptimizer）将Superoptimization用于DNN高层中间表达的图优化，在大多数模型上取得了比XLA和TensorRT更优的效果。TASO的工作是MetaFlow（作者另一个基于人工规则的图替换框架）的延续，因此也采用了与MetaFlow一致的替换子定义。MetaFlow替换子的定义包括：源图、目标图、输入和输出的映射关系。</p>
+<p><img src="https://github.com/jiazhihao/TASO/blob/master/figures/inference.png?raw=true"></p>
+<p>TASO相比其他开源框架最大的区别就是不需要手工去设定各种各样的替换子，只需要像设计硬件指令一样设计出基本的算子定义（或者计算逻辑），之后系统会根据指定的算子集自动生成满足条件的替换子，经过验证的替换子最终作用于图替换过程。基于高度抽象的替换子定义，TASO可以独立于具体的训练或预测框架，离线完成替换子的生成和验证，并在图优化阶段加载到程序中进行图替换。尽管手工设计有很多弊端，但TASO在代码实现过程中并没有完全抛弃手工设计的方式，而是采用了手工设计和替换子自动生成相结合的方式。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-29%2013.56.06.png?raw=true" style="zoom:40%;" /></p>
+<h4 id="替换子定义">替换子定义</h4>
+<p>替换子包含三个部分，源图、目标图、输入和输出tensor的映射关系。并且替换子通常是与shape无关的，源图和目标图都是由算子构成的，每个算子都可以指定一些配置，比如kernel指定卷积核的大小、axis指定reduce的维度等等。</p>
+<p>但需要注意的是concat和split两个算子，在图替换中这两个算子通常用于算子融合，比如下图对两个不同的输入B和C进行相同的MatMul操作，就可以替换为先将输入B和C进行一次合并，然后调用一次MatMul后，对结果进行切分得到两个输出X和Y。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-29%2016.24.40.png?raw=true" style="zoom:50%;" /></p>
+<p>为了能正确切分出X和Y，在Concat时我们需要给每个维度维护一个分割树（split
+tree）。一个行分割的例子如下，图中需要将A和B按照第0维进行concat，因此输入A在第0维有一个原始的分割树[0,
+<span class="math inline">\(S_{A}\)</span>]，表示对于tensor
+A，第0维从0到<span
+class="math inline">\(S_{A}\)</span>行都是A的数据区域。A和B
+concat后tensor的row变成了<span
+class="math inline">\(S_{A}+S_{B}\)</span>，并且通过分割树可以知道第0到<span
+class="math inline">\(S_{A}\)</span>行是A的数据，从<span
+class="math inline">\(S_{A}\)</span>到<span
+class="math inline">\(S_{A}+S_{B}\)</span>行是B的数据。根据分割树，Split非常容易地就可以将数据进行切分。TASO的分割树支持任意维度的切分和递归切分。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-29%2016.37.22.png?raw=true" style="zoom:70%;" /></p>
+<h4 id="替换子生成">替换子生成</h4>
+<p>替换子生成包含两个阶段：构建搜索空间，以及对潜在的替换子进行测试。</p>
+<ul>
+<li><p>构建搜索空间</p>
+<p>搜索空间由任意合法的计算图构成，而计算图由给定的算子集中的算子组成。TASO向我们表明了一种暴力枚举、深度优先递归构建的方法。</p>
+<p>给定算子集和初始化的input
+tensor集合，对于每一个输入tensor，每次从算子集中选择一个合法的算子构建graph，并计算当前graph的输出tensor，将输出tensor加入到input
+tensor集合，
+保存graph以及graph的fingerprint（对输出tensor计算hash值），接着重复上面的过程继续加入算子，直到递归的深度达到设定的上限。</p>
+<p>对于同样的输入tensor，如果构建的两个计算图的输出tensor相同，则这两个计算图构成了一个潜在的替换子。为了避免出现浮点计算异常的情况，构建计算图时所有的tensor都是int类型。</p></li>
+<li><p>测试潜在替换子</p>
+<p>为了进一步验证潜在替换子的合法性，TASO设计了一系列cases来测试潜在替换子。每个测试case都使用随机初始化的输入tensor，当两个计算图结果一致时才认为测试通过，只有所有测试cases都通过的潜在替换子才是合法的替换子。</p>
+<p>与构建计算图时使用int类型的tensor不一样，所有测试case的输入tensor都是-1到1之间的浮点数。由于relu对于所有小于0的值都返回0，因此可能导致非法的替换子通过测试cases，作者认为可以使用任意一个非线性函数来代替relu，TASO中使用<span
+class="math inline">\(x(x+1)+1\)</span>。</p></li>
+</ul>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-30%2016.30.05.png?raw=true" style="zoom:50%;" /></p>
+<h4 id="替换子验证">替换子验证</h4>
+<p>TASO同时使用一阶逻辑表达的算子属性对替换子进行进一步验证，这些属性通常是由人工定义，并且经过充分review和大量测试验证过的。</p>
+<p>在定义算子属性之前，首先需要对算子进行符号建模，算子模型通常包含参数和输入tensors。比如<span
+class="math inline">\(conv(s, p, c, x,
+y)\)</span>表示conv算子的符号模型，<span
+class="math inline">\(s\)</span>，<span
+class="math inline">\(p\)</span>，<span
+class="math inline">\(c\)</span>是conv的参数，分别表示stride、padding和activation，<span
+class="math inline">\(x\)</span>和<span
+class="math inline">\(y\)</span>是卷积操作的两个输入。如果activation是none，很显然conv就是一个线性操作，因此满足以下属性：
+<span class="math display">\[
+\begin{aligned}
+∀s,p,x,y,z. conv(s,p,Anone,ewadd(x,y),z) = \\
+ewadd(conv(s,p,Anone,x,z),conv(s,p,Anone,y,z))
+\end{aligned}
+\]</span>
+TASO定义了大量的算子属性，并且使用z3（一阶逻辑验证器）对所有合法的替换子进行验证。如果有合法的替换子无法被一阶逻辑验证，则需要根据替换子手动添加一条算子属性，以确保所有合法的替换子都能验证通过。</p>
+<h4 id="冗余替换子裁剪">冗余替换子裁剪</h4>
+<p>自动生成的替换子往往存在大量的冗余，TASO使用了两种策略消除冗余。</p>
+<ul>
+<li><p>Input tensor renaming</p>
+<p>对输入进行重命名的方式消除不同替换子之间的冗余。比如下面两个替换子，</p>
+<p>替换子a:</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-30%2018.14.31.png?raw=true" style="zoom:40%;" /></p>
+<p>替换子b：</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-30%2018.15.49.png?raw=true" style="zoom:40%;" /></p>
+<p>将替换子a的一个输入tensor
+A改名为C，就得到了替换子b，说明这两个替换子存在冗余，因此最终只会保留更加通用的替换子b。</p></li>
+<li><p>Common subgraph</p>
+<p>如果替换子的源图和目标图包含同样的子图，则可以用一个相同的tensor替换掉公共子图。比如下面的一个替换子，</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-30%2018.14.59.png?raw=true" style="zoom:40%;" /></p>
+<p>source graph和target graph包含同一个子图（B x C），将source
+graph替换成target
+graph时，公共子图没有任何变化，因此可以将子图消除。</p></li>
+</ul>
+<p>实验结果显示，裁剪可以消除大量的冗余替换子。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/substitution/屏幕快照%202019-12-30%2018.12.39.png?raw=true" style="zoom:50%;" /></p>
+<h3 id="低精度和layout优化">低精度和layout优化</h3>
+<h3 id="相关资料">相关资料</h3>
+<ol type="1">
+<li>https://cs.stanford.edu/~zhihao/papers/sosp19.pdf<br />
+</li>
+<li>https://github.com/jiazhihao/TASO<br />
+</li>
+<li>TensorFlow Graph Optimizations,
+https://web.stanford.edu/class/cs245/slides/TFGraphOptimizationsStanford.pdf<br />
+</li>
+<li>https://github.com/google/souper</li>
+</ol>
+
+      
+    </div>
+      
+      <footer>
+        
+  
+  <div class="categories">
+    <a href="/categories/graph-optimization-图优化/">graph optimization, 图优化</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/图替换/">图替换</a>, <a href="/tags/超优化/">超优化</a>, <a href="/tags/graph-optimization/">graph optimization</a>, <a href="/tags/super-optimization/">super optimization</a>, <a href="/tags/substitution/">substitution</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  
+</section>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.8/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="q" value="site:hjchen2.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">Recent Posts</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">Categories</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/DL-Compiler/">DL Compiler</a><small>8</small></li>
+  
+    <li><a href="/categories/Daily/">Daily</a><small>1</small></li>
+  
+    <li><a href="/categories/ML-framework/">ML framework</a><small>2</small></li>
+  
+    <li><a href="/categories/XRT/">XRT</a><small>1</small></li>
+  
+    <li><a href="/categories/code/">code</a><small>1</small></li>
+  
+    <li><a href="/categories/deep-learning/">deep learning</a><small>1</small></li>
+  
+    <li><a href="/categories/graph-optimization-图优化/">graph optimization, 图优化</a><small>1</small></li>
+  
+    <li><a href="/categories/kaldi-decision-tree-决策树/">kaldi, decision tree, 决策树</a><small>1</small></li>
+  
+    <li><a href="/categories/low-bitwidth/">low bitwidth</a><small>1</small></li>
+  
+    <li><a href="/categories/model-compression/">model compression</a><small>1</small></li>
+  
+    <li><a href="/categories/neural-machine-translation/">neural machine translation</a><small>1</small></li>
+  
+    <li><a href="/categories/reinforcement-learning/">reinforcement learning</a><small>3</small></li>
+  
+    <li><a href="/categories/tvm-knowledge/">tvm knowledge</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">Tag Cloud</h3>
+  <div class="entry">
+    <a href="/tags/Attention/" style="font-size: 10px;">Attention</a> <a href="/tags/Compiler/" style="font-size: 10px;">Compiler</a> <a href="/tags/Deep-Learning-Compiler/" style="font-size: 20px;">Deep Learning Compiler</a> <a href="/tags/Encoder-Decoder/" style="font-size: 10px;">Encoder-Decoder</a> <a href="/tags/FusionStitching/" style="font-size: 10px;">FusionStitching</a> <a href="/tags/HMM/" style="font-size: 10px;">HMM</a> <a href="/tags/IREE/" style="font-size: 17.5px;">IREE</a> <a href="/tags/KunPeng/" style="font-size: 10px;">KunPeng</a> <a href="/tags/PackedFunc/" style="font-size: 10px;">PackedFunc</a> <a href="/tags/QVNNI16/" style="font-size: 10px;">QVNNI16</a> <a href="/tags/TVM/" style="font-size: 10px;">TVM</a> <a href="/tags/TensorFlow-XLA/" style="font-size: 10px;">TensorFlow XLA</a> <a href="/tags/TensorRT/" style="font-size: 10px;">TensorRT</a> <a href="/tags/XLA/" style="font-size: 10px;">XLA</a> <a href="/tags/XRT/" style="font-size: 10px;">XRT</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/caffe/" style="font-size: 12.5px;">caffe</a> <a href="/tags/decision-tree/" style="font-size: 10px;">decision tree</a> <a href="/tags/deep-learning/" style="font-size: 12.5px;">deep learning</a> <a href="/tags/embedding/" style="font-size: 10px;">embedding</a> <a href="/tags/fp16/" style="font-size: 10px;">fp16</a> <a href="/tags/framework/" style="font-size: 10px;">framework</a> <a href="/tags/graph-optimization/" style="font-size: 10px;">graph optimization</a> <a href="/tags/int16/" style="font-size: 10px;">int16</a> <a href="/tags/kaldi/" style="font-size: 10px;">kaldi</a> <a href="/tags/large-scale-ML-framework/" style="font-size: 10px;">large scale ML framework</a> <a href="/tags/loss-scaling/" style="font-size: 10px;">loss scaling</a> <a href="/tags/machine-learning/" style="font-size: 12.5px;">machine learning</a> <a href="/tags/machine-learning%EF%BC%8C%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC/" style="font-size: 10px;">machine learning，贝尔曼公式推导</a> <a href="/tags/machine-translation/" style="font-size: 10px;">machine translation</a> <a href="/tags/momentum/" style="font-size: 10px;">momentum</a> <a href="/tags/pruning/" style="font-size: 10px;">pruning</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/reinforcement-learning/" style="font-size: 15px;">reinforcement learning</a> <a href="/tags/seq2seq/" style="font-size: 10px;">seq2seq</a> <a href="/tags/substitution/" style="font-size: 10px;">substitution</a> <a href="/tags/super-optimization/" style="font-size: 10px;">super optimization</a> <a href="/tags/web-technology/" style="font-size: 10px;">web technology</a> <a href="/tags/%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9B%B8%E5%85%B3%E9%9F%B3%E7%B4%A0/" style="font-size: 10px;">上下文相关音素</a> <a href="/tags/%E5%86%B3%E7%AD%96%E6%A0%91/" style="font-size: 10px;">决策树</a> <a href="/tags/%E5%9B%BE%E6%9B%BF%E6%8D%A2/" style="font-size: 10px;">图替换</a> <a href="/tags/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/" style="font-size: 10px;">混合精度训练</a> <a href="/tags/%E8%B6%85%E4%BC%98%E5%8C%96/" style="font-size: 10px;">超优化</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2023 Dou Jiang
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+
+</body>
+</html>
+

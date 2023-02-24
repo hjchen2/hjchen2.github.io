@@ -1,0 +1,395 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>NEURAL MACHINE TRANSLATION论文学习串讲 › Don&#39;t Respond</title>
+  <meta name="author" content="Dou Jiang">
+  
+  <meta name="description" content="seq2seq
+主要学习的是论文Neural machine translation by jointly learning to
+align and translate (Dzmitry Bahdanau、Yoshua Bengio等，2016.05)和Neural
+machine translation (Minh-ThangLuong，2016.12)。
+神经机器翻译的目的是将一门语言的文本序列翻译成另一门语言的文本序列，因此机器翻译的训练语料一般是源语言和目标语言组成的一对文本，也叫做平行语料(parallel
+corpus)。我们通常将输入和输出都是序列的模型叫做seq2seq，seq2seq不仅应用在机器翻译领域，也用于当前热门的自动问答系统以及文本摘要的自动生成等领域。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="NEURAL MACHINE TRANSLATION论文学习串讲"/>
+  <meta property="og:site_name" content="Don&#39;t Respond"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="Don&#39;t Respond" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  <header id="header"><div class="meta inner">
+  <h1><a href="/">Don&#39;t Respond</a></h1>
+  <h2><a href="/"></a></h2>
+  <nav id="main-nav">
+    <ul>
+      
+      <li><a href="/about">About</a></li>
+      
+      <li><a href="/archives">Archives</a></li>
+      
+      <li><a href="/atom.xml">RSS</a></li>
+      
+    </ul>
+    <div class="clearfix"></div>
+  </nav>
+</div>
+<div class="clearfix"></div>
+</header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  <div class="post-content">
+    <header>
+      
+  
+    <h1 class="title">NEURAL MACHINE TRANSLATION论文学习串讲</h1>
+  
+
+      
+        <time datetime="2017-12-01T04:24:08.000Z">2017-12-01</time>
+      
+    </header>
+    <div class="entry">
+      
+        <h2 id="seq2seq">seq2seq</h2>
+<p>主要学习的是论文Neural machine translation by jointly learning to
+align and translate (Dzmitry Bahdanau、Yoshua Bengio等，2016.05)和Neural
+machine translation (Minh-ThangLuong，2016.12)。</p>
+<p>神经机器翻译的目的是将一门语言的文本序列翻译成另一门语言的文本序列，因此机器翻译的训练语料一般是源语言和目标语言组成的一对文本，也叫做平行语料(parallel
+corpus)。我们通常将输入和输出都是序列的模型叫做seq2seq，seq2seq不仅应用在机器翻译领域，也用于当前热门的自动问答系统以及文本摘要的自动生成等领域。</p>
+<span id="more"></span>
+<h2 id="encoder-decoder">Encoder-Decoder</h2>
+<p>2014年Dzmitry Bahdanau、Yoshua Bengio等人在论文Learning Phrase
+Representations using RNN Encoder–Decoder for Statistical Machine
+Translation中首次提出将RNN
+Encoder-Decoder结构来计算双语短语对的条件概率，用于改进统计机器翻译的效果。Encoder-Decoder是由encoder和decoder两部分组成，encoder将输入序列编码成定长的语义向量，decoder将语义向量进行解码得到目标序列。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/12c7a5370bc9da07193c0bd43c5b27cd.png?raw=true" width=500 align=center></p>
+<p>在NMT中Encoder-Decoder试图直接对并行语料的条件概率<span
+class="math inline">\(P(Y|X)\)</span>进行建模，encoder输入的是一组向量序列<span
+class="math inline">\(X=(x_{1},…,x_{T_{x}})\)</span>，<span
+class="math inline">\(x_i\)</span>为词<span
+class="math inline">\(i\)</span>的one-hot编码向量，并将序列<span
+class="math inline">\(X\)</span>编码成语义向量<span
+class="math inline">\(c\)</span>，decoder输入语义向量<span
+class="math inline">\(c\)</span>，并逐个生成序列<span
+class="math inline">\(Y=(y_{1},…,y_{T_{y}})\)</span>，其中<span
+class="math inline">\(y_{i}\)</span>的生成与之前已经生成的词序列<span
+class="math inline">\(y_{1},…,y_{i-1}\)</span>有关。</p>
+<p><span class="math display">\[\log p(Y|X)=\sum_{t=1}^{T_{y}}\log
+p(y_{t}|y_{&lt;t}, c)\]</span></p>
+<p>对于不定长度序列的编码和解码，我们很自然会想到RNN，实际上RNN
+Encoder–Decoder就是正反两组RNN拼接在一起组成的编码解码网络。经典的RNN
+Encoder–Decoder示意图如下：</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/ab3551f2c0f12a3bc50283e49e09e52c.png?raw=true" width=400 align=center /></p>
+<p>我们可以用下面公式描述编码过程： <span
+class="math display">\[h_{t}=f(x_{t},h_{t-1})\]</span> <span
+class="math display">\[c=q({h_{1},…,h_{T_{x}}})\]</span></p>
+<p>函数<span
+class="math inline">\(f\)</span>一般用一个RNN结构来表示，可以是LSTM、GRU等，<span
+class="math inline">\(h_{t}\)</span>表示encoder
+RNN在第t时刻的cell隐状态，向量c的计算与encoder
+RNN所有时刻的cell隐状态相关，函数<span
+class="math inline">\(q\)</span>可以表示所有隐状态的加权和，但由于RNN的特殊性，我们这里只使用最后一个时刻的隐状态作为向量<span
+class="math inline">\(c\)</span>，即<span
+class="math inline">\(c=h_{T_{x}}\)</span>。</p>
+<p>对于解码过程，生成<span
+class="math inline">\(y_{t}\)</span>时的条件概率可以改写成</p>
+<p><span
+class="math display">\[p(y_{t}|y_{&lt;t},c)=g(y_{t-1},s_{t},c)\]</span>
+<span class="math display">\[s_{t}=f(s_{t-1},y_{t-1},c)\]</span></p>
+<p>其中，<span
+class="math inline">\(g\)</span>是非线性函数，可以是单层的softmax，也可以是一个多层结构的神经网络，<span
+class="math inline">\(y_{t-1}\)</span>表示上一时刻的输出，<span
+class="math inline">\(f\)</span>同样是一个RNN结构，<span
+class="math inline">\(s_{t}\)</span>表示decoder RNN cell的隐状态。</p>
+<h2 id="attention">Attention</h2>
+<p>在Encoder-Decoder中每个目标词生成时使用的都是同一个向量<span
+class="math inline">\(c\)</span>，虽然理论上来讲向量<span
+class="math inline">\(c\)</span>可以表示输入序列的语义信息，比如一些关键词、句子结构和语法信息等，但也存在注意力分散的问题。在机器翻译中，一般翻译出来的词与源序列的词是有对齐关系的，也就是说目标词的生成与源序列中的部分关键词关系更大，而其他词对当前目标词的生成影响就很小。在Encoder-Decoder中不论生成哪个目标词，使用的语义向量都是<span
+class="math inline">\(c\)</span>，而语义向量<span
+class="math inline">\(c\)</span>是由句子<span
+class="math inline">\(X\)</span>的每个单词经过Encoder编码而成的，也就意味着句子<span
+class="math inline">\(X\)</span>中的关键词对生成任意目标词的影响力是相同的。</p>
+<p><img src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/pictures/v2-db380a8bf032afa9533d358389de99d6_hd.jpg?raw=true" width=500></p>
+<p>第一篇论文在Encoder-Decoder的基础上引入注意力机制，来解决上述注意力分散的问题。在论文中提出，每个目标词生成时使用的语义向量是不同的，也就是说Encoder-Decoder将会学会在生成目标词时给每个源语词分配权重，这个权重表示该源语词对当前目标词的重要程度。增加了attention机制的Encoder-Decoder框架如下图：</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/e9ba93ee15054825cb2c66a7180ef022.png?raw=true" width=400 align=center></p>
+<p>在基于attention的模型中，每个目标词生成时的条件概率可以写成： <span
+class="math display">\[p(y_{i}|y_{&lt;t},X)=g(y_{i-1},s_{i},c_{i})\]</span>
+<span class="math display">\[s_{i}=f(s_{i-1},y_{i-1},c_{i})\]</span></p>
+<p>在RNN中每个时刻的隐状态<span
+class="math inline">\(h_{i}\)</span>可以表示第<span
+class="math inline">\(i\)</span>个源语词及其周围部分词的信息，因此与之前的Encoder-Decoder框架不同，语义向量<span
+class="math inline">\(c_{i}\)</span>不再是encoder
+RNN最后一个时刻的隐状态，而是与encoder RNN所有时刻的隐状态（<span
+class="math inline">\(h_{1},...,h_{T_{x}}\)</span>）相关的一个向量。</p>
+<p><span
+class="math display">\[c_{i}=\sum_{j=1}^{T_{x}}\alpha_{ij}h_{j}\]</span>
+<span class="math inline">\(\alpha_{ij}\)</span>可以认为是目标词<span
+class="math inline">\(i\)</span>与源语词<span
+class="math inline">\(j\)</span>的对齐权重，因此可以使用源语词<span
+class="math inline">\(i\)</span>的隐状态<span
+class="math inline">\(h_{i}\)</span>和目标词前一时刻的隐状态<span
+class="math inline">\(s_{i-1}\)</span>来计算。 <span
+class="math display">\[\alpha_{ij}=\frac{\exp(e_{ij})}{\sum_{k=1}^{T_{x}}\exp(e_{ik})}\]</span>
+其中 <span class="math display">\[e_{ij}=a(s_{i-1},h_{j})\]</span> <span
+class="math inline">\(a\)</span>是一个对齐模型，在Bahdanau的论文中将其定义成一个前馈神经网络，与Encoder-Decoder一起参与训练。计算公式如下：
+<span class="math display">\[a(s_{i-1},h_{j})=v_{a}^\mathsf{T}\cdot
+tanh(W_{a}s_{i-1}+U_{a}h_{j}) \]</span> <span
+class="math inline">\(v_{a}\)</span>、<span
+class="math inline">\(W_{a}\)</span>和<span
+class="math inline">\(U_{a}\)</span>都是对齐模型的参数。在第二篇ThangLuong的论文中提出下面三种计算方式，本质上也是大同小异。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/667d0e7417d384138f961490ff0745c3.png?raw=true" width=400 align=center></p>
+<p>下图是Bahdanau在论文中给出的一个模拟图，图中模拟的是在给定源语序列（<span
+class="math inline">\(X_{1},X_{2},...,X_{T}\)</span>）的情况下生成第<span
+class="math inline">\(t\)</span>个目标词<span
+class="math inline">\(y_{t}\)</span>的过程。</p>
+<p><img src="https://github.com/hjchen2/personal/blob/master/blog/nmt/970f70807791925f3f8f54266e0a8435.png?raw=true" width=300 align=center></p>
+<h2 id="encoder">Encoder</h2>
+<p>在Bahdanau的论文中Encoder和Decoder使用的都是GRU（Gated Recurrent
+Unit），GRU与LSTM一样都是RNN众多变体中比较常见的一种，也可以使用其他变体RNN，比如在ThangLuong的论文中主要用的就是LSTM。</p>
+<p>我们知道传统的RNN理论上可以记忆无限长的序列，但由于递归权重对每个时刻的输入都是一样的，这就导致一个二选一的问题：(1)
+模型发散，无法收敛（2）梯度消失，无法产生长时记忆。GRU和LSTM一样，都是通过引入门（gate）的机制来解决传统RNN梯度消失的问题，gate打开和关闭是由当前时刻的输入和前一时刻的隐层状态控制的，也就是说每个时刻gate的状态都是不同的，一些需要长时间记忆的信息会通过gate一直传递下去，从而学习到长距离依赖。</p>
+<p>传统RNN的隐层计算公式：<span
+class="math inline">\(h_{t}=g(W^{hh}h_{t-1}+W^{hx}x_{t})\)</span>，<span
+class="math inline">\(W^{hh}\)</span>是递归权重，<span
+class="math inline">\(W^{hx}\)</span>是隐层的权重。实际上，LSTM和GRU都可以认为是对<span
+class="math inline">\(h_{t}\)</span>计算方式的改进。</p>
+<p>下面是GRU结构的示意图，输入为<span
+class="math inline">\(h_{t-1}\)</span>和<span
+class="math inline">\(x_{t}\)</span>，输出为<span
+class="math inline">\(h_{t}\)</span>。在GRU中存在两个gate，一个是reset
+gate，一个是update gate，分别对应下图中的<span
+class="math inline">\(r_{t}\)</span>和<span
+class="math inline">\(z_{t}\)</span>，<span
+class="math inline">\(\widetilde
+h_{t}\)</span>表示候选隐层状态，候选隐层状态与上一时刻的隐层状态<span
+class="math inline">\(h_{t-1}\)</span>一起更新当前时刻的隐层状态<span
+class="math inline">\(h_{t}\)</span>。</p>
+<p><img src="https://coding.net/u/hjchen2/p/personal/git/raw/master/blog/pictures/rnn-gru-unit.png?raw=true" width=400 align=center></p>
+<p>GRU的计算过程：<br />
+1、首先计算重置门<span class="math inline">\(r_{t}\)</span>和更新门<span
+class="math inline">\(z_{t}\)</span>，其中<span
+class="math inline">\(\sigma\)</span>表示sigmoid函数 <span
+class="math display">\[r_{t}=\sigma(W^{r}x_{t}+U^{r}h_{t-1})\]</span>
+<span
+class="math display">\[z_{t}=\sigma(W^{z}x_{t}+U^{z}h_{t-1})\]</span>
+2、计算候选隐层状态<span class="math inline">\(\widetilde
+h_{t}\)</span>，其中<span
+class="math inline">\(r_{t}\)</span>用来控制历史记忆的传递，如果<span
+class="math inline">\(r_{t}=0\)</span>，那么<span
+class="math inline">\(\widetilde h_{t}\)</span>只与当前输入<span
+class="math inline">\(x_{t}\)</span>有关，历史记忆被重置。 <span
+class="math display">\[\widetilde h_{t}=tanh(Wx_{t}+U[r_{t}\odot
+h_{t-1}])\]</span> 实际上仅仅增加一个reset
+gate就已经可以解决长时依赖的问题，因为如果有需要<span
+class="math inline">\(r_{t}\)</span>可以总等于1，那么历史记忆就会一直传递下去。但这会带来一个问题，<span
+class="math inline">\(h_{t-1}\)</span>会累加到当前时刻的隐层状态上产生新的记忆，不断累加的记忆会导致<span
+class="math inline">\(\widetilde
+h_{t}\)</span>达到饱和，最终导致模型无法收敛。为了解决这个问题，GRU可以选择对当前输入产生的新记忆进行遗忘，只传递之前的历史记忆，也就是说我们允许GRU舍弃一些对后续无关的输入信息，保证记忆都是有效信息。GRU是通过下面的更新操作来实现这个过程的，
+<span class="math display">\[h_{t}=z_{t}\odot h_{t-1}+(1-z_{t})\odot
+\widetilde h_{t}\]</span> <span
+class="math inline">\(z_{i}\)</span>反映了相对历史记忆当前输入信息的重要程度，<span
+class="math inline">\(z_{i}\)</span>越小表明当前输入信息越重要。</p>
+<p>实际上在Bahdanau的论文中使用的是双向RNN（BiRNN），BiRNN在前向RNN的基础上增加了一个反向RNN，使得RNN可以同时看到历史和未来的信息，最终前向RNN的隐层状态和反向RNN的隐层状态拼接后输出。</p>
+<p><span class="math display">\[h_{i}=\left [ \begin{align} &amp;
+\vec{h_{i}} \\ &amp; \stackrel{\leftarrow}{h_{i}} \end{align}\right
+]\]</span></p>
+<h2 id="decoder">Decoder</h2>
+<p>在Bahdanau的论文中decoder采用是一个前向的GRU，但与encoder
+GRU不同的是decoder GRU需要额外输入语义向量<span
+class="math inline">\(c_{i}\)</span>。decoder GRU隐层状态<span
+class="math inline">\(s_{i}\)</span>的计算如下： <span
+class="math display">\[s_{i}=(1-z_{i})\odot s_{i-1}+z_{i}\odot
+\widetilde s_{i}\]</span> 其中，<br />
+<span class="math display">\[\widetilde s_{i}=tanh(Wy_{i-1}+U[r_{i}\odot
+s_{i-1}]+Cc_{i})\]</span> <span
+class="math display">\[r_{i}=\sigma(W_{r}y_{i-1}+U_{r}s_{i-1}+C_{r}c_{i})\]</span>
+<span
+class="math display">\[z_{i}=\sigma(W_{z}y_{i-1}+U_{z}s_{i-1}+C_{z}c_{i})\]</span>
+encoder GRU的隐层状态会被传递到decoder
+GRU用于生成第一个目标词，所以decoder
+GRU的隐层状态的初始值不是0，而是将encoder中反向GRU第一个时刻的隐层状态直接复制给decoder
+GRU，即<span
+class="math inline">\(s_{0}=tanh(W_{s}\stackrel{\leftarrow}{h_{1}})\)</span>。</p>
+<h2 id="beam-search">beam search</h2>
+
+      
+    </div>
+      
+      <footer>
+        
+  
+  <div class="categories">
+    <a href="/categories/neural-machine-translation/">neural machine translation</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/seq2seq/">seq2seq</a>, <a href="/tags/machine-translation/">machine translation</a>, <a href="/tags/Encoder-Decoder/">Encoder-Decoder</a>, <a href="/tags/Attention/">Attention</a>
+  </div>
+
+        
+  <div class="addthis addthis_toolbox addthis_default_style">
+    
+      <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+    
+      <a class="addthis_button_tweet"></a>
+    
+    
+      <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+    
+      <a class="addthis_button_pinterest_pinit" pi:pinit:layout="horizontal"></a>
+    
+    <a class="addthis_counter addthis_pill_style"></a>
+  </div>
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js"></script>
+
+      
+      <div class="clearfix"></div>
+      </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  
+</section>
+
+
+
+
+  
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+  });
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@2.7.8/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="q" value="site:hjchen2.github.io">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">Recent Posts</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2023/02/24/IREE编译流程6/">IREE编译流程解析(六)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/02/13/IREE编译流程5/">IREE编译流程解析(五)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程4/">IREE编译流程解析(四)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程3/">IREE编译流程解析(三)</a>
+      </li>
+    
+      <li>
+        <a href="/2023/01/04/IREE编译流程2/">IREE编译流程解析(二)</a>
+      </li>
+    
+  </ul>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">Categories</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/DL-Compiler/">DL Compiler</a><small>8</small></li>
+  
+    <li><a href="/categories/Daily/">Daily</a><small>1</small></li>
+  
+    <li><a href="/categories/ML-framework/">ML framework</a><small>2</small></li>
+  
+    <li><a href="/categories/XRT/">XRT</a><small>1</small></li>
+  
+    <li><a href="/categories/code/">code</a><small>1</small></li>
+  
+    <li><a href="/categories/deep-learning/">deep learning</a><small>1</small></li>
+  
+    <li><a href="/categories/graph-optimization-图优化/">graph optimization, 图优化</a><small>1</small></li>
+  
+    <li><a href="/categories/kaldi-decision-tree-决策树/">kaldi, decision tree, 决策树</a><small>1</small></li>
+  
+    <li><a href="/categories/low-bitwidth/">low bitwidth</a><small>1</small></li>
+  
+    <li><a href="/categories/model-compression/">model compression</a><small>1</small></li>
+  
+    <li><a href="/categories/neural-machine-translation/">neural machine translation</a><small>1</small></li>
+  
+    <li><a href="/categories/reinforcement-learning/">reinforcement learning</a><small>3</small></li>
+  
+    <li><a href="/categories/tvm-knowledge/">tvm knowledge</a><small>1</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">Tag Cloud</h3>
+  <div class="entry">
+    <a href="/tags/Attention/" style="font-size: 10px;">Attention</a> <a href="/tags/Compiler/" style="font-size: 10px;">Compiler</a> <a href="/tags/Deep-Learning-Compiler/" style="font-size: 20px;">Deep Learning Compiler</a> <a href="/tags/Encoder-Decoder/" style="font-size: 10px;">Encoder-Decoder</a> <a href="/tags/FusionStitching/" style="font-size: 10px;">FusionStitching</a> <a href="/tags/HMM/" style="font-size: 10px;">HMM</a> <a href="/tags/IREE/" style="font-size: 17.5px;">IREE</a> <a href="/tags/KunPeng/" style="font-size: 10px;">KunPeng</a> <a href="/tags/PackedFunc/" style="font-size: 10px;">PackedFunc</a> <a href="/tags/QVNNI16/" style="font-size: 10px;">QVNNI16</a> <a href="/tags/TVM/" style="font-size: 10px;">TVM</a> <a href="/tags/TensorFlow-XLA/" style="font-size: 10px;">TensorFlow XLA</a> <a href="/tags/TensorRT/" style="font-size: 10px;">TensorRT</a> <a href="/tags/XLA/" style="font-size: 10px;">XLA</a> <a href="/tags/XRT/" style="font-size: 10px;">XRT</a> <a href="/tags/c/" style="font-size: 10px;">c++</a> <a href="/tags/caffe/" style="font-size: 12.5px;">caffe</a> <a href="/tags/decision-tree/" style="font-size: 10px;">decision tree</a> <a href="/tags/deep-learning/" style="font-size: 12.5px;">deep learning</a> <a href="/tags/embedding/" style="font-size: 10px;">embedding</a> <a href="/tags/fp16/" style="font-size: 10px;">fp16</a> <a href="/tags/framework/" style="font-size: 10px;">framework</a> <a href="/tags/graph-optimization/" style="font-size: 10px;">graph optimization</a> <a href="/tags/int16/" style="font-size: 10px;">int16</a> <a href="/tags/kaldi/" style="font-size: 10px;">kaldi</a> <a href="/tags/large-scale-ML-framework/" style="font-size: 10px;">large scale ML framework</a> <a href="/tags/loss-scaling/" style="font-size: 10px;">loss scaling</a> <a href="/tags/machine-learning/" style="font-size: 12.5px;">machine learning</a> <a href="/tags/machine-learning%EF%BC%8C%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F%E6%8E%A8%E5%AF%BC/" style="font-size: 10px;">machine learning，贝尔曼公式推导</a> <a href="/tags/machine-translation/" style="font-size: 10px;">machine translation</a> <a href="/tags/momentum/" style="font-size: 10px;">momentum</a> <a href="/tags/pruning/" style="font-size: 10px;">pruning</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/reinforcement-learning/" style="font-size: 15px;">reinforcement learning</a> <a href="/tags/seq2seq/" style="font-size: 10px;">seq2seq</a> <a href="/tags/substitution/" style="font-size: 10px;">substitution</a> <a href="/tags/super-optimization/" style="font-size: 10px;">super optimization</a> <a href="/tags/web-technology/" style="font-size: 10px;">web technology</a> <a href="/tags/%E4%B8%8A%E4%B8%8B%E6%96%87%E7%9B%B8%E5%85%B3%E9%9F%B3%E7%B4%A0/" style="font-size: 10px;">上下文相关音素</a> <a href="/tags/%E5%86%B3%E7%AD%96%E6%A0%91/" style="font-size: 10px;">决策树</a> <a href="/tags/%E5%9B%BE%E6%9B%BF%E6%8D%A2/" style="font-size: 10px;">图替换</a> <a href="/tags/%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6%E8%AE%AD%E7%BB%83/" style="font-size: 10px;">混合精度训练</a> <a href="/tags/%E8%B6%85%E4%BC%98%E5%8C%96/" style="font-size: 10px;">超优化</a>
+  </div>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  
+  &copy; 2023 Dou Jiang
+  
+</div>
+<div class="clearfix"></div></footer>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+
+</body>
+</html>
+
