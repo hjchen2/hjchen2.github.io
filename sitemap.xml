@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2017/01/19/caffe%E5%AD%A6%E4%B9%A0/</loc>  
+      
+    <lastmod>2023-05-19T04:05:09.105Z</lastmod>  
+      
+    <date>1484800268000</date>  
+    <title>caffe学习总结 | Don't Respond</title>  
+      
+    <desc>caffe学习总结 caffe的由来 caffe是贾扬清在UC Berkeley攻读计算机科学博士学位时开发的一套深度学习框架，由于高效、易读和模块化的设计，开源后经过nvidia的帮助优化和社区不断的完善，如今成为视觉领域主流的框架之一。</desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2017/04/25/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>  
       
     <lastmod>2023-05-19T03:51:57.657Z</lastmod>  
@@ -131,17 +142,6 @@
     <title>模型压缩之pruning | Don't Respond</title>  
       
     <desc>Regularization of Neural Networks using DropConnect DropConnect主要是用来解决全连接过拟合问题的，是Dropout的通用实现。随着神经网络参数量越来越大，过拟合的风险越来越高，之前的一些经验是使用L1/L2以及Dropout。Dropout随机地将激活函数输出置0，导致每次参与训练的参数量变少，由于随机drop的关系，每次训练的网络都可</desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/01/19/caffe%E5%AD%A6%E4%B9%A0/</loc>  
-      
-    <lastmod>2023-02-07T02:39:59.818Z</lastmod>  
-      
-    <date>1484800268000</date>  
-    <title>caffe学习总结 | Don't Respond</title>  
-      
-    <desc>#caffe学习总结 ##caffe的由来 caffe是贾扬清在UC Berkeley攻读计算机科学博士学位时开发的一套深度学习框架，由于高效、易读和模块化的设计，开源后经过nvidia的帮助优化和社区不断的完善，如今成为视觉领域主流的框架之一。</desc>  
   </url>  
     
   <url>  
