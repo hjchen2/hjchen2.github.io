@@ -2,6 +2,17 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">  
     
   <url>  
+    <loc>https://hjchen2.github.io/2017/04/25/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>  
+      
+    <lastmod>2023-05-19T03:51:57.657Z</lastmod>  
+      
+    <date>1493094668000</date>  
+    <title>强化学习（二） | Don't Respond</title>  
+      
+    <desc>DQN 前面我们讲到TD算法结合了动态规划和蒙特卡洛算法的优点，不依赖具体的环境模型，并且更新时采用滑动平均的方式，因此单步就能更新，而不需要生成整个episode，在非episode情况下仍然适用。TD算法又分为on policy的sarsa算法和off policy的Q learning算法，其中Q learning算法直接使用下一状态的最大动作值函数进行更新，加快了算法收敛速度，因此Q le</desc>  
+  </url>  
+    
+  <url>  
     <loc>https://hjchen2.github.io/2023/02/24/IREE%E7%BC%96%E8%AF%91%E6%B5%81%E7%A8%8B6/</loc>  
       
     <lastmod>2023-03-07T06:09:20.211Z</lastmod>  
@@ -21,17 +32,6 @@
     <title>IREE编译流程解析 | Don't Respond</title>  
       
     <desc>IREE目前支持将MHLO或XLA、Torch Tensor和TOSA作为输入，经过一系列passes编译生成IREE定义的VM bytecode中间产物，其中硬件相关代码会编译成相应的Executable，保存在VM bytecode中供host进行调用，比如CUDA相关的计算代码会被lower成PTX代码，在IREE的runtime中再被CUDA的运行时以JIT的方式编译成可执行的cubin </desc>  
-  </url>  
-    
-  <url>  
-    <loc>https://hjchen2.github.io/2017/04/25/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%EF%BC%88%E4%BA%8C%EF%BC%89/</loc>  
-      
-    <lastmod>2023-02-24T12:32:55.989Z</lastmod>  
-      
-    <date>1493094668000</date>  
-    <title>强化学习（二） | Don't Respond</title>  
-      
-    <desc>DQN 前面我们讲到TD算法结合了动态规划和蒙特卡洛算法的优点，不依赖具体的环境模型，并且更新时采用滑动平均的方式，因此单步就能更新，而不需要生成整个episode，在非episode情况下仍然适用。TD算法又分为on policy的sarsa算法和off policy的Q learning算法，其中Q learning算法直接使用下一状态的最大动作值函数进行更新，加快了算法收敛速度，因此Q le</desc>  
   </url>  
     
   <url>  
